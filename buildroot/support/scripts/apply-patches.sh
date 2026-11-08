@@ -158,6 +158,7 @@ function scan_patchdir {
 }
 
 touch ${builddir}/.applied_patches_list
+echo "    Patch Dir : $patchdir"
 scan_patchdir "$patchdir" "$patchpattern"
 
 # Check for rejects...

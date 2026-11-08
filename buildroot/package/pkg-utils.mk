@@ -164,10 +164,12 @@ pkg-patch-hash-dirs = \
 	$($(1)_PKGDIR) $(addsuffix /$($(1)_RAWNAME),$(call qstrip,$(BR2_GLOBAL_PATCH_DIR)))
 
 pkg-patches-dirs = \
-	$(foreach dir, $(call pkg-patch-hash-dirs,$(1)),\
-		$(wildcard $(if $($(1)_VERSION),\
-			$(or $(wildcard $(dir)/$($(1)_VERSION)),$(dir)),\
-			$(dir))))
+        $(foreach dir, $(call pkg-patch-hash-dirs,$(1)),\
+		$(or $(wildcard $(if $($(1)_CUSTOM_PATCH_DIR), \
+                        $(wildcard $(dir)/$($(1)_CUSTOM_PATCH_DIR)))), \
+                $(wildcard $(if $($(1)_VERSION),\
+                        $(or $(wildcard $(dir)/$($(1)_VERSION)),$(dir)),\
+                        $(dir)))))
 
 pkg-patches-url = $(foreach patch,$($(1)_PATCH),\
 	$(if $(findstring ://,$(patch)),$(patch),\
