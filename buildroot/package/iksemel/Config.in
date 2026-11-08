@@ -1,1 +1,9 @@
-source package/iksemel/astlinux/Config.in
+config BR2_PACKAGE_IKSEMEL
+	bool "iksemel"
+	default n
+	help
+	  iksemel is an XML (eXtensible Markup Language) parser library
+	  designed for Jabber applications.
+
+	  https://github.com/meduketto/iksemel
+

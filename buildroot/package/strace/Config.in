@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/strace/astlinux/Config.in
+
+config BR2_PACKAGE_STRACE
+	bool "strace"
+	help
+	  A useful diagnostic, instructional, and debugging tool.
+	  Allows you to track what system calls a program makes
+	  while it is running.
+
+	  https://github.com/strace/strace/releases
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

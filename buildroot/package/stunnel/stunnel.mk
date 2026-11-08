@@ -1,15 +1,42 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# stunnel
+#
+#############################################################
+
+STUNNEL_VERSION = 5.80
+STUNNEL_SITE = https://www.stunnel.org/archive/5.x
+STUNNEL_CUSTOM_PATCH_DIR = astlinux
+STUNNEL_DEPENDENCIES = openssl
+
+STUNNEL_CONF_OPTS = \
+	--with-ssl=$(STAGING_DIR)/usr \
+	--localstatedir=/var \
+	--disable-libwrap \
+	--disable-systemd \
+	--disable-fips \
+	--with-threads=fork
+
+define STUNNEL_INSTALL_TARGET_CMDS
+	ln -snf /tmp/etc/stunnel $(TARGET_DIR)/etc/stunnel
+	$(INSTALL) -m 0755 -D package/stunnel/astlinux/stunnel.init $(TARGET_DIR)/etc/init.d/stunnel
+	$(INSTALL) -m 0755 -D $(@D)/src/stunnel $(TARGET_DIR)/usr/sbin/stunnel
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # stunnel
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/stunnel/astlinux/stunnel.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 STUNNEL_VERSION_MAJOR = 5
 STUNNEL_VERSION = $(STUNNEL_VERSION_MAJOR).80

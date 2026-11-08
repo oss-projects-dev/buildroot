@@ -1,6 +1,17 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/linux-firmware/astlinux/Config.in
+
+config BR2_PACKAGE_LINUX_FIRMWARE
+	bool "linux-firmware"
+	depends on BR2_LINUX_KERNEL
+	default n
+	help
+	  This package provides various binary firmware files (closed
+	  binary blobs) for such devices like LAN, WLAN cards etc.
+
+	  https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

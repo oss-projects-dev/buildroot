@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/fxload/astlinux/Config.in
+
+config BR2_PACKAGE_FXLOAD
+	bool "fxload"
+	default n
+	help
+	  fxload is used to load firmware over usb
+	  specifically, we use it with Xorcom hardware
+
+	  http://sourceforge.net/projects/linux-hotplug
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

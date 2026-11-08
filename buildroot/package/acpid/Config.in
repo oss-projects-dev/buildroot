@@ -1,6 +1,17 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/acpid/astlinux/Config.in
+
+config BR2_PACKAGE_ACPID
+	bool "acpid"
+	depends on BR2_x86_64 || BR2_i386
+	help
+	  Advanced Configuration and Power Interface event daemon.
+
+	  Acpid is designed to notify user-space programs of ACPI events,
+	  and allows you to configure specific actions for specific events.
+
+	  http://sourceforge.net/projects/acpid2/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

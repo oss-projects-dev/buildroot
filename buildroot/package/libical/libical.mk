@@ -1,15 +1,36 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# libical
+#
+#############################################################
+
+#LIBICAL_VERSION = 0.48
+#LIBICAL_SITE = http://downloads.sourceforge.net/project/freeassociation/libical/libical-$(LIBICAL_VERSION)
+LIBICAL_CUSTOM_PATCH_DIR = astlinux
+LIBICAL_VERSION = r1139
+LIBICAL_SITE = https://astlinux-project.org/files
+LIBICAL_CUSTOM_PATCH_DIR = astlinux
+LIBICAL_DEPENDENCIES = host-bison host-flex
+LIBICAL_INSTALL_STAGING = YES
+LIBICAL_AUTORECONF = YES
+
+LIBICAL_CONF_OPTS = \
+		--disable-static
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libical
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libical/astlinux/libical.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LIBICAL_VERSION = 1.0.1
 LIBICAL_SITE = https://github.com/libical/libical/releases/download/v$(LIBICAL_VERSION)

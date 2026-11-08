@@ -1,6 +1,20 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libedit/astlinux/Config.in
+
+config BR2_PACKAGE_LIBEDIT
+	bool "libedit"
+	select BR2_PACKAGE_NCURSES
+	help
+	  The editline library (from BSD) provides generic line editing
+	  and history functions. It slightly resembles GNU readline.
+
+	  Jess Thrysoee maintains an autotoolified package, which we use
+	  in Buildroot as it makes it much simpler than using the upstream
+	  sources which require pmake.
+
+	  http://www.thrysoee.dk/editline
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

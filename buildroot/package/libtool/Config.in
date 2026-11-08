@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libtool/astlinux/Config.in
+
+config BR2_PACKAGE_LIBTOOL
+	bool "libtool"
+	help
+	  Library that hides the complexity of using shared/static libraries
+	  on different platforms behind a consistent, portable interface.
+
+	  http://www.gnu.org/software/libtool/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

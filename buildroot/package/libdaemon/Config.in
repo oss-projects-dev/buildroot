@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libdaemon/astlinux/Config.in
+
+config BR2_PACKAGE_LIBDAEMON
+	bool "libdaemon"
+	help
+	  libdaemon is a lightweight C library that eases the
+	  writing of UNIX daemons.
+
+	  http://0pointer.de/lennart/projects/libdaemon/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

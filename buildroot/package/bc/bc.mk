@@ -1,15 +1,42 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# bc
+#
+#############################################################
+
+BC_VERSION = 1.06.95
+BC_SOURCE = bc-$(BC_VERSION).tar.bz2
+BC_SITE = http://alpha.gnu.org/gnu/bc
+BC_CUSTOM_PATCH_DIR = astlinux
+BC_DEPENDENCIES = host-bison host-flex
+
+ifeq ($(BR2_PACKAGE_LIBEDIT),y)
+BC_DEPENDENCIES += libedit
+BC_CONF_OPTS += --with-libedit
+endif
+
+define BC_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 -D $(@D)/bc/bc $(TARGET_DIR)/usr/bin/bc
+endef
+
+define BC_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/bc
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # bc
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/bc/astlinux/bc.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 BC_VERSION = 1.07.1
 BC_SITE = $(BR2_GNU_MIRROR)/bc

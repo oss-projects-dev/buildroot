@@ -1,6 +1,17 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/ipset/astlinux/Config.in
+
+config BR2_PACKAGE_IPSET
+	bool "ipset"
+	select BR2_PACKAGE_LIBMNL
+	help
+	  Utility to manage IP sets in the linux kernel.
+	  Requires a patched kernel or version >=2.6.39.
+
+	  http://ipset.netfilter.org/
+
+comment "ipset requires a toolchain with LARGEFILE support"
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

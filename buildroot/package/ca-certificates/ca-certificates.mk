@@ -1,15 +1,48 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # ca-certificates
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/ca-certificates/astlinux/ca-certificates.mk
+CA_CERTIFICATES_VERSION = 2026-10-20
+CA_CERTIFICATES_SOURCE = cacert-$(CA_CERTIFICATES_VERSION).pem
+CA_CERTIFICATES_SITE = https://curl.haxx.se/ca
+CA_CERTIFICATES_CUSTOM_PATCH_DIR = astlinux
+
+define CA_CERTIFICATES_EXTRACT_CMDS
+	cp $(DL_DIR)/$(CA_CERTIFICATES_SOURCE) $(@D)/cacert.pem
+endef
+
+define CA_CERTIFICATES_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 -d $(TARGET_DIR)/usr/lib/ssl/certs
+	$(INSTALL) -m 0755 -d $(TARGET_DIR)/etc/ssl/certs
+	$(INSTALL) -m 0444 -D $(@D)/cacert.pem $(TARGET_DIR)/usr/share/ca-certificates/ca-bundle.crt
+	ln -sf /usr/share/ca-certificates/ca-bundle.crt $(TARGET_DIR)/usr/lib/ssl/certs/ca-bundle.crt
+	ln -sf /usr/share/ca-certificates/ca-bundle.crt $(TARGET_DIR)/usr/lib/ssl/cert.pem
+	ln -sf /usr/share/ca-certificates/ca-bundle.crt $(TARGET_DIR)/etc/ssl/certs/ca-certificates.crt
+endef
+
+define CA_CERTIFICATES_UNINSTALL_TARGET_CMDS
+	rm -f  $(TARGET_DIR)/usr/lib/ssl/certs/ca-bundle.crt
+	rm -f  $(TARGET_DIR)/usr/lib/ssl/cert.pem
+	rm -f  $(TARGET_DIR)/etc/ssl/certs/ca-certificates.crt
+	rm -rf $(TARGET_DIR)/usr/share/ca-certificates
+endef
+
+$(eval $(generic-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# ca-certificates
+#
+################################################################################
 
 CA_CERTIFICATES_VERSION = 20260816+nmu1
 CA_CERTIFICATES_SOURCE = ca-certificates_$(CA_CERTIFICATES_VERSION).tar.xz

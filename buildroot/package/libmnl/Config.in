@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libmnl/astlinux/Config.in
+
+config BR2_PACKAGE_LIBMNL
+	bool "libmnl"
+	help
+	  libmnl is a minimalistic user-space library oriented
+	  to Netlink developers.
+
+	  http://netfilter.org/projects/libmnl/
+
+comment "libmnl requires a toolchain with LARGEFILE support"
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

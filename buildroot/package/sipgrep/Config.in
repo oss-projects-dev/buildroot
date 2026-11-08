@@ -1,1 +1,9 @@
-source package/sipgrep/astlinux/Config.in
+config BR2_PACKAGE_SIPGREP
+	bool "sipgrep"
+	default n
+	select BR2_PACKAGE_LIBPCAP
+	select BR2_PACKAGE_PCRE2
+	help
+	  Network grep for SIP.
+
+	  https://github.com/sipcapture/sipgrep

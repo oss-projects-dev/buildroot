@@ -1,15 +1,28 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# gperf
+#
+#############################################################
+
+GPERF_VERSION = 3.1
+GPERF_SITE = $(BR2_GNU_MIRROR)/gperf
+GPERF_CUSTOM_PATCH_DIR = astlinux
+
+$(eval $(autotools-package))
+$(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # gperf
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/gperf/astlinux/gperf.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 GPERF_VERSION = 3.1
 GPERF_SITE = $(BR2_GNU_MIRROR)/gperf

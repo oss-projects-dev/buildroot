@@ -1,6 +1,17 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/chrony/astlinux/Config.in
+
+config BR2_PACKAGE_CHRONY
+	bool "chrony"
+	select BR2_PACKAGE_LIBCAP
+	help
+	  An NTP client and server designed to perform well in a wide range
+	  of conditions. It can synchronize the system clock with NTP servers,
+	  reference clocks, and manual input using wristwatch and keyboard.
+
+	  https://chrony-project.org/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

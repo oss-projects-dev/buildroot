@@ -1,15 +1,34 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# fakeroot
+#
+#############################################################
+FAKEROOT_VERSION = 1.32.1
+FAKEROOT_SOURCE = fakeroot_$(FAKEROOT_VERSION).orig.tar.gz
+FAKEROOT_SITE = https://snapshot.debian.org/archive/debian/20230724T160429Z/pool/main/f/fakeroot
+FAKEROOT_CUSTOM_PATCH_DIR = astlinux
+
+# Force capabilities detection off
+# For now these are process capabilities (faked) rather than file
+# so they're of no real use
+HOST_FAKEROOT_CONF_ENV = \
+	ac_cv_header_sys_capability_h=no \
+	ac_cv_func_capset=no
+
+$(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # fakeroot
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/fakeroot/astlinux/fakeroot.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 FAKEROOT_VERSION = 1.36
 FAKEROOT_SOURCE = fakeroot_$(FAKEROOT_VERSION).orig.tar.gz

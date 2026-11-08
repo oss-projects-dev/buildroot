@@ -1,6 +1,22 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/perl/astlinux/Config.in
+
+config BR2_PACKAGE_PERL
+	bool "perl"
+	depends on BR2_LINUX_KERNEL
+	default n
+	help
+	  Larry Wall's Practical Extraction and Report Language
+	  An interpreted scripting language, known among some as "Unix's Swiss
+	  Army Chainsaw".
+	  
+	  Perl:
+	  http://www.perl.org/
+	  
+	  Perl-Cross:
+	  http://arsv.github.io/perl-cross/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,15 +1,28 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # nasm
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/nasm/astlinux/nasm.mk
+NASM_VERSION = 2.14.02
+NASM_SOURCE = nasm-$(NASM_VERSION).tar.xz
+NASM_SITE = https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)
+NASM_CUSTOM_PATCH_DIR = astlinux
+
+$(eval $(host-autotools-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# nasm
+#
+################################################################################
 
 NASM_VERSION = 2.16.03
 NASM_SOURCE = nasm-$(NASM_VERSION).tar.xz

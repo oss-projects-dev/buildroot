@@ -1,6 +1,26 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/nut/astlinux/Config.in
+
+config BR2_PACKAGE_NUT
+	bool "nut"
+	help
+	  Network UPS tools
+
+	  The primary goal of the Network UPS Tools (NUT) project is to provide
+	  support for Power Devices, such as Uninterruptible Power Supplies,
+	  Power Distribution Units and Solar Controllers.
+
+	  http://www.networkupstools.org/
+
+if BR2_PACKAGE_NUT
+
+config BR2_PACKAGE_NUT_SERIAL_DRIVERS
+	bool "serial drivers"
+	help
+	  Select to enable the building of serial drivers.
+
+endif # BR2_PACKAGE_NUT
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

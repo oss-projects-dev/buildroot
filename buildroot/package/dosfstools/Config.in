@@ -1,6 +1,36 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/dosfstools/astlinux/Config.in
+
+config BR2_PACKAGE_DOSFSTOOLS
+	bool "dosfstools"
+	depends on BR2_USE_WCHAR
+	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+	help
+	  Tools for creating and checking DOS FAT filesystems.
+
+	  https://github.com/dosfstools/dosfstools
+
+config BR2_PACKAGE_DOSFSTOOLS_MKDOSFS
+	bool "mkdosfs"
+	depends on BR2_PACKAGE_DOSFSTOOLS
+	help
+	  Creates a DOS FAT filesystem on a device.
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSCK
+	bool "dosfsck"
+	depends on BR2_PACKAGE_DOSFSTOOLS
+	help
+	  Checks a DOS FAT filesystem.
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL
+	bool "dosfslabel"
+	depends on BR2_PACKAGE_DOSFSTOOLS
+	help
+	  Get or set the DOS FAT filesystem label.
+
+comment "dosfstools requires a toolchain with LARGEFILE and WCHAR support"
+	depends on !BR2_USE_WCHAR
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

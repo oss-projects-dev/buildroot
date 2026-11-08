@@ -1,15 +1,68 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# rsync
+#
+#############################################################
+
+RSYNC_VERSION = 3.5.2
+RSYNC_SOURCE = rsync-$(RSYNC_VERSION).tar.gz
+RSYNC_SITE = https://rsync.samba.org/ftp/rsync/src
+RSYNC_CUSTOM_PATCH_DIR = astlinux
+RSYNC_DEPENDENCIES = host-pkgconf zlib popt
+# We know that our C library is modern enough for C99 vsnprintf() and mkstemp(). Since
+# configure can't detect this, we tell configure that vsnprintf() and mkstemp() is safe.
+RSYNC_CONF_ENV = \
+	rsync_cv_HAVE_C99_VSNPRINTF=yes \
+	rsync_cv_HAVE_SECURE_MKSTEMP=yes
+
+RSYNC_CONF_OPTS = \
+	--disable-debug \
+	--with-nobody-user=nobody \
+	--with-nobody-group=nobody \
+	--with-included-zlib=no \
+	--with-included-popt=no \
+	--disable-idn \
+	--disable-roll-simd \
+	--disable-md5-asm \
+	--disable-lz4 \
+	--disable-xxhash \
+	--disable-zstd
+
+ifeq ($(BR2_PACKAGE_ACL),y)
+	RSYNC_DEPENDENCIES += acl
+else
+	RSYNC_CONF_OPTS += --disable-acl-support
+endif
+
+ifeq ($(BR2_PACKAGE_OPENSSL),y)
+	RSYNC_DEPENDENCIES += openssl
+	RSYNC_CONF_OPTS += --enable-openssl
+else
+	RSYNC_CONF_OPTS += --disable-openssl
+endif
+
+define RSYNC_INSTALL_TARGET_CMDS
+	$(INSTALL) -D -m 0755 $(@D)/rsync $(TARGET_DIR)/usr/bin/rsync
+endef
+
+define RSYNC_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/rsync
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # rsync
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/rsync/astlinux/rsync.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 RSYNC_VERSION = 3.5.0
 RSYNC_SITE = https://rsync.samba.org/ftp/rsync/src

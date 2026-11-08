@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/msmtp/astlinux/Config.in
+
+config BR2_PACKAGE_MSMTP
+	bool "msmtp"
+	select BR2_PACKAGE_LIBRETLS
+	default n
+	help
+	  msmtp is an MUA/MTa like ssmtp, only better
+
+	  https://marlam.de/msmtp/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

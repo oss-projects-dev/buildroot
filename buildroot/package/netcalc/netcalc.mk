@@ -1,15 +1,31 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # netcalc
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/netcalc/astlinux/netcalc.mk
+NETCALC_VERSION = 2.1.7
+NETCALC_SOURCE = netcalc-$(NETCALC_VERSION).tar.gz
+NETCALC_SITE = https://github.com/troglobit/netcalc/releases/download/v$(NETCALC_VERSION)
+NETCALC_CUSTOM_PATCH_DIR = astlinux
+
+NETCALC_CONF_OPTS = \
+	--disable-ipcalc-symlink
+
+$(eval $(autotools-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# netcalc
+#
+################################################################################
 
 NETCALC_VERSION = 2.1.7
 NETCALC_SITE = https://github.com/troglobit/netcalc/releases/download/v$(NETCALC_VERSION)

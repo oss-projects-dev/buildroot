@@ -1,15 +1,56 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# sudo
+#
+#############################################################
+
+SUDO_VERSION = 1.8.32
+SUDO_SITE = https://www.sudo.ws/sudo/dist
+SUDO_CUSTOM_PATCH_DIR = astlinux
+
+# This is to avoid sudo's make install from chown()ing files which fails
+SUDO_INSTALL_TARGET_OPTS = INSTALL_OWNER="" DESTDIR="$(TARGET_DIR)" install
+
+SUDO_CONF_OPTS = \
+	--with-rundir=/var/run/sudo \
+	--without-lecture \
+	--without-sendmail \
+	--without-umask \
+	--with-logging=syslog \
+	--without-interfaces \
+	--without-pam \
+	--without-ldap \
+	--with-env-editor
+
+# mksigname/mksiglist needs to run on build host to generate source files
+define SUDO_BUILD_MKSIGNAME_MKSIGLIST_HOST
+	$(HOST_MAKE_ENV) $(MAKE) $(HOST_CONFIGURE_OPTS) \
+		CPPFLAGS="$(HOST_CPPFLAGS) -I../../include -I../.." \
+		-C $(@D)/lib/util mksigname mksiglist
+endef
+
+SUDO_POST_CONFIGURE_HOOKS += SUDO_BUILD_MKSIGNAME_MKSIGLIST_HOST
+
+define SUDO_INSTALL_CLEANUP
+	rm -f $(TARGET_DIR)/usr/bin/cvtsudoers
+endef
+
+SUDO_POST_INSTALL_TARGET_HOOKS += SUDO_INSTALL_CLEANUP
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # sudo
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/sudo/astlinux/sudo.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 SUDO_VERSION_MAJOR = 1.9.17
 SUDO_VERSION_MINOR = p2

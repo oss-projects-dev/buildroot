@@ -1,15 +1,91 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# dnsmasq
+#
+#############################################################
+
+DNSMASQ_VERSION = 2.93
+DNSMASQ_SITE = http://thekelleys.org.uk/dnsmasq
+DNSMASQ_CUSTOM_PATCH_DIR = astlinux
+DNSMASQ_MAKE_ENV = $(TARGET_MAKE_ENV) CC="$(TARGET_CC)"
+DNSMASQ_MAKE_OPTS = COPTS="$(DNSMASQ_COPTS)" PREFIX=/usr CFLAGS="$(TARGET_CFLAGS)"
+DNSMASQ_MAKE_OPTS += DESTDIR=$(TARGET_DIR) LDFLAGS="$(TARGET_LDFLAGS)"
+DNSMASQ_DEPENDENCIES = host-pkgconf
+
+DNSMASQ_COPTS = \
+	-DNO_DUMPFILE
+
+ifneq ($(BR2_INET_IPV6),y)
+DNSMASQ_COPTS += -DNO_IPV6
+endif
+
+ifneq ($(BR2_PACKAGE_DNSMASQ_DHCP),y)
+DNSMASQ_COPTS += -DNO_DHCP
+endif
+
+ifneq ($(BR2_PACKAGE_DNSMASQ_TFTP),y)
+DNSMASQ_COPTS += -DNO_TFTP
+endif
+
+ifeq ($(BR2_PACKAGE_DNSMASQ_IDN),y)
+DNSMASQ_COPTS += -DHAVE_IDN
+DNSMASQ_DEPENDENCIES += libidn libintl
+DNSMASQ_MAKE_ENV += LDFLAGS+="-lintl -lidn"
+endif
+
+ifneq ($(BR2_LARGEFILE),y)
+DNSMASQ_COPTS += -DNO_LARGEFILE
+endif
+
+ifeq ($(BR2_PACKAGE_DBUS),y)
+DNSMASQ_DEPENDENCIES += dbus
+DNSMASQ_COPTS += -DHAVE_DBUS
+endif
+
+ifneq ($(BR2_PACKAGE_IPSET),y)
+DNSMASQ_COPTS += -DNO_IPSET
+endif
+
+define DNSMASQ_FIX_PKGCONFIG
+	$(SED) 's^PKG_CONFIG = pkgconf^PKG_CONFIG = $(PKG_CONFIG_HOST_BINARY)^' \
+		$(DNSMASQ_DIR)/Makefile
+endef
+
+define DNSMASQ_BUILD_CMDS
+	$(DNSMASQ_FIX_PKGCONFIG)
+	$(DNSMASQ_MAKE_ENV) $(MAKE1) -C $(@D) $(DNSMASQ_MAKE_OPT)
+endef
+
+define DNSMASQ_INSTALL_TARGET_CMDS
+	$(DNSMASQ_MAKE_ENV) $(MAKE) -C $(@D) $(DNSMASQ_MAKE_OPT) install
+	$(INSTALL) -m 0755 -D package/dnsmasq/astlinux/dnsmasq.init $(TARGET_DIR)/etc/init.d/dnsmasq
+	$(INSTALL) -m 0644 -D package/dnsmasq/astlinux/dnsmasq.static $(TARGET_DIR)/stat/etc/dnsmasq.static
+	$(INSTALL) -m 0744 -D package/dnsmasq/astlinux/scripts/dnsmasq-lease.script.sh $(TARGET_DIR)/etc/dnsmasq-lease.script
+	ln -sf /tmp/etc/dnsmasq.conf $(TARGET_DIR)/etc/dnsmasq.conf
+	ln -sf /tmp/etc/dnsmasq.static $(TARGET_DIR)/etc/dnsmasq.static
+endef
+
+define DNSMASQ_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/sbin/dnsmasq
+	rm -f $(TARGET_DIR)/etc/init.d/dnsmasq
+	rm -f $(TARGET_DIR)/stat/etc/dnsmasq.static
+	rm -f $(TARGET_DIR)/etc/dnsmasq-lease.script
+endef
+
+$(eval $(generic-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # dnsmasq
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/dnsmasq/astlinux/dnsmasq.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 DNSMASQ_VERSION = 2.93
 DNSMASQ_SOURCE = dnsmasq-$(DNSMASQ_VERSION).tar.xz

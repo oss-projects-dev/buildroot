@@ -1,6 +1,19 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/sox/astlinux/Config.in
+
+config BR2_PACKAGE_SOX
+	bool "sox"
+	default n
+	help
+	  SoX is a cross-platform (Windows, Linux, MacOS X, etc.) command line
+	  utility that can convert various formats of computer audio files
+	  into other formats.
+	  It can also apply various effects to these sound files, and, as an
+	  added bonus, SoX can play and record audio files on most platforms.
+
+	  http://sox.sourceforge.net/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

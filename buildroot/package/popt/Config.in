@@ -1,6 +1,13 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/popt/astlinux/Config.in
+
+config BR2_PACKAGE_POPT
+	bool "popt"
+	help
+	  Popt is a C library for parsing command line parameters.
+
+	  http://rpm5.org
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

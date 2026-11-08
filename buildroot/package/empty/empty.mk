@@ -1,15 +1,40 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # empty
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/empty/astlinux/empty.mk
+EMPTY_VERSION = 0.6.23d
+EMPTY_SOURCE = empty-$(EMPTY_VERSION).tgz
+EMPTY_SITE = https://downloads.sourceforge.net/project/empty/empty/empty-$(EMPTY_VERSION)
+EMPTY_CUSTOM_PATCH_DIR = astlinux
+
+define EMPTY_BUILD_CMDS
+	$(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) all
+endef
+
+define EMPTY_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 -D $(@D)/empty $(TARGET_DIR)/usr/bin/empty
+endef
+
+define EMPTY_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/empty
+endef
+
+$(eval $(generic-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# empty
+#
+################################################################################
 
 EMPTY_VERSION = 0.6.23c
 EMPTY_SOURCE = empty-$(EMPTY_VERSION).tgz

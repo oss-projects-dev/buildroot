@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/flex/astlinux/Config.in
+
+config BR2_PACKAGE_FLEX
+	bool "flex"
+	help
+	  A fast lexical analyser generator.  A tool for generating
+	  programs that perform pattern-matching on text.
+
+	  http://flex.sourceforge.net/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

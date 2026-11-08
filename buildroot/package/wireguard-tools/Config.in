@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/wireguard-tools/astlinux/Config.in
+
+config BR2_PACKAGE_WIREGUARD_TOOLS
+	bool "wireguard-tools"
+	help
+	  This supplies the main userspace tooling for using and
+	  configuring WireGuard tunnels, including the wg(8) utility.
+
+	  https://www.wireguard.com
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

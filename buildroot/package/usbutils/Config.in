@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/usbutils/astlinux/Config.in
+
+config BR2_PACKAGE_USBUTILS
+	bool "usbutils"
+	select BR2_PACKAGE_LIBUSB
+	help
+	  USB enumeration utilities
+
+	  https://sourceforge.net/projects/linux-usb/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

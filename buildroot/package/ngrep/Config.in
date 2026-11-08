@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/ngrep/astlinux/Config.in
+
+config BR2_PACKAGE_NGREP
+	bool "ngrep"
+	default n
+	select BR2_PACKAGE_LIBPCAP
+	select BR2_PACKAGE_PCRE2
+	help
+	  Network grep.
+
+	  https://github.com/jpr5/ngrep/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

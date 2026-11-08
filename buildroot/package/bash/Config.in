@@ -1,6 +1,24 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/bash/astlinux/Config.in
+
+config BR2_PACKAGE_BASH
+	bool "bash"
+	select BR2_PACKAGE_NCURSES
+	help
+	  The standard GNU Bourne again shell.
+
+	  http://tiswww.case.edu/php/chet/bash/bashtop.html
+
+if BR2_PACKAGE_BASH
+
+config BR2_PACKAGE_BASH_DEFAULT_SHELL
+	bool "bash default shell"
+	default y
+	help
+	  Link /bin/sh to bash
+
+endif
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

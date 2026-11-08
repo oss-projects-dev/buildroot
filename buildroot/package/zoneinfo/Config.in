@@ -1,1 +1,8 @@
-source package/zoneinfo/astlinux/Config.in
+config BR2_PACKAGE_ZONEINFO
+	bool "zoneinfo"
+	default n
+	help
+	  Timezone Data files required by some glibc applications
+	  to resolve localtime correctly.
+
+	  ftp://elsie.nci.nih.gov/pub/ 

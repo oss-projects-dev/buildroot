@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/iproute2/astlinux/Config.in
+
+config BR2_PACKAGE_IPROUTE2
+	bool "iproute2"
+	help
+	  Kernel routing and traffic control utilities.  Provides things
+	  like ip and tc.
+
+	  http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

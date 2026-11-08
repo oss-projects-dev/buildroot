@@ -1,15 +1,36 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# statserial
+#
+#############################################################
+STATSERIAL_VERSION = 1.1
+STATSERIAL_SOURCE = statserial-$(STATSERIAL_VERSION).tar.gz
+STATSERIAL_SITE = http://www.ibiblio.org/pub/Linux/system/serial/
+STATSERIAL_CUSTOM_PATCH_DIR = astlinux
+STATSERIAL_DEPENDENCIES = ncurses
+
+define STATSERIAL_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) CC="$(TARGET_CC)" LD="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)" LDFLAGS="$(TARGET_LDFLAGS)" -C $(@D)
+endef
+
+define STATSERIAL_INSTALL_TARGET_CMDS
+	$(INSTALL) -D -m 0755 $(@D)/statserial $(TARGET_DIR)/usr/bin/statserial
+endef
+
+$(eval $(generic-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # statserial
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/statserial/astlinux/statserial.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 STATSERIAL_VERSION = 1.1
 STATSERIAL_SITE = http://www.ibiblio.org/pub/Linux/system/serial

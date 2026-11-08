@@ -1,6 +1,17 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libsrtp/astlinux/Config.in
+
+config BR2_PACKAGE_LIBSRTP
+	bool "libsrtp"
+ 	default n
+	select BR2_PACKAGE_OPENSSL
+	help
+	  The libSRTP library is an open-source implementation of the
+	  Secure Real-time Transport Protocol (SRTP) originally authored
+	  by Cisco Systems, Inc. It is available under a BSD-style license.
+
+	  https://github.com/cisco/libsrtp
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

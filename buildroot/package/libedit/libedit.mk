@@ -1,15 +1,38 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # libedit
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libedit/astlinux/libedit.mk
+LIBEDIT_VERSION = 20260512-3.1
+LIBEDIT_SITE = https://thrysoee.dk/editline
+LIBEDIT_CUSTOM_PATCH_DIR = astlinux
+LIBEDIT_INSTALL_STAGING = YES
+
+LIBEDIT_DEPENDENCIES = ncurses
+
+define LIBEDIT_INSTALL_TARGET_CMDS
+	cp -a $(STAGING_DIR)/usr/lib/libedit.so* $(TARGET_DIR)/usr/lib/
+endef
+
+define LIBEDIT_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/lib/libedit.so*
+endef
+
+$(eval $(autotools-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# libedit
+#
+################################################################################
 
 LIBEDIT_VERSION = 20230828-3.1
 LIBEDIT_SITE = https://www.thrysoee.dk/editline

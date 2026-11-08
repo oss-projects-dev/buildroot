@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/ca-certificates/astlinux/Config.in
+
+config BR2_PACKAGE_CA_CERTIFICATES
+	bool "CA Certificates"
+	depends on BR2_PACKAGE_OPENSSL
+	help
+	  This package includes PEM files of CA certificates to allow
+	  SSL-based applications to check for the authenticity of SSL
+	  connections.
+
+	  https://curl.haxx.se/docs/caextract.html
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

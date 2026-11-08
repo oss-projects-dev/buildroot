@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/lua/astlinux/Config.in
+
+config BR2_PACKAGE_LUA
+	bool "lua"
+	help
+	  Lua is a powerful, fast, light-weight, embeddable scripting language.
+
+	  http://www.lua.org/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

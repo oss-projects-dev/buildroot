@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libsodium/astlinux/Config.in
+
+config BR2_PACKAGE_LIBSODIUM
+	bool "libsodium"
+	default n
+	help
+	  Sodium is a portable, cross-compilable, installable, packageable
+	  fork of the NaCl Cryptograpy & Networking library, with a compatible API.
+
+	  http://github.com/jedisct1/libsodium
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

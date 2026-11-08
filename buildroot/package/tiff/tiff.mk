@@ -1,15 +1,53 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# tiff
+#
+#############################################################
+
+TIFF_VERSION = 4.7.2
+TIFF_SITE = https://download.osgeo.org/libtiff
+TIFF_CUSTOM_PATCH_DIR = astlinux
+TIFF_SOURCE = tiff-$(TIFF_VERSION).tar.gz
+TIFF_INSTALL_STAGING = YES
+TIFF_CONF_OPTS = \
+	--disable-contrib \
+	--disable-cxx \
+	--disable-lerc \
+	--disable-jbig \
+	--disable-tests \
+	--disable-docs \
+	--disable-lzma \
+	--disable-webp \
+	--disable-zstd \
+	--disable-libdeflate
+
+TIFF_DEPENDENCIES = host-pkgconf zlib jpeg
+
+define TIFF_INSTALL_TARGET_CMDS
+	cp -a $(@D)/libtiff/.libs/libtiff.so* $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/tiff2pdf $(TARGET_DIR)/usr/bin/tiff2pdf
+	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/tiffinfo $(TARGET_DIR)/usr/bin/tiffinfo
+endef
+
+define TIFF_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/tiff2pdf
+	rm -f $(TARGET_DIR)/usr/bin/tiffinfo
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # tiff
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/tiff/astlinux/tiff.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 TIFF_VERSION = 4.7.2
 TIFF_SOURCE = tiff-$(TIFF_VERSION).tar.xz

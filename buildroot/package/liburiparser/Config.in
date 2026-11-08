@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/liburiparser/astlinux/Config.in
+
+config BR2_PACKAGE_LIBURIPARSER
+	bool "liburiparser"
+	help
+	  uriparser is a strictly RFC 3986 compliant URI parsing and handling
+	  library written in C.
+
+	  https://uriparser.github.io
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,6 +1,21 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/lxc/astlinux/Config.in
+
+config BR2_PACKAGE_LXC
+	bool "lxc"
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_USE_MMU # fork()
+	help
+	  Linux Containers (LXC), provides the ability to group and
+	  isolate of a set of processes in a jail by virtualizing and
+	  accounting the kernel resources. It is similar to
+	  Linux-Vserver or Openvz.
+
+	  https://linuxcontainers.org/
+
+comment "lxc needs a glibc or musl toolchain w/ threads"
+	depends on !BR2_TOOLCHAIN_HAS_THREADS
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

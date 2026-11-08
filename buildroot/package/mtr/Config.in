@@ -1,6 +1,19 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/mtr/astlinux/Config.in
+
+config BR2_PACKAGE_MTR
+	bool "mtr"
+ 	default n
+	select BR2_PACKAGE_NCURSES
+	select BR2_PACKAGE_LIBCAP
+	help
+	  My TraceRoute
+	  mtr combines the functionality of the 'traceroute' and 'ping'
+	  programs in a single network diagnostic tool.
+	  	  
+	  https://github.com/traviscross/mtr
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

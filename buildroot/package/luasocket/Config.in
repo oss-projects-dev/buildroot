@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/luasocket/astlinux/Config.in
+
+config BR2_PACKAGE_LUASOCKET
+	bool "luasocket"
+	help
+	  LuaSocket is the most comprehensive networking support library
+	  for the Lua language.
+	  It provides easy access to TCP, UDP, DNS, SMTP,
+	  FTP, HTTP, MIME and much more.
+
+	  https://github.com/lunarmodules/luasocket
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

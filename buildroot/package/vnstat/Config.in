@@ -1,6 +1,25 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/vnstat/astlinux/Config.in
+
+config BR2_PACKAGE_VNSTAT
+	bool "vnstat"
+	depends on BR2_USE_MMU # fork()
+	depends on BR2_USE_WCHAR # mbstowcs()
+	select BR2_PACKAGE_SQLITE
+	help
+	  vnStat is a console-based network traffic monitor that keeps a
+	  log of network traffic for the selected interface(s). It uses
+	  the network interface statistics provided by the kernel as
+	  information source. This means that vnStat won't actually be
+	  sniffing any traffic and also ensures light use of system
+	  resources.
+
+	  https://humdi.net/vnstat
+
+comment "vnstat needs a toolchain w/ wchar"
+	depends on BR2_USE_MMU
+	depends on !BR2_USE_WCHAR
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

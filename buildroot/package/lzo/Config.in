@@ -1,6 +1,13 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/lzo/astlinux/Config.in
+
+config BR2_PACKAGE_LZO
+	bool "lzo"
+	help
+	  Portable lossless data compression library written in ANSI C.
+
+	  http://www.oberhumer.com/opensource/lzo/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

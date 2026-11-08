@@ -1,6 +1,19 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/dialog/astlinux/Config.in
+
+config BR2_PACKAGE_DIALOG
+	bool "dialog"
+	select BR2_PACKAGE_NCURSES
+	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+	help
+	  dialog - display dialog boxes from shell scripts
+
+	  This application provides a method of displaying several different
+	  types of dialog boxes from shell scripts.  This allows a developer
+	  of a script to interact with the user in a much friendlier manner.
+
+	  http://invisible-island.net/dialog/dialog.html
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

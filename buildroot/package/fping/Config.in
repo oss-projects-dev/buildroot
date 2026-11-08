@@ -1,6 +1,18 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/fping/astlinux/Config.in
+
+config BR2_PACKAGE_FPING
+	bool "fping"
+	default n
+	help
+	  fping is a program to send ICMP echo probes to network hosts, similar to ping,
+	  but much better performing when pinging multiple hosts. fping has a very
+	  long history: Roland Schemers did publish a first version of it in 1992 and it has
+	  established itself since then as a standard tool for network diagnostics and statistics.
+
+	  http://fping.org/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

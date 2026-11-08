@@ -1,6 +1,13 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/iptables/astlinux/Config.in
+
+config BR2_PACKAGE_IPTABLES
+	bool "iptables"
+	help
+	  Linux kernel (2.4+) firewall, NAT, and packet mangling tools.
+
+	  http://www.iptables.org/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

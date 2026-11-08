@@ -1,15 +1,31 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# iperf
+#
+#############################################################
+
+IPERF_VERSION = 2.2.1
+IPERF_SOURCE = iperf-$(IPERF_VERSION).tar.gz
+IPERF_SITE = https://downloads.sourceforge.net/project/iperf2
+IPERF_CUSTOM_PATCH_DIR = astlinux
+
+IPERF_CONF_OPTS = \
+	--disable-dependency-tracking
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # iperf
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/iperf/astlinux/iperf.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 IPERF_VERSION = 2.2.1
 IPERF_SITE = https://downloads.sourceforge.net/project/iperf2

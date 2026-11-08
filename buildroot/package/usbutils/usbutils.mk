@@ -1,15 +1,43 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# usbutils
+#
+#############################################################
+
+USBUTILS_VERSION = 017
+USBUTILS_SITE = https://github.com/gregkh/usbutils/archive/v$(USBUTILS_VERSION)
+USBUTILS_CUSTOM_PATCH_DIR = astlinux
+USBUTILS_SOURCE = usbutils-$(USBUTILS_VERSION).tar.gz
+USBUTILS_DEPENDENCIES = host-pkgconf libusb udev
+# Missing configure script
+USBUTILS_AUTORECONF = YES
+
+# Build after busybox since it's got a lightweight lsusb
+ifeq ($(BR2_PACKAGE_BUSYBOX),y)
+USBUTILS_DEPENDENCIES += busybox
+endif
+
+define USBUTILS_TARGET_CLEANUP
+	rm -f $(TARGET_DIR)/usr/bin/lsusb.py
+	rm -f $(TARGET_DIR)/usr/bin/usb-devices
+endef
+
+USBUTILS_POST_INSTALL_TARGET_HOOKS += USBUTILS_TARGET_CLEANUP
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # usbutils
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/usbutils/astlinux/usbutils.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 USBUTILS_VERSION = 018
 USBUTILS_SOURCE = usbutils-$(USBUTILS_VERSION).tar.xz

@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/tiff/astlinux/Config.in
+
+config BR2_PACKAGE_TIFF
+	bool "tiff"
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_JPEG
+	help
+	  Library for handling TIFF (Tag Image File Format) images.
+
+	  http://simplesystems.org/libtiff/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

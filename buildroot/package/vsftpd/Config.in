@@ -1,6 +1,13 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/vsftpd/astlinux/Config.in
+
+config BR2_PACKAGE_VSFTPD
+	bool "vsftpd"
+	help
+	  vsftpd is an ftp daemon written with security in mind.
+	  http://vsftpd.beasts.org/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

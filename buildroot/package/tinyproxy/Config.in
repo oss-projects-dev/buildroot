@@ -1,6 +1,18 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/tinyproxy/astlinux/Config.in
+
+config BR2_PACKAGE_TINYPROXY
+	bool "tinyproxy"
+ 	default n
+	help
+	  Tinyproxy is a small, efficient HTTP/SSL proxy daemon released
+	  under the GNU General Public License. Tinyproxy is very
+	  useful in a small network setting, where a larger proxy would
+	  be too resource intensive.
+
+	  https://tinyproxy.github.io
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

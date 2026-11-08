@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/spandsp/astlinux/Config.in
+
+config BR2_PACKAGE_SPANDSP
+	bool "spandsp"
+	default n
+	select BR2_PACKAGE_TIFF
+	help
+	  spandsp - spandsp library and rxfax/txfax for Asterisk  
+
+	  http://www.soft-switch.org/downloads/snapshots/spandsp/spandsp-20061116.tar.gz
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,6 +1,13 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/pcre2/astlinux/Config.in
+
+config BR2_PACKAGE_PCRE2
+	bool "pcre2"
+	help
+	  PCRE2 library, Perl Compatible Regular Expressions
+
+	  https://github.com/PCRE2Project/pcre2
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

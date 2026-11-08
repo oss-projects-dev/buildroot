@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/netsnmp/astlinux/Config.in
+
+config BR2_PACKAGE_NETSNMP
+	bool "netsnmp"
+	help
+	  Suite of applications used to implement SNMP v1, SNMP v2c, and
+	  SNMP v3 using both IPv4 and IPv6.
+
+	  https://github.com/net-snmp/net-snmp
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

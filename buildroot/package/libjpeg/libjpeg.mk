@@ -1,15 +1,35 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# jpeg (libjpeg)
+#
+#############################################################
+
+LIBJPEG_VERSION = 10
+LIBJPEG_SITE = https://www.ijg.org/files
+LIBJPEG_CUSTOM_PATCH_DIR = astlinux
+LIBJPEG_SOURCE = jpegsrc.v$(LIBJPEG_VERSION).tar.gz
+LIBJPEG_INSTALL_STAGING = YES
+
+define LIBJPEG_REMOVE_USELESS_TOOLS
+	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg jpegtrans rdjpgcom wrjpgcom)
+endef
+
+LIBJPEG_POST_INSTALL_TARGET_HOOKS += LIBJPEG_REMOVE_USELESS_TOOLS
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libjpeg
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libjpeg/astlinux/libjpeg.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LIBJPEG_VERSION = 9f
 LIBJPEG_SITE = http://www.ijg.org/files

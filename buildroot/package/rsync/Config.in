@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/rsync/astlinux/Config.in
+
+config BR2_PACKAGE_RSYNC
+	bool "rsync"
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_POPT
+	help
+	  File transfer program to keep remote files in sync.
+
+	  https://rsync.samba.org/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

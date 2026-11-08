@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libpcap/astlinux/Config.in
+
+config BR2_PACKAGE_LIBPCAP
+	bool "libpcap"
+	select BR2_PACKAGE_ZLIB
+	help
+	  A system-independent library for user-level network packet capture.
+
+	  http://www.tcpdump.org/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

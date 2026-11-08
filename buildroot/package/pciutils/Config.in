@@ -1,6 +1,18 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/pciutils/astlinux/Config.in
+
+config BR2_PACKAGE_PCIUTILS
+	bool "pciutils"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Various utilities dealing with the PCI bus.
+	  Provides things like setpci and lspci.
+
+	  You'll need a copy of pci.ids or pci.ids.gz in your
+	  target skeleton to enjoy verbose output.
+
+	  http://atrey.karlin.mff.cuni.cz/~mj/pciutils.html
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

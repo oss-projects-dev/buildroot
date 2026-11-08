@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/luaexpat/astlinux/Config.in
+
+config BR2_PACKAGE_LUAEXPAT
+	bool "luaexpat"
+	select BR2_PACKAGE_EXPAT
+	help
+	  LuaExpat is a SAX XML parser based on the Expat library.
+
+	  https://lunarmodules.github.io/luaexpat
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

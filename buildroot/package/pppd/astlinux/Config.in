@@ -1,9 +1,0 @@
-config BR2_PACKAGE_PPPD
-	select BR2_PACKAGE_OPENSSL
-	select BR2_PACKAGE_LIBPCAP
-	bool "pppd"
-	help
-	  An implementation of the Point-to-point protocol.
-
-	  https://github.com/paulusmack/ppp
-

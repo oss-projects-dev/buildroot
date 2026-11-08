@@ -1,15 +1,74 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# libcap
+#
+#############################################################
+
+LIBCAP_VERSION = 2.78
+LIBCAP_SITE = https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2
+LIBCAP_CUSTOM_PATCH_DIR = astlinux
+LIBCAP_SOURCE = libcap-$(LIBCAP_VERSION).tar.xz
+
+LIBCAP_DEPENDENCIES = host-gperf
+LIBCAP_INSTALL_STAGING = YES
+
+HOST_LIBCAP_DEPENDENCIES = host-gperf
+
+LIBCAP_MAKE_FLAGS = \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+	BUILD_CC="$(HOSTCC)" \
+	BUILD_CFLAGS="$(HOST_CFLAGS)" \
+	lib=lib \
+	prefix=/usr \
+	SHARED=$(if $(BR2_STATIC_LIBS),,yes) \
+	PTHREADS=$(if $(BR2_TOOLCHAIN_HAS_THREADS),yes,)
+
+define LIBCAP_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D)/libcap \
+		$(LIBCAP_MAKE_FLAGS) all
+endef
+
+define LIBCAP_INSTALL_STAGING_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/libcap $(LIBCAP_MAKE_FLAGS) \
+		DESTDIR=$(STAGING_DIR) install
+endef
+
+define LIBCAP_INSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/libcap $(LIBCAP_MAKE_FLAGS) \
+		DESTDIR=$(TARGET_DIR) install
+endef
+
+HOST_LIBCAP_MAKE_FLAGS = \
+	DYNAMIC=yes \
+	GOLANG=no \
+	lib=lib \
+	prefix=$(HOST_DIR) \
+	RAISE_SETFCAP=no
+
+define HOST_LIBCAP_BUILD_CMDS
+	$(HOST_MAKE_ENV) $(HOST_CONFIGURE_OPTS) $(MAKE) -C $(@D) \
+		$(HOST_LIBCAP_MAKE_FLAGS)
+endef
+
+define HOST_LIBCAP_INSTALL_CMDS
+	$(HOST_MAKE_ENV) $(MAKE) -C $(@D) $(HOST_LIBCAP_MAKE_FLAGS) install
+endef
+
+$(eval $(generic-package))
+$(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libcap
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libcap/astlinux/libcap.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LIBCAP_VERSION = 2.73
 LIBCAP_SITE = https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2

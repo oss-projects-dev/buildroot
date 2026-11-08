@@ -1,6 +1,26 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/zabbix/astlinux/Config.in
+
+config BR2_PACKAGE_ZABBIX
+	bool "zabbix"
+	default n
+	help
+	  Zabbix agent to be used with Zabbix Monitoring Solution
+
+	  http://www.zabbix.com	
+
+config BR2_PACKAGE_ZABBIX_PROXY
+	bool "zabbix_proxy"
+	default n
+	depends on BR2_PACKAGE_ZABBIX
+	select BR2_PACKAGE_SQLITE
+	select BR2_PACKAGE_FPING
+	help
+	  Zabbix proxy to be used with Zabbix Monitoring Solution
+
+	  http://www.zabbix.com
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,15 +1,50 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# ngrep
+#
+#############################################################
+
+NGREP_VERSION = 1.49.0
+NGREP_SOURCE = ngrep-$(NGREP_VERSION).tar.gz
+NGREP_SITE = https://github.com/jpr5/ngrep/archive/v$(NGREP_VERSION)
+NGREP_CUSTOM_PATCH_DIR = astlinux
+NGREP_DEPENDENCIES = libpcap pcre2
+
+NGREP_UNINSTALL_STAGING_OPTS = --version
+
+NGREP_CONF_ENV = \
+	NGREP_PCRE2_CONFIG_SCRIPT="$(STAGING_DIR)/usr/bin/pcre2-config"
+
+NGREP_CONF_OPTS = \
+	--disable-pcap-restart \
+	--disable-tcpkill \
+	--with-dropprivs-user=nobody \
+	--with-pcap-includes=$(STAGING_DIR)/usr/include \
+	--enable-pcre2 \
+	--enable-ipv6
+
+define NGREP_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 -D $(@D)/ngrep $(TARGET_DIR)/usr/bin/ngrep
+endef
+
+define NGREP_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/ngrep
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # ngrep
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/ngrep/astlinux/ngrep.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 NGREP_VERSION = 1.47
 NGREP_SITE = $(call github,jpr5,ngrep,$(subst .,_,V$(NGREP_VERSION)))

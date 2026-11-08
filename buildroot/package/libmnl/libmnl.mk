@@ -1,15 +1,29 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# libmnl
+#
+#############################################################
+
+LIBMNL_VERSION = 1.0.5
+LIBMNL_SOURCE = libmnl-$(LIBMNL_VERSION).tar.bz2
+LIBMNL_SITE = https://netfilter.org/projects/libmnl/files
+LIBMNL_CUSTOM_PATCH_DIR = astlinux
+LIBMNL_INSTALL_STAGING = YES
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libmnl
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libmnl/astlinux/libmnl.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LIBMNL_VERSION = 1.0.5
 LIBMNL_SOURCE = libmnl-$(LIBMNL_VERSION).tar.bz2

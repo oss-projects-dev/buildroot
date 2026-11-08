@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/sudo/astlinux/Config.in
+
+config BR2_PACKAGE_SUDO
+	bool "sudo"
+	help
+	  Sudo is a program designed to allow a sysadmin to give
+	  limited root privileges to users and log root activity.  The
+	  basic philosophy is to give as few privileges as possible
+	  but still allow people to get their work done.
+
+	  http://www.sudo.ws/sudo/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

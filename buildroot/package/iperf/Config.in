@@ -1,6 +1,18 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/iperf/astlinux/Config.in
+
+config BR2_PACKAGE_IPERF
+	bool "iperf"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Internet Protocol bandwidth measuring tool for measuring
+	  TCP/UDP performance.
+
+	  https://sourceforge.net/projects/iperf2/
+
+comment "iperf requires a toolchain with C++ support enabled"
+	depends on !BR2_INSTALL_LIBSTDCPP
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

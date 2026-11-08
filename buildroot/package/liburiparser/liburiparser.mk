@@ -1,15 +1,37 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
 ################################################################################
 #
 # liburiparser
 #
 ################################################################################
 
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/liburiparser/astlinux/liburiparser.mk
+LIBURIPARSER_VERSION = 0.9.1
+LIBURIPARSER_SOURCE = uriparser-$(LIBURIPARSER_VERSION).tar.bz2
+LIBURIPARSER_SITE = https://github.com/uriparser/uriparser/releases/download/uriparser-$(LIBURIPARSER_VERSION)
+LIBURIPARSER_CUSTOM_PATCH_DIR = astlinux
+LIBURIPARSER_INSTALL_STAGING = YES
+
+LIBURIPARSER_CONF_OPTS = \
+		--disable-test \
+		--disable-doc
+
+ifeq ($(BR2_USE_WCHAR),)
+LIBURIPARSER_CONF_OPTS += --disable-wchar_t
+endif
+
+$(eval $(autotools-package))
+
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+################################################################################
+#
+# liburiparser
+#
+################################################################################
 
 LIBURIPARSER_VERSION = 1.0.2
 LIBURIPARSER_SOURCE = uriparser-$(LIBURIPARSER_VERSION).tar.xz

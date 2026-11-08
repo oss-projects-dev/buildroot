@@ -1,6 +1,14 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/ethtool/astlinux/Config.in
+
+config BR2_PACKAGE_ETHTOOL
+	bool "ethtool"
+	help
+	  ethtool is a small utility for examining and tuning your
+	  ethernet-based network interface.
+
+	  http://sourceforge.net/projects/gkernel/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

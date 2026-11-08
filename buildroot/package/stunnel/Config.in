@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/stunnel/astlinux/Config.in
+
+config BR2_PACKAGE_STUNNEL
+	bool "stunnel"
+	select BR2_PACKAGE_OPENSSL
+	help
+	  Stunnel is a program that wraps any TCP connection with an SSL
+	  connection.
+
+	  http://www.stunnel.org/
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,15 +1,43 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# autoconf
+#
+#############################################################
+
+AUTOCONF_VERSION = 2.71
+AUTOCONF_SOURCE = autoconf-$(AUTOCONF_VERSION).tar.xz
+AUTOCONF_SITE = $(BR2_GNU_MIRROR)/autoconf
+AUTOCONF_CUSTOM_PATCH_DIR = astlinux
+
+HOST_AUTOCONF_CONF_ENV = \
+	EMACS="no" \
+	ac_cv_path_M4=$(HOST_DIR)/bin/m4 \
+	ac_cv_prog_gnu_m4_gnu=no
+
+HOST_AUTOCONF_DEPENDENCIES = host-m4 host-libtool
+
+$(eval $(host-autotools-package))
+
+# variables used by other packages
+AUTOCONF = $(HOST_DIR)/bin/autoconf -I "$(ACLOCAL_DIR)" -I "$(ACLOCAL_HOST_DIR)"
+AUTOHEADER = $(HOST_DIR)/bin/autoheader -I "$(ACLOCAL_DIR)" -I "$(ACLOCAL_HOST_DIR)"
+AUTORECONF = $(HOST_CONFIGURE_OPTS) ACLOCAL="$(ACLOCAL)" \
+	AUTOCONF="$(AUTOCONF)" AUTOHEADER="$(AUTOHEADER)" \
+	AUTOMAKE="$(AUTOMAKE)" AUTOPOINT=/bin/true GTKDOCIZE=/bin/true \
+	$(HOST_DIR)/bin/autoreconf -f -i
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # autoconf
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/autoconf/astlinux/autoconf.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 AUTOCONF_VERSION = 2.72
 AUTOCONF_SOURCE = autoconf-$(AUTOCONF_VERSION).tar.xz

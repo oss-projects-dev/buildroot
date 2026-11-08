@@ -1,6 +1,16 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/libfuse/astlinux/Config.in
+
+config BR2_PACKAGE_LIBFUSE
+	bool "libfuse"
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_USE_MMU # fork()
+	help
+	  FUSE (Filesystem in UserSpacE)
+
+	  https://github.com/libfuse/libfuse
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

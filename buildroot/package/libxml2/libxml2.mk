@@ -1,15 +1,73 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# libxml2
+#
+#############################################################
+
+LIBXML2_VERSION = 2.15.4
+LIBXML2_SITE = https://download.gnome.org/sources/libxml2/2.15
+LIBXML2_CUSTOM_PATCH_DIR = astlinux
+LIBXML2_SOURCE = libxml2-$(LIBXML2_VERSION).tar.xz
+LIBXML2_INSTALL_STAGING = YES
+
+ifneq ($(BR2_LARGEFILE),y)
+LIBXML2_CONF_ENV = CC="$(TARGET_CC) $(TARGET_CFLAGS) -DNO_LARGEFILE_SOURCE"
+endif
+
+LIBXML2_CONF_OPTS = --with-gnu-ld --without-python --without-debug
+
+define LIBXML2_STAGING_LIBXML2_CONFIG_FIXUP
+	$(SED) "s,^prefix=.*,prefix=\'$(STAGING_DIR)/usr\',g" $(STAGING_DIR)/usr/bin/xml2-config
+	$(SED) "s,^exec_prefix=.*,exec_prefix=\'$(STAGING_DIR)/usr\',g" $(STAGING_DIR)/usr/bin/xml2-config
+endef
+LIBXML2_POST_INSTALL_STAGING_HOOKS += LIBXML2_STAGING_LIBXML2_CONFIG_FIXUP
+
+HOST_LIBXML2_DEPENDENCIES = host-pkgconf
+LIBXML2_DEPENDENCIES = host-pkgconf
+
+HOST_LIBXML2_CONF_OPTS = --without-zlib --without-debug --without-python
+
+ifneq ($(BR2_HAVE_DEVFILES),y)
+define LIBXML2_REMOVE_CONFIG_SCRIPTS
+	rm -f $(TARGET_DIR)/usr/bin/xml2-config
+	rm -f $(TARGET_DIR)/usr/lib/xml2Conf.sh
+endef
+LIBXML2_POST_INSTALL_TARGET_HOOKS += LIBXML2_REMOVE_CONFIG_SCRIPTS
+endif
+
+ifeq ($(BR2_PACKAGE_ZLIB),y)
+LIBXML2_DEPENDENCIES += zlib
+LIBXML2_CONF_OPTS += --with-zlib=$(STAGING_DIR)/usr
+else
+LIBXML2_CONF_OPTS += --without-zlib
+endif
+
+LIBXML2_DEPENDENCIES += $(if $(BR2_PACKAGE_LIBICONV),libiconv)
+
+ifeq ($(BR2_ENABLE_LOCALE)$(BR2_PACKAGE_LIBICONV),y)
+LIBXML2_CONF_OPTS += --with-iconv
+else
+LIBXML2_CONF_OPTS += --without-iconv
+endif
+
+$(eval $(autotools-package))
+$(eval $(host-autotools-package))
+
+# libxml2 for the host
+LIBXML2_HOST_BINARY = $(HOST_DIR)/bin/xmllint
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libxml2
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/libxml2/astlinux/libxml2.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LIBXML2_VERSION_MAJOR = 2.15
 LIBXML2_VERSION = $(LIBXML2_VERSION_MAJOR).4

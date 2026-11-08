@@ -1,15 +1,52 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# logrotate
+#
+#############################################################
+
+LOGROTATE_VERSION = 3.22.0
+LOGROTATE_SOURCE = logrotate-$(LOGROTATE_VERSION).tar.gz
+LOGROTATE_SITE = https://github.com/logrotate/logrotate/releases/download/$(LOGROTATE_VERSION)
+LOGROTATE_CUSTOM_PATCH_DIR = astlinux
+
+LOGROTATE_DEPENDENCIES = popt host-pkgconf
+
+LOGROTATE_CONF_OPTS = --without-selinux
+
+ifeq ($(BR2_PACKAGE_ACL),y)
+LOGROTATE_DEPENDENCIES += acl
+LOGROTATE_CONF_OPTS += --with-acl
+else
+LOGROTATE_CONF_OPTS += --without-acl
+endif
+
+define LOGROTATE_INSTALL_TARGET_CONF
+	$(INSTALL) -m 0644 package/logrotate/astlinux/logrotate.conf $(TARGET_DIR)/etc/logrotate.conf
+	if [ ! -d $(TARGET_DIR)/etc/logrotate.d ]; then \
+		$(INSTALL) -d -m 0755 $(TARGET_DIR)/etc/logrotate.d; \
+	fi
+endef
+LOGROTATE_POST_INSTALL_TARGET_HOOKS += LOGROTATE_INSTALL_TARGET_CONF
+
+define LOGROTATE_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/sbin/logrotate
+	rm -f $(TARGET_DIR)/etc/logrotate.conf
+endef
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # logrotate
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/logrotate/astlinux/logrotate.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 LOGROTATE_VERSION = 3.22.0
 LOGROTATE_SOURCE = logrotate-$(LOGROTATE_VERSION).tar.xz

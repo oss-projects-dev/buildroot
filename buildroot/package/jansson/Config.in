@@ -1,6 +1,15 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/jansson/astlinux/Config.in
+
+config BR2_PACKAGE_JANSSON
+	bool "jansson"
+	help
+	  Jansson is a C library for encoding, decoding and manipulating JSON
+	  data.
+
+	  http://www.digip.org/jansson/
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

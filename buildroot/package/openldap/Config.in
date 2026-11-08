@@ -1,6 +1,28 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/openldap/astlinux/Config.in
+
+config BR2_PACKAGE_OPENLDAP
+	bool "openldap"
+	select BR2_PACKAGE_OPENSSL
+	help
+	  OpenLDAP Software is an open source implementation of the
+	  Lightweight Directory Access Protocol.
+
+	  The suite includes:
+	  - slapd: stand-alone LDAP daemon (optional server)
+	  - libraries: implementing the LDAP protocol
+	  - utilities, tools, and sample clients (ex. ldapsearch)
+
+	  http://www.openldap.org/
+
+config BR2_PACKAGE_OPENLDAP_SERVER
+	bool "openldap-server"
+	default n
+	depends on BR2_PACKAGE_OPENLDAP
+	help
+	  Include slapd and server related files.
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

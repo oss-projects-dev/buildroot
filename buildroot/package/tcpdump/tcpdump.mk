@@ -1,15 +1,46 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# tcpdump
+#
+#############################################################
+
+TCPDUMP_VERSION = 4.99.7
+TCPDUMP_SITE = https://www.tcpdump.org/release
+TCPDUMP_CUSTOM_PATCH_DIR = astlinux
+TCPDUMP_SOURCE = tcpdump-$(TCPDUMP_VERSION).tar.gz
+
+TCPDUMP_CONF_ENV = \
+	td_cv_buggygetaddrinfo=no \
+	PCAP_CONFIG=$(STAGING_DIR)/usr/bin/pcap-config
+
+TCPDUMP_CONF_OPTS = \
+	--without-crypto \
+	--disable-local-libpcap \
+	$(if $(BR2_PACKAGE_TCPDUMP_SMB),--enable-smb,--disable-smb)
+
+TCPDUMP_DEPENDENCIES = zlib libpcap host-pkgconf
+
+# make install installs an unneeded extra copy of the tcpdump binary
+define TCPDUMP_REMOVE_DUPLICATED_BINARY
+	rm -f $(TARGET_DIR)/usr/bin/tcpdump.$(TCPDUMP_VERSION)
+endef
+
+TCPDUMP_POST_INSTALL_TARGET_HOOKS += TCPDUMP_REMOVE_DUPLICATED_BINARY
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # tcpdump
 #
 ################################################################################
-
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
-ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-include package/tcpdump/astlinux/tcpdump.mk
-endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
-
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 TCPDUMP_VERSION = 4.99.5
 TCPDUMP_SITE = https://www.tcpdump.org/release

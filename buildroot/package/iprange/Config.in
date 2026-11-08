@@ -1,1 +1,7 @@
-source package/iprange/astlinux/Config.in
+config BR2_PACKAGE_IPRANGE
+	bool "iprange"
+	help
+	  iprange is a tool capable of managing sets of IPs.
+
+	  https://github.com/firehol/iprange/wiki
+

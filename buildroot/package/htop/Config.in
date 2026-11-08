@@ -1,6 +1,18 @@
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-source package/htop/astlinux/Config.in
+
+config BR2_PACKAGE_HTOP
+	bool "htop"
+	select BR2_PACKAGE_NCURSES
+	help
+	  htop is a cross-platform interactive process viewer.
+	  It is a text-mode application (for console or X terminals)
+	  and requires ncurses.
+
+	  https://htop.dev/
+	  https://github.com/htop-dev/htop/releases
+
+
 endif
 
 endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
