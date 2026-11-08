@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include boot/syslinux/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_TARGET_SYSLINUX
 	bool "syslinux"
 	depends on BR2_i386 || BR2_x86_64
@@ -59,3 +65,5 @@ config BR2_TARGET_SYSLINUX_C32
 endif # BR2_TARGET_SYSLINUX_LEGACY_BIOS
 
 endif # BR2_TARGET_SYSLINUX
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
