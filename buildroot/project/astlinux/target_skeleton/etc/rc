@@ -1,0 +1,476 @@
+#!/bin/sh
+#
+#/etc/rc
+#
+# Basic Config goes here...
+export PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
+
+# Functions
+
+ast_checkfs () {
+
+  if ! echo $1 | grep -q dev; then
+    echo "Skipping fs check on $1"
+    return 0
+  fi
+
+  echo "Checking $1"
+
+  e2fsck -y -C 0 $1
+  status="$?"
+
+  case $status in
+  0)
+    echo "$1 is clean."
+    return 0
+    ;;
+
+  1)
+    echo "$1 was checked and is now clean."
+    return 0
+    ;;
+
+  2)
+    echo "$1 was checked and is now clean. System should be rebooted."
+    return 0
+    ;;
+
+  4)
+    echo "$1 still has errors; run e2fsck manually."
+    return 1
+    ;;
+
+  *)
+    echo "Something else is wrong with $1; run e2fsck manually."
+    return 1
+    ;;
+  esac
+}
+
+set_asturw () {
+
+  case $ASTURW in
+
+  # valid device name -- should we test for the device being present?
+  /dev/[sv]d[a-h][0-9])
+    ;;
+
+  # not set
+  '')
+    ;;
+
+  auto)
+    if [ -x /sbin/findfs ]; then
+      ASTURW=`/sbin/findfs LABEL=ASTURW 2>/dev/null`
+    else
+      ASTURW=""
+    fi
+    ;;
+
+  *)
+    echo "Invalid asturw name: $ASTURW" >&2
+    exec /bin/sh
+    ;;
+  esac
+}
+
+set_kddev () {
+
+  case $KDDEV in
+
+  # valid device name -- should we test for the device being present?
+  /dev/[sv]d[a-h][0-9])
+    ;;
+
+  # not set
+  '')
+    ;;
+
+  auto)
+    if [ -x /sbin/findfs ]; then
+      KDDEV=`/sbin/findfs LABEL=ASTKD 2>/dev/null`
+    else
+      KDDEV=""
+    fi
+    ;;
+
+  *)
+    echo "Invalid astkd name: $KDDEV" >&2
+    exec /bin/sh
+    ;;
+  esac
+}
+
+unionfs_for_dir()
+{
+  local dir="$1" upath asturw asturo union fuse_opt union_opt
+
+  upath="/mnt/unionfs"
+  asturw="/mnt/asturw/$dir"
+  asturo="$upath/asturo/$dir"
+  union="$upath/union/$dir"
+
+  fuse_opt="-o allow_other,use_ino,nonempty,suid"
+  union_opt="-o cow,max_files=16384"
+
+  if [ ! -d "$asturw" ]; then
+    mkdir -p "$asturw"
+  fi
+  mkdir -p "$asturo"
+  mkdir -p "$union"
+  mount --bind "/$dir" "$asturo"
+  unionfs $fuse_opt $union_opt "${asturw}=RW:${asturo}=RO" "$union"
+  mount --bind "$union" "/$dir"
+}
+
+init() {
+
+  mount -t proc none /proc
+  mount -t sysfs none /sys
+
+  CMDLINE="`cat /proc/cmdline`"
+
+  if echo $CMDLINE | grep -q single; then
+    ASTRLEVEL=single
+  elif echo $CMDLINE | grep -q custom; then
+    ASTRLEVEL=custom
+  else
+    ASTRLEVEL=default
+  fi
+
+  for i in $CMDLINE; do
+
+    case $i in
+    root=*)
+      # could use ${i:5} in bash... sigh.
+      ROOTDEV=`echo $i | sed -e 's/root=//'`
+      ;;
+
+    astkd=*)
+      KDDEV=`echo $i | sed -e 's/astkd=//'`
+      ;;
+
+    astimg=*)
+      ASTIMG=`echo $i | sed -e 's/astimg=//'`
+      if echo $ASTIMG | grep -q .run; then
+        RUNNIX=yes
+      fi
+      ;;
+
+    asturw=*)
+      ASTURW=`echo $i | sed -e 's/asturw=//'`
+      ;;
+
+    astlinux=*)
+      ASTLINUX=`echo $i | sed -e 's/astlinux=//'`
+      ;;
+    esac
+
+  done
+
+  devtmpfs="$(awk '/^devtmpfs/ { print $2; nextfile; }' /proc/mounts)"
+  if [ -n "$devtmpfs" ]; then
+    mount -o remount,size=512k "$devtmpfs"
+    if [ "$devtmpfs" != "/dev" ]; then
+      mount -o move "$devtmpfs" /dev
+    fi
+    fstab_dev=""
+  else
+    echo "Warning: devtmpfs not available" >&2
+  fi
+
+  set_asturw
+  set_kddev
+
+  mount -t tmpfs -o size=10000k none /tmp
+  fstab_tmp="none    /tmp            tmpfs   size=10000k     0       0"
+
+  mount -t tmpfs -o size=10000k none /var
+  fstab_var="none    /var            tmpfs   size=10000k     0       0"
+
+  mkdir -p /dev/pts
+  mount -t devpts none /dev/pts
+
+  mkdir -p /dev/shm
+  mount -t tmpfs -o size=512k none /dev/shm
+  fstab_shm="none    /dev/shm        tmpfs   size=512k       0       0"
+
+  mkdir -p /tmp/etc/modprobe.d
+  echo '## Auto-generated file, do not edit!!' >/tmp/etc/modprobe.d/alias.conf
+
+  if [ -n "$ASTURW" ]; then
+    mount -t tmpfs -o size=512k none /mnt/unionfs
+    fstab_base="none    /mnt/unionfs    tmpfs   size=512k       0       0"
+  elif [ -z "$ASTIMG" ]; then
+    fstab_base="$ROOTDEV /             ext4    ro              0       0"
+  else
+    fstab_base="##"
+  fi
+
+  echo "$fstab_base
+proc    /proc           proc    defaults        0       0${fstab_dev:+
+$fstab_dev}
+$fstab_tmp
+$fstab_var
+$fstab_shm
+" > /tmp/etc/fstab
+
+  mkdir /var/spool /var/lib
+  mkdir /var/empty /var/lock /var/db /var/run
+  touch /var/run/utmp
+  mkdir /var/run/screen /var/state /tmp/bin
+  mkdir -m 1777 /var/tmp
+
+  ## Check and mount unionfs
+  if [ -n "$ASTURW" ]; then
+    echo "$ASTURW /mnt/asturw ext4 noauto,noatime 0 0" >> /tmp/etc/fstab
+
+    ast_checkfs $ASTURW
+
+    mount /mnt/asturw >/dev/null
+
+    unionfs_for_dir etc
+    unionfs_for_dir stat
+    if [ -z "$KDDEV" ]; then
+      unionfs_for_dir mnt/kd
+    fi
+  fi
+
+  /sbin/udevd --daemon
+  # Trigger udev USB subsystem in case USB events occured before udev was started.
+  /sbin/udevadm trigger --action=add --subsystem-match=usb
+
+  # Generate /dev/input/by-path/ symlinks for /dev/input/event* entries
+  # Example: /dev/input/by-path/platform-pcspkr-event-spkr
+  /sbin/udevadm trigger --subsystem-match=input --sysname-match='event*'
+
+  case $ASTLINUX in
+
+  genx86_64-vm)
+    # Xen
+    if [ -f /sys/hypervisor/type ] && grep -q 'xen' /sys/hypervisor/type; then
+      modprobe xen-netfront
+    fi
+    # Hyper-V
+    if lscpu | grep -q -i '^hypervisor vendor: *microsoft'; then
+      modprobe hv_netvsc
+      modprobe hv_utils
+    fi
+    ;;
+
+  esac
+
+  if [ -r /etc/rc.modules ]; then
+    grep -v "#" /etc/rc.modules | \
+    (while read i; do
+     if [ "$i" = "sleep" ]; then
+       sleep 2
+     elif [ "$i" = "r8168" ]; then
+       modprobe r8169 2>/dev/null
+     elif [ "$i" = "virtio-pci" ]; then
+       modprobe virtio_net 2>/dev/null
+     elif [ "$i" != "rtc" ]; then
+       modprobe $i 2>/dev/null
+     fi
+     done)
+    sleep 5
+  fi
+
+  #set the clock to zulu time, assuming rtc-cmos built-in to kernel
+  if [ -r /dev/rtc0 ]; then
+    hwclock -su --rtc /dev/rtc0 2>/dev/null
+  fi
+
+  #Apply IO schedulers
+  if [ -n "$IOSCHED" ]; then
+    for i in $IOSCHED; do
+      IODEV=`echo $i | cut -d: -f1`
+      IOS=`echo $i | cut -d: -f2`
+      if grep -q $IOS /sys/block/$IODEV/queue/scheduler; then
+        echo "Applying I/O scheduler $IOS to $IODEV"
+        echo $IOS > /sys/block/$IODEV/queue/scheduler
+      else
+        echo "Error: $IOS is not available on $IODEV"
+      fi
+    done
+  fi
+
+  #Check and mount filesystems
+  if [ -z "$ASTIMG" ]; then
+    echo "Checking $ROOTDEV"
+
+    ast_checkfs $ROOTDEV
+  fi
+
+  if [ -n "$KDDEV" ]; then
+    echo "$KDDEV /mnt/kd ext4 noauto,noatime 0 0" >> /tmp/etc/fstab
+
+    ast_checkfs $KDDEV
+
+    mount /mnt/kd >/dev/null
+  fi
+
+  # Check for persistent /root
+  if [ -d /mnt/kd/root ]; then
+    ln -s /mnt/kd/root /tmp/root
+  else
+    mkdir /tmp/root
+  fi
+
+  # Re-mount Runnix partition
+  if ! mount | grep -q "/oldroot/cdrom"; then
+    if [ -x /sbin/findfs ]; then
+      LABEL=`/sbin/findfs LABEL=RUNNIX`
+      if [ -n "$LABEL" ]; then
+        if mount -t vfat -o ro "$LABEL" /oldroot/cdrom; then
+          echo "Runnix vfat partition re-mounted read-only"
+        fi
+      else
+        echo "Runnix vfat partition label not found, use: dosfslabel /dev/sda1 RUNNIX" 1>&2
+      fi
+    fi
+  fi
+
+  # Check for video (non-serial) console, and load os/console.kmap if it exists
+  if ! echo "$CMDLINE" | grep -q "console="; then
+    if [ -f /oldroot/cdrom/os/console.kmap ]; then
+      echo "Loading console keyboard map: /oldroot/cdrom/os/console.kmap"
+      loadkmap < /oldroot/cdrom/os/console.kmap
+    fi
+  fi
+
+  # Create /tmp/etc/rc.conf
+  /usr/sbin/gen-rc-conf
+  # Source rc.conf variables
+  . /etc/rc.conf
+
+  if [ "$IPV6" != "yes" ]; then
+    echo "alias net-pf-10 off" >>/tmp/etc/modprobe.d/alias.conf
+  fi
+
+  # glibc/zoneinfo style TZ support
+  if [ -z "$TIMEZONE" ]; then
+    TIMEZONE="UTC"
+  fi
+  if [ -f "/usr/share/zoneinfo/$TIMEZONE" ]; then
+    ln -sf "/usr/share/zoneinfo/$TIMEZONE" /tmp/etc/localtime
+    echo "$TIMEZONE" > /tmp/etc/timezone
+    echo "date.timezone = $TIMEZONE" > /tmp/etc/php.ini
+  else
+    echo "Invalid Timezone: $TIMEZONE" >&2
+  fi
+
+  # /etc/TZ Timezone support
+  if [ -z "$TZ_TIMEZONE" -a -f /etc/localtime ]; then
+    TZ_TIMEZONE=$(tail -n1 /etc/localtime)
+  fi
+  if [ -n "$TZ_TIMEZONE" ]; then
+    echo "$TZ_TIMEZONE" > /tmp/etc/TZ
+  fi
+
+  if [ "$PERSISTLOG" = "yes" ]; then
+
+    if [ ! -d /mnt/kd/log ]; then
+      mkdir /mnt/kd/log
+      touch /var/log/wtmp
+    fi
+
+    ln -s /mnt/kd/log /var/log
+
+  else
+    mkdir /var/log
+    touch /var/log/wtmp
+  fi
+
+  # Define and export xxx_proxy environmental variables
+  # This is also done in /etc/profile for new logins
+  if [ -n "$HTTP_PROXY" ]; then
+    export http_proxy="$HTTP_PROXY"
+  fi
+  if [ -n "$HTTPS_PROXY" ]; then
+    export https_proxy="$HTTPS_PROXY"
+  fi
+  if [ -n "$FTP_PROXY" ]; then
+    export ftp_proxy="$FTP_PROXY"
+  fi
+
+  # Resize filesystems if we need to...
+  if [ -n "$VAR_SIZE" ]; then
+    mount -o remount,size=$VAR_SIZE /var
+  fi
+
+  if [ -n "$TMP_SIZE" ]; then
+    mount -o remount,size=$TMP_SIZE /tmp
+  fi
+
+  dmesg > /var/run/dmesg.boot
+
+  echo "going to runlevel $ASTRLEVEL..."
+
+  SCRIPTS="`ls /etc/runlevels/$ASTRLEVEL/S* 2>/dev/null`"
+  for i in $SCRIPTS; do
+    if [ -x $i ]; then
+      $i init
+    fi
+  done
+
+  if [ "$USBTTY" = "yes" ]; then
+    /sbin/udevadm trigger --action=add --subsystem-match=tty --sysname-match='ttyUSB[0-9]'
+  fi
+}
+
+shutdown() {
+
+  CMDLINE="`cat /proc/cmdline`"
+
+  if echo $CMDLINE | grep -q single; then
+    ASTRLEVEL=single
+  elif echo $CMDLINE | grep -q custom; then
+    ASTRLEVEL=custom
+  else
+    ASTRLEVEL=default
+  fi
+
+  ## Close
+  SCRIPTS="`ls /etc/runlevels/$ASTRLEVEL/K[0-9][0-9]sshd 2>/dev/null`"
+  for i in $SCRIPTS; do
+    if [ -x $i ]; then
+      $i close
+    fi
+  done
+
+  ## Stop
+  SCRIPTS="`ls /etc/runlevels/$ASTRLEVEL/K* 2>/dev/null`"
+  for i in $SCRIPTS; do
+    if [ -x $i ]; then
+      $i stop
+    fi
+  done
+
+  sync
+  sleep 2
+
+  if [ -r /dev/rtc0 ]; then
+    hwclock -wu --rtc /dev/rtc0 2>/dev/null
+  fi
+
+  echo "Stopping udevd..."
+  udevadm control --timeout=121 --exit
+  killall udevd 2>/dev/null
+
+  umount -a -r 2>/dev/null
+}
+
+# can't read cmdline here, because /proc isn't yet mounted
+
+case $1 in
+sysinit|default)
+  init
+  ;;
+
+shutdown)
+  shutdown
+  ;;
+
+esac
+

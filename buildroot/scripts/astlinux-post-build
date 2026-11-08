@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Use BuildRoot "post-build" script to overly board specific files
+#
+
+overlay_target()
+{
+  local target_skeleton="$base/project/astlinux/board/$board/target_skeleton"
+
+  if [ ! -d "$target_skeleton" ]; then
+    exit_error "Source Directory not found: $target_skeleton"
+  fi
+
+  echo "
+##
+## Post Build Target Overlay: Board = \"$board\"
+##
+"
+
+  cp -pv "$target_skeleton/etc/inittab" "$target/etc/inittab"
+
+  cp -pv "$target_skeleton/etc/rc.modules" "$target/etc/rc.modules"
+
+  if [ -f "$target_skeleton/stat/etc/sensors.conf" ]; then
+    cp -pv "$target_skeleton/stat/etc/sensors.conf" "$target/stat/etc/sensors.conf"
+  else
+    rm -f "$target/stat/etc/sensors.conf"
+  fi
+
+  echo "
+##
+## Finished Target Overlay
+##
+"
+}
+
+exit_error()
+{
+  echo "
+## ** ERROR **
+## Post Build: Board = \"$board\"
+## $1
+"
+  exit 1
+}
+
+gen_os_release()
+{
+  local version="$1" variant="$2"
+
+  echo "ID=\"astlinux\""
+  echo "NAME=\"AstLinux\""
+  echo "PRETTY_NAME=\"$version\""
+  echo "VERSION=\"$version\""
+  echo "VERSION_ID=\"$version\""
+  echo "VARIANT=\"$variant\""
+  echo "VARIANT_ID=\"$variant\""
+}
+
+gen_changelog()
+{
+  local version="$1" changelog_file="$2" end_match
+
+  echo "================================================="
+  echo "=== Release: $version"
+  echo "=== ChangeLog Information back to AstLinux 1.2.0"
+  echo "================================================="
+  echo ""
+
+  end_match="Additions for AstLinux 1.1.7:"
+
+  sed -n "8,/^${end_match}/ p" "$changelog_file" | sed "/^${end_match}/ d"
+}
+
+target="$1"
+
+base="${target%/output/target}"
+
+if [ ! -f "$base/astlinux.board" ]; then
+  echo "genx86_64" > "$base/astlinux.board"
+fi
+
+board="$(cat "$base/astlinux.board")"
+
+if [ -z "$board" ] || [ ! -d "$base/project/astlinux/board/$board" ]; then
+  exit_error "Unknown Board type."
+fi
+
+overlay_target
+
+. "$base/scripts/ver-label/astlinux_release_version.sh"
+astlinux_release_version
+echo ${ASTVER} > "$target/etc/astlinux-release"
+
+gen_os_release "$ASTVER" "$board" > "$target/etc/os-release"
+
+mkdir -p "$target/stat/etc/docs"
+gen_changelog "$ASTVER" "$base/docs/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
+
+exit 0
+

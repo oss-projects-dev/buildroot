@@ -1,0 +1,21 @@
+## These modules get modprobe'd when the system starts up.
+##
+## Comment out any modules you don't need.
+##
+## Ethernet support
+#8139cp
+8139too
+#via-rhine
+#via-velocity
+#vmxnet3
+pcnet32
+e1000
+e1000e
+igb
+#r8125
+r8169
+tg3
+igc
+#ixgbe
+#i40e
+#atlantic

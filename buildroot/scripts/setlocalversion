@@ -1,0 +1,19 @@
+#!/bin/sh
+# Print additional version information for non-release trees.
+
+usage() {
+  echo "Usage: $0 [srctree]" >&2
+  exit 1
+}
+
+cd "${1:-.}" || usage
+
+# Check for git and a git repo.
+if head="$(git rev-parse --verify --short HEAD 2>/dev/null)"; then
+
+  printf '%s%s' -g "$head"
+
+  # All done with git
+  exit
+fi
+

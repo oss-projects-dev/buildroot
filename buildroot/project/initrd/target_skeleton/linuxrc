@@ -1,0 +1,194 @@
+#!/bin/sh
+export PATH=/usr/bin:/usr/sbin:/bin:/sbin
+
+DRIVES="sda sdb sdc sdd sde sdf sdg sdh vda vdb vdc vdd"
+
+# Max image size in 1024 (k) bytes
+MAX_IMAGEFS_SIZE=262144   # 256m
+
+#functions
+
+list_nvme() {
+  local form="$1" dev sub_dev
+
+  for dev in $(ls -1 /dev/nvme[0-9]n* 2>/dev/null); do
+    sub_dev="${dev##*/}"
+    if [ "${sub_dev%%p*}" = "${sub_dev}" ];then
+      if [ "$form" = "part" ]; then
+        echo "${sub_dev}p"
+      else
+        echo "${sub_dev}"
+      fi
+    fi
+  done
+}
+
+sync_inittab() {
+  local mp="$1"
+
+  # Auto detect ASTURW
+  if [ "$ASTURW" = "auto" ]; then
+    ASTURW="$(/sbin/findfs LABEL=ASTURW 2>/dev/null)"
+  fi
+
+  if [ -n "$ASTURW" ]; then
+    mkdir -p /mnt/asturw
+    if mount -t ext4 -o ro $ASTURW /mnt/asturw >/dev/null 2>&1; then
+      if [ -f /mnt/asturw/etc/inittab ]; then
+        cp -p /mnt/asturw/etc/inittab $mp/etc/inittab
+      fi
+      umount /mnt/asturw
+    fi
+  fi
+}
+
+image_to_tmpfs() {
+  local mp="$1" used
+
+  mount -t tmpfs -o size=${MAX_IMAGEFS_SIZE}k none $mp
+
+  echo "Copying AstLinux files to RAM..."
+  cp -a /image/. $mp/
+
+  sync_inittab $mp
+
+  mount -o ro,remount $mp
+
+  # Reduce total size to 'used'
+  used="$(df -k -P $mp | awk '/^none/ { print $3; }')"
+  if [ -n "$used" ] && [ $used -lt $MAX_IMAGEFS_SIZE ]; then
+    mount -o remount,size=${used}k $mp
+  fi
+}
+
+astlive () {
+
+  # Mount root, image, etc.
+
+  # Get amount of RAM in machine (in mB)
+  MEM=`awk '/^MemTotal:/ { print int($2 / 1024) }' /proc/meminfo`
+
+  if [ $MEM -lt 100 ]; then
+    echo "You might have problems running AstLinux with only ${MEM}mB
+of RAM. You should consider getting more."
+    sleep 3
+    RAMFS=no
+  elif [ $MEM -lt 200 ]; then
+    RAMFS=no
+  else
+    RAMFS=yes
+  fi
+
+  if echo "${CMDLINE}" | grep -q noram; then
+    echo "Overriding RAM detection as specified on the command line"
+    RAMFS=no
+  fi
+
+  if echo "${CMDLINE}" | grep -q debug; then
+    echo "Debugging enabled...will drop to a shell at some point"
+    DEBUG=1
+  fi
+
+  echo "Looking for AstLinux image..."
+  if ! losetup /dev/loop0 /cdrom/os/$ASTIMG; then
+    echo "Losetup failed"
+    exec /bin/sh
+  fi
+
+  echo "AstLinux image found!"
+  if ! mount -o ro /dev/loop0 /image; then
+    echo "Mount failed"
+    exec /bin/sh
+  fi
+
+  if [ "$RAMFS" = "yes" ]; then
+    image_to_tmpfs /new
+
+    # unmount the loop device
+    cd /
+    umount /dev/loop0
+    losetup -d /dev/loop0
+    echo "unmounting /cdrom"
+    umount /cdrom
+
+  else
+    echo "Moving mount point to /new"
+    mount --move /image /new
+  fi
+
+  umount /sys
+  umount /proc
+
+  # Pivot root and start real init
+  echo "Pivoting..."
+  cd /new
+  pivot_root . oldroot
+  mount -o move oldroot/dev dev
+  exec /usr/sbin/chroot . /bin/sh <<- EOF >dev/console 2>&1
+exec /sbin/init ${CMDLINE}
+EOF
+}
+
+# Get kernel CMDLINE
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+CMDLINE="`cat /proc/cmdline`"
+
+CDROM=""
+
+# Mount Root Device
+for x in $(list_nvme part) $DRIVES; do
+  if mount -t vfat -o ro /dev/${x}1 /cdrom >/dev/null 2>&1; then
+    if [ -f /cdrom/os/astflag ]; then
+      CDROM="${x}"
+      break
+    else
+      umount /dev/${x}1
+    fi
+  fi
+done
+
+if [ -z "$CDROM" ]; then
+  for x in $(list_nvme) $DRIVES; do
+    if mount -t iso9660 -o ro /dev/${x} /cdrom >/dev/null 2>&1; then
+      if [ -f /cdrom/os/astflag ]; then
+        CDROM="${x}"
+        break
+      else
+        umount /dev/${x}
+      fi
+    fi
+  done
+fi
+
+# CD not found
+if [ -z "$CDROM" ]; then
+  echo "AstLinux medium not found."
+  exec /bin/sh
+fi
+
+for i in ${CMDLINE}; do
+
+  case $i in
+  astimg=*)
+    ASTIMG=`echo $i | awk '/^astimg=/ { print substr($0, 8); }'`
+    ;;
+
+  asturw=*)
+    ASTURW=`echo $i | awk '/^asturw=/ { print substr($0, 8); }'`
+    ;;
+
+  newinstall)
+    export PRODUCT="AstLinux"
+    exec /sbin/init ${CMDLINE}
+    ;;
+
+  astlive)
+    astlive
+    ;;
+
+  esac
+
+done
+

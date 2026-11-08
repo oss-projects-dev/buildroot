@@ -1,0 +1,158 @@
+#!/bin/bash
+#
+# build [ board ]
+#
+
+# Max image size in 1024 (k) bytes
+MAX_IMAGEFS_SIZE=262144   # 256m
+
+REQUIRED_CMDS="which zcat bzcat make gcc bison flex msgfmt makeinfo autoconf nasm wget rsync sed perl gettext intltool-extract"
+
+ROOTFS_SQUASHFS="output/images/rootfs.squashfs"
+ROOTFS_EXT2="output/images/rootfs.ext2"
+
+RUNNIX_VER="$(awk -F'=' '/^RUNNIX_VER/ { print $2; exit }' boot/runnix/runnix.mk)"
+
+RUNNIX_DIR="output/build/runnix-${RUNNIX_VER// /}"
+
+RUNFS_DIR="output/build/runfs"
+
+make_release()
+{
+  echo "
+##
+## AstLinux Build: Board = \"$board\"
+##
+## AstLinux Release: Version = \"$ASTVER\"
+##
+"
+
+  mkdir -p ${ASTVER}
+  cp ${ROOTFS_SQUASHFS} ${ASTVER}/${ASTVER}.run
+  (
+    cd ${ASTVER}
+    sha1sum ${ASTVER}.run > ${ASTVER}.run.sha1
+  )
+  touch ${ASTVER}/astflag
+  sed -e "s/ASTVER/${ASTVER}/g" project/astlinux/board/${board}/runnix.conf > ${ASTVER}/${ASTVER}.run.conf
+  image_size=$(du -s -k "${ROOTFS_EXT2}" | awk '{ print $1 }')
+  if [ $image_size -gt $MAX_IMAGEFS_SIZE ]; then
+    echo "build: WARNING -- Image Size is larger then ${MAX_IMAGEFS_SIZE}KB, 'noram' is set"
+    sed -i 's/ astlive / astlive noram /' ${ASTVER}/${ASTVER}.run.conf
+  fi
+
+  cp initrd.img ${ASTVER}/${ASTVER}.initrd.img
+  tar -cvzf ${ASTVER}.tar.gz ${ASTVER}
+  sha1sum ${ASTVER}.tar.gz > ${ASTVER}.tar.gz.sha1
+}
+
+make_runfs()
+{
+  mkdir -p ${RUNFS_DIR}/os
+
+  RUNNIX_KCMD_CONSOLE="$(grep -e '^KCMD=' project/astlinux/board/${board}/runnix.conf | \
+        sed -e 's/"//g' -e 's/^KCMD=.*console=//' -e 's/ .*$//' -e 's/^KCMD=.*$//')"
+
+  if [ -f "${RUNNIX_DIR}/configs/${board}.cfg" ]; then
+    cp -p ${RUNNIX_DIR}/configs/${board}.cfg ${RUNFS_DIR}/syslinux.cfg
+  elif [ -n "${RUNNIX_KCMD_CONSOLE}" ]; then
+    cp -p ${RUNNIX_DIR}/configs/default6-serial.cfg ${RUNFS_DIR}/syslinux.cfg
+  else
+    cp -p ${RUNNIX_DIR}/configs/default6.cfg ${RUNFS_DIR}/syslinux.cfg
+  fi
+  # Install EFI/BOOT syslinux.cfg
+  if [ -n "${RUNNIX_KCMD_CONSOLE}" ]; then
+    cp -p ${RUNNIX_DIR}/configs/defaultEFI-serial.cfg ${RUNFS_DIR}/EFI/BOOT/syslinux.cfg
+  else
+    cp -p ${RUNNIX_DIR}/configs/defaultEFI.cfg ${RUNFS_DIR}/EFI/BOOT/syslinux.cfg
+  fi
+
+  rm -f ${RUNFS_DIR}/os/astlinux-*
+
+  cp -p ${ASTVER}/* ${RUNFS_DIR}/os/
+  echo ${ASTVER} > ${RUNFS_DIR}/os/ver
+}
+
+exit_error()
+{
+  echo "
+## ** ERROR **
+## AstLinux Build: Board = \"$board\"
+## $1
+"
+  exit 1
+}
+
+umask 002
+
+PATH=/sbin:/usr/sbin:$PATH
+
+if [ -n "$1" ]; then
+  echo "Defining Board = \"$1\""
+  echo "$1" > "astlinux.board"
+fi
+
+if [ ! -f "astlinux.board" ]; then
+  echo "genx86_64" > "astlinux.board"
+fi
+
+board="$(cat "astlinux.board")"
+
+if [ -z "$board" ] || [ ! -d "project/astlinux/board/$board" ]; then
+  exit_error "Unknown Board type."
+fi
+
+if [ "$(uname -m)" != "x86_64" ]; then
+  exit_error "Build system must be x86_64."
+fi
+
+x_tools_dir="$(awk -F'"' '/^BR2_TOOLCHAIN_EXTERNAL_PATH=/ { print $2; nextfile }' .config | sed 's:^[^/]*::')"
+if [ -z "$x_tools_dir" ]; then
+  exit_error "BR2_TOOLCHAIN_EXTERNAL_PATH not found in .config file."
+fi
+if [ ! -d "$HOME$x_tools_dir" ]; then
+  cat "crosstool-ng-src/README"
+  exit_error "Toolchain not found, see instructions above."
+fi
+
+error=0
+for i in $REQUIRED_CMDS; do
+  if ! which $i >/dev/null 2>&1; then
+    error=1
+    echo "build: Required command \"$i\" is missing in your build environment."
+    if [ "$i" = "which" ]; then  # no use proceeding
+      break
+    fi
+  fi
+done
+if [ $error -ne 0 ]; then
+  exit_error "Missing Required Command(s)."
+fi
+
+  echo "
+##
+## AstLinux Build: Board = \"$board\"
+##
+"
+
+if ! ./scripts/build-initrd; then
+  exit 1
+fi
+
+make oldconfig
+
+time make all
+
+if [ $? -eq 0 -a -f "$ROOTFS_SQUASHFS" -a -f "initrd.img" -a -d "$RUNNIX_DIR" -a -d "$RUNFS_DIR" ]; then
+  . ./scripts/ver-label/astlinux_release_version.sh
+  astlinux_release_version
+  make_release
+  make_runfs
+else
+  rm -f "$ROOTFS_SQUASHFS"
+  echo "build: Incomplete build, no AstLinux Release for you."
+  exit 1
+fi
+
+exit 0
+

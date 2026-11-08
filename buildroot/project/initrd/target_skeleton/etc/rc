@@ -1,0 +1,23 @@
+#!/bin/sh
+
+export PATH=/bin:/sbin
+
+case $1 in
+
+install)
+  echo "Installation not supported here."
+  sleep 2
+  reboot -f
+  ;;
+
+shutdown)
+  echo "Rebooting..."
+  sync
+  sleep 2
+  umount -a -r >/dev/null 2>&1
+
+  ### Nothing below this line for shutdown ###
+  ;;
+
+esac
+

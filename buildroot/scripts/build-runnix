@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+# build-runnix
+#
+
+CONFIG="runnix.config"
+
+ROOTFS_EXT2_GZ="output/images/rootfs.ext2.gz"
+
+KERNEL="output/images/bzImage"
+
+SYSLINUX_VERSION="$(awk -F'=' '/^SYSLINUX_VERSION/ { print $2; exit }' boot/syslinux/syslinux.mk)"
+
+SYSLINUX_DIR="output/build/syslinux-${SYSLINUX_VERSION// /}"
+
+make_release()
+{
+  echo "
+##
+## RUNNIX Release: Version = \"$RUNVER\"
+##
+"
+
+  mkdir -p ${RUNVER}
+  cp -a project/runnix/files/* ${RUNVER}/
+  cp -p ${SYSLINUX_DIR}/bios/mbr/mbr.bin ${RUNVER}/mbr.bin
+  cp -p ${SYSLINUX_DIR}/bios/linux/syslinux ${RUNVER}/syslinux
+  cp -p ${KERNEL} ${RUNVER}/rootfs_vfat/runnix
+  cp -p ${ROOTFS_EXT2_GZ} ${RUNVER}/rootfs_vfat/runnix.img
+  cp -p ${SYSLINUX_DIR}/bios/com32/menu/menu.c32 ${RUNVER}/rootfs_vfat/menu.c32
+  cp -p ${SYSLINUX_DIR}/bios/com32/libutil/libutil.c32 ${RUNVER}/rootfs_vfat/libutil.c32
+  # EFI
+  cp -p ${SYSLINUX_DIR}/efi64/efi/syslinux.efi ${RUNVER}/rootfs_vfat/EFI/BOOT/bootx64.efi
+  cp -p ${SYSLINUX_DIR}/efi64/com32/elflink/ldlinux/ldlinux.e64 ${RUNVER}/rootfs_vfat/EFI/BOOT/ldlinux.e64
+  cp -p ${SYSLINUX_DIR}/efi64/com32/menu/menu.c32 ${RUNVER}/rootfs_vfat/EFI/BOOT/menu.c32
+  cp -p ${SYSLINUX_DIR}/efi64/com32/libutil/libutil.c32 ${RUNVER}/rootfs_vfat/EFI/BOOT/libutil.c32
+  echo "${RUNVER}" > ${RUNVER}/rootfs_vfat/ver
+
+  tar -cvzf ${RUNVER}.tar.gz ${RUNVER}
+  sha1sum ${RUNVER}.tar.gz > ${RUNVER}.tar.gz.sha1
+}
+
+save_state()
+{
+  cp -p .config .config.runnix.save
+  cp -p ${CONFIG} .config
+
+  if [ -d "output" ]; then
+    mv output output.runnix.save
+  fi
+}
+
+restore_state()
+{
+  # This may be called multiple times on a interrupt
+  # Only restore once
+  if [ -f ".config.runnix.save" ]; then
+
+    rm -rf output
+
+    if [ -d "output.runnix.save" ]; then
+      mv output.runnix.save output
+    fi
+
+    cp -p .config.runnix.save .config
+    rm -f .config.runnix.save
+  fi
+}
+
+umask 002
+
+PATH=/sbin:/usr/sbin:$PATH
+
+if [ ! -f "$CONFIG" ]; then
+  echo "The $CONFIG file does not exist, exiting."
+  exit 1
+fi
+
+# Save and Restore state if AstLinux is currently in output/
+#
+save_restore=0
+if [ -f "output/target/etc/astlinux-release" ]; then
+  save_restore=1
+fi
+
+if [ $save_restore -eq 1 ]; then
+  save_state
+
+  trap 'restore_state; exit $?' INT TERM EXIT
+fi
+
+make oldconfig
+
+time make all
+
+if [ $? -eq 0 -a -f "$ROOTFS_EXT2_GZ" -a -f "$KERNEL" -a -d "$SYSLINUX_DIR" ]; then
+  . ./scripts/ver-label/runnix_release_version.sh
+  runnix_release_version
+  make_release
+else
+  rm -f "$ROOTFS_EXT2_GZ"
+  echo "build: Incomplete build, no RUNNIX Release for you."
+fi
+
+if [ $save_restore -eq 1 ]; then
+  trap - INT TERM EXIT
+
+  restore_state
+
+  make oldconfig
+fi
+
+exit 0
+

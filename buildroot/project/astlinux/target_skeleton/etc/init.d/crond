@@ -1,0 +1,88 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+init () {
+
+  mkdir -p /var/spool/cron
+  if [ -d /mnt/kd/crontabs ]; then
+    ln -snf /mnt/kd/crontabs /var/spool/cron/crontabs
+  else
+    mkdir /var/spool/cron/crontabs
+  fi
+
+  # Automatically add daily cron entry for logrotate
+  if [ -x /usr/sbin/logrotate ]; then
+    if [ ! -f /var/spool/cron/crontabs/root ] || ! grep -q '/usr/sbin/logrotate ' /var/spool/cron/crontabs/root; then
+      echo "
+##
+## logrotate - Do not remove, comment-out to disable
+00 04 * * * /usr/sbin/logrotate /etc/logrotate.conf >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
+    fi
+  fi
+
+  # Automatically add daily cron entry for Fossil - disabled by default
+  if [ -x /usr/bin/fossil-commit ]; then
+    if [ ! -f /var/spool/cron/crontabs/root ] || ! grep -q '/usr/bin/fossil-commit ' /var/spool/cron/crontabs/root; then
+      echo "
+##
+## Fossil daily auto-commit - Do not remove, un-comment to enable
+#55 23 * * * /usr/bin/fossil-commit >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
+    fi
+  fi
+}
+
+start () {
+  local log_file log_level
+
+  echo "Starting crond..."
+
+  ## Log Methods: "syslog", "file" or "none". Default is "syslog"
+  case "$CRON_LOG_METHOD" in
+    file) log_file="/var/log/cron.log" ;;
+    none) log_file="/dev/null" ;;
+       *) log_file="" ;;
+  esac
+  ## Log Levels: "info" or "error". Default is "info"
+  case "$CRON_LOG_LEVEL" in
+   error) log_level="9" ;;
+       *) log_level="" ;;
+  esac
+  crond ${log_file:+-L "$log_file"} ${log_level:+-l "$log_level"}
+}
+
+stop () {
+
+  if ps | grep -q -e '[ /]crond[ ]' -e '[ /]crond$'; then
+    echo "Stopping crond..."
+    killall crond >/dev/null 2>&1
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac
+

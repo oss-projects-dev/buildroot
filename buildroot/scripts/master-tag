@@ -1,0 +1,78 @@
+#!/bin/bash
+
+TVER="1.5"
+
+if [ "${1:0:4}" != "${TVER}." ]; then
+  echo "Usage: master-tag ${TVER}.x"
+  exit 1
+fi
+
+RELEASE="astlinux-${1}"
+
+ASTLINUX_RELEASE="project/astlinux/target_skeleton/etc/astlinux-release"
+
+ASTLINUX_CHANGELOG="docs/ChangeLog.txt"
+
+mark_release()
+{
+  echo "$RELEASE" > "$ASTLINUX_RELEASE"
+
+  sed -i "s/^Released @TBD@/Released $(date +%Y-%m-%d)/" "$ASTLINUX_CHANGELOG"
+}
+
+mark_git()
+{
+  local error="$1"
+
+  echo "git" > "$ASTLINUX_RELEASE"
+
+  if [ "$error" = "error" ]; then
+    sed -i "s/^Released $(date +%Y-%m-%d)/Released @TBD@/" "$ASTLINUX_CHANGELOG"
+  else
+    sed -i '8 i\
+Additions for AstLinux '$TVER'.'$(($(echo "$RELEASE" | cut -d'.' -f3)+1))':\
+=============================\
+\
+Released @TBD@\
+\
+' "$ASTLINUX_CHANGELOG"
+  fi
+}
+
+if ! git status >/dev/null 2>&1; then
+  echo "Tagging astlinux requires a git checkout, exiting."
+  exit 1
+fi
+
+GIT="$(cat $ASTLINUX_RELEASE)"
+
+if [ "git" != "$GIT" ]; then
+  echo "master-tag: Current directory is not in git branch"
+  exit 1
+fi
+
+if ! git pull; then
+  exit 1
+fi
+
+mark_release
+
+git commit -a -m "mark release '$RELEASE'"
+git push
+
+if [ $? -ne 0 ]; then
+  mark_git error
+  exit 1
+fi
+
+git tag -a "${1}" -m "Tag: ${1}"
+git push origin "${1}"
+
+mark_git
+
+git commit -a -m "return to release 'git'"
+git push
+
+git pull
+
+exit 0

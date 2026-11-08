@@ -1,0 +1,51 @@
+#!/bin/sh
+
+file="$1"
+
+url="$2"
+
+redirect_url_to_https()
+{
+  local host="$1" base_url cname
+
+  base_url="$url"
+  base_url="${base_url#http://}"
+  base_url="${base_url#https://}"
+
+  if [ "$host" != "${base_url%%/*}" ]; then
+    return
+  fi
+
+  if [ ! -x /usr/sbin/unbound-host ]; then
+    return
+  fi
+
+  cname="$(/usr/sbin/unbound-host -t CNAME "$host" | sed -n -r -e 's/^.* CNAME .* ([^ ]+)$/\1/p' | head -n1)"
+  if [ -z "$cname" ]; then
+    return
+  fi
+
+  if [ "$base_url" != "${base_url#*/}" ]; then
+    base_url="${base_url#*/}"
+  else
+    base_url=""
+  fi
+
+  url="https://${cname%.}/${base_url}"
+}
+
+if [ -z "$file" -o -z "$url" ]; then
+  echo "Usage: download-file file url" >&2
+  exit 1
+fi
+
+## Redirect AstLinux mirror URL to HTTPS
+##
+redirect_url_to_https "mirror.astlinux-project.org"
+
+## Redirect AstLinux files URL to HTTPS, used for Add-On Packages
+##
+redirect_url_to_https "files.astlinux-project.org"
+
+curl -sSfL --globoff --retry 1 --connect-timeout 15 --max-time 1800 -o "$file" "$url" >/dev/null
+

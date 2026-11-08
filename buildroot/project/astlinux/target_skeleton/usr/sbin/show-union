@@ -1,0 +1,107 @@
+#!/bin/sh
+
+ASTURW="/mnt/asturw"
+
+KD="mnt/kd"
+
+ASTERISK_SOUNDS="stat/var/lib/asterisk/sounds"
+ASTERISK_MOH="stat/var/lib/asterisk/moh"
+PACKAGES="stat/var/packages"
+LOCALE="stat/var/lib/locale"
+
+system()
+{
+  find $ASTURW -type f | \
+    grep -v -e "^$ASTURW/$KD" \
+            -e "^$ASTURW/$ASTERISK_SOUNDS" \
+            -e "^$ASTURW/$ASTERISK_MOH" \
+            -e "^$ASTURW/$PACKAGES" \
+            -e "^$ASTURW/$LOCALE"
+}
+
+kd()
+{
+  if mount | grep -q "/$KD  *type  *ext4"; then
+    echo "/$KD is not on ASTURW. /$KD is a separate partition." >&2
+  else
+    find $ASTURW/$KD -type f
+  fi
+}
+
+asterisk_sounds()
+{
+  if [ -d $ASTURW/$ASTERISK_SOUNDS ]; then
+    find $ASTURW/$ASTERISK_SOUNDS -type f
+  else
+    echo "No Asterisk Sounds on ASTURW." >&2
+  fi
+  if [ -d $ASTURW/$ASTERISK_MOH ]; then
+    find $ASTURW/$ASTERISK_MOH -type f
+  else
+    echo "No Asterisk MOH Sounds on ASTURW." >&2
+  fi
+}
+
+packages()
+{
+  if [ -d $ASTURW/$PACKAGES ]; then
+    find $ASTURW/$PACKAGES -type f
+  else
+    echo "No Installed Packages on ASTURW." >&2
+  fi
+}
+
+locale()
+{
+  if [ -d $ASTURW/$LOCALE ]; then
+    find $ASTURW/$LOCALE -type f
+  else
+    echo "No Installed Locale on ASTURW." >&2
+  fi
+}
+
+all()
+{
+  find $ASTURW
+}
+
+# main
+
+if ! mount | grep -q "$ASTURW"; then
+  echo "Unable to find ASTURW partition." >&2
+  exit 1
+fi
+
+case $1 in
+
+system|'')
+  system
+  ;;
+
+kd)
+  kd
+  ;;
+
+asterisk_sounds)
+  asterisk_sounds
+  ;;
+
+packages)
+  packages
+  ;;
+
+locale)
+  locale
+  ;;
+
+all)
+  all
+  ;;
+
+*)
+  echo "Usage: show-union [ system|kd|asterisk_sounds|packages|locale|all ]"
+  exit 1
+  ;;
+
+esac
+

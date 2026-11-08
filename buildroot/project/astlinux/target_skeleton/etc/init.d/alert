@@ -1,0 +1,199 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+dev_to_ipv4_addresses()
+{
+  ip -o addr show dev "$1" 2>/dev/null | \
+        awk '$3 == "inet" { split($4, field, "/"); print field[1]; }' | \
+        tr '\n' ' '
+}
+
+dev_to_ipv4_networks()
+{
+  ip -o addr show dev "$1" 2>/dev/null | \
+        awk '$3 == "inet" { print $4; }' | \
+        tr '\n' ' '
+}
+
+welcome_msg()
+{
+  local asterisk="" cpu cpu_cores cpu_speed memtotal memavail board release
+
+  if [ -x /usr/sbin/asterisk ]; then
+    asterisk="$(/usr/sbin/asterisk -V)"
+  fi
+
+  cpu="$(sed -n -r 's/^model name[[:space:]]*:[[:space:]]*([^@]+).*$/\1/p' /proc/cpuinfo | head -n1)"
+  cpu="$(echo $cpu | sed -e 's/([^)]*)//g' -e 's/ CPU//g')"
+  cpu_cores="$(grep -c "^processor" /proc/cpuinfo)"
+  cpu_speed="$(lscpu | sed -n -r 's/^CPU max MHz:[[:space:]]*([0-9]+).*$/\1/p')"
+  if [ -z "$cpu_speed" ]; then
+    cpu_speed="$(sed -n -r 's/^cpu MHz[[:space:]]*:[[:space:]]*([0-9]+).*$/\1/p' /proc/cpuinfo | head -n1)"
+  fi
+  case $((cpu_speed % 10)) in
+    9) cpu_speed=$((cpu_speed+1)) ;;
+    8) cpu_speed=$((cpu_speed+2)) ;;
+    2) cpu_speed=$((cpu_speed-2)) ;;
+    1) cpu_speed=$((cpu_speed-1)) ;;
+  esac
+  cpu="${cpu} (${cpu_cores}x) @ ${cpu_speed} MHz"
+
+  memtotal="$(awk '/^MemTotal:/ { print int(($2 + 512) / 1024) }' /proc/meminfo)"
+  memavail="$(awk '/^MemAvailable:/ { print int(($2 + 512) / 1024) }' /proc/meminfo)"
+
+  board="$(cat /proc/cmdline | sed -n -r -e 's:^.* astlinux=([^ ]+).*$:\1:p')"
+  if grep -q ' console=' /proc/cmdline; then
+    board="${board}-serial"
+  fi
+
+  if [ -x /usr/sbin/system-vendor ]; then
+    vendor="$(/usr/sbin/system-vendor 2>/dev/null)"
+  else
+    vendor=""
+  fi
+
+  if [ -d /sys/firmware/efi ]; then
+    uefi=" - UEFI"
+  else
+    uefi=""
+  fi
+
+  release="$(cat /etc/astlinux-release)"
+
+  echo -e "\n\n\033[40m\033[1;32m  Welcome to AstLinux, Release: ${release}${asterisk:+ - $asterisk}  \033[0m"
+  echo "
+  System information (as of $(date))
+
+      Host Name: $HOSTNAME.$DOMAIN
+          Linux: $(uname -r -m)
+            CPU: $cpu
+            RAM: $memtotal MB, Available $memavail MB
+     Board Type: $board${vendor:+
+       Hardware: $vendor$uefi}
+
+      Interface: $EXTIF (External)   IPv4 Address: $(dev_to_ipv4_addresses $EXTIF)${INTIF:+
+      Interface: $INTIF (1st LAN)    IPv4 Network: $(dev_to_ipv4_networks $INTIF)}${INT2IF:+
+      Interface: $INT2IF (2nd LAN)    IPv4 Network: $(dev_to_ipv4_networks $INT2IF)}${INT3IF:+
+      Interface: $INT3IF (3rd LAN)    IPv4 Network: $(dev_to_ipv4_networks $INT3IF)}${INT4IF:+
+      Interface: $INT4IF (4th LAN)    IPv4 Network: $(dev_to_ipv4_networks $INT4IF)}${DMZIF:+
+      Interface: $DMZIF (The DMZ)    IPv4 Network: $(dev_to_ipv4_networks $DMZIF)}
+"
+  if [ "$ENABLE_MOTD" != "no" ] && [ ! -f /tmp/etc/motd ]; then
+    local H='\033[40m\033[1;32m'
+    local L='\033[1;31m'
+    local N='\033[0m'
+    echo -e "${H}|||||${N}
+${H}| A |${N}     ${L}Release:${N} ${release}${asterisk:+ - $asterisk}
+${H}| s |${N}   ${L}Host Name:${N} $HOSTNAME.$DOMAIN
+${H}| t |${N}   ${L}Last Boot:${N} $(date '+%Y-%m-%d %H:%M')
+${H}| L |${N}       ${L}Linux:${N} $(uname -r -m)
+${H}| i |${N}         ${L}CPU:${N} $cpu
+${H}| n |${N}         ${L}RAM:${N} $memtotal MB
+${H}| u |${N}  ${L}Board Type:${N} $board
+${H}| x |${N}    ${L}Hardware:${N} ${vendor:-Generic $(uname -m)}${uefi}
+${H}|||||${N}" >/tmp/etc/motd
+  fi
+
+  # Add a one second delay to allow the message to transmit since getty immediately
+  # follows this service and flushes any unsent serial data for a serial console.
+  sleep 1
+}
+
+is_alert_sound_type()
+{
+  local sound_type="$1" sound IFS
+
+  unset IFS
+  for sound in $ALERT_SOUNDS; do
+    if [ "$sound" = "$sound_type" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+set_tune_octave()
+{
+  local orig_tune="$1" octave="$2" dest_tune arg freq power IFS
+
+  if [ "$octave" = "1" -o "$octave" = "2" -o "$octave" = "3" ]; then
+    power=$((2**octave))
+    dest_tune=""
+    unset IFS
+    for arg in $orig_tune; do
+      if [ "${arg#-f}" != "$arg" ]; then
+        freq="${arg#-f}"
+        dest_tune="$dest_tune${dest_tune:+ }-f$((freq*power))"
+      else
+        dest_tune="$dest_tune${dest_tune:+ }$arg"
+      fi
+    done
+  else
+    dest_tune="$orig_tune"
+  fi
+
+  echo "$dest_tune"
+}
+
+play_alert_sound_type()
+{
+  local tune=""
+
+  case $1 in
+    startup)  tune="-f330 -l100 -d1 -n -f277 -l100 -d1 -n -f330 -l100 -d1 -n -f440 -l330" ;;
+    shutdown) tune="-f988 -l180 -d33 -n -f831 -l110" ;;
+  esac
+
+  if [ -n "$tune" ]; then
+    if [ -n "$ALERT_SOUNDS_OCTAVE" ]; then
+      tune="$(set_tune_octave "$tune" "$ALERT_SOUNDS_OCTAVE")"
+    fi
+    beep $tune
+  fi
+}
+
+start () {
+
+  welcome_msg
+
+  # Generate Alert Sounds (after finished booting)
+  if is_alert_sound_type startup; then
+    play_alert_sound_type startup
+  fi
+}
+
+stop () {
+
+  # Generate Alert Sounds (on reboot/shutdown)
+  if is_alert_sound_type shutdown; then
+    play_alert_sound_type shutdown
+  fi
+}
+
+case $1 in
+
+  start)
+    start
+    ;;
+
+  stop)
+    stop
+    ;;
+
+  init)
+    start
+    ;;
+
+  restart)
+    stop
+    sleep 2
+    start
+    ;;
+
+  *)
+    echo "Usage: start|stop|restart"
+    ;;
+
+esac

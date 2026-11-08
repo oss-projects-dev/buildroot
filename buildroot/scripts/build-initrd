@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# build-initrd [ force ]
+#
+
+save_state()
+{
+  cp -p .config .config.initrd.save
+  cp -p "$initrd_config_file" .config
+
+  if [ -d "output" ]; then
+    mv output output.initrd.save
+  fi
+}
+
+restore_state()
+{
+  # This may be called multiple times on a interrupt
+  # Only restore once
+  if [ -f ".config.initrd.save" ]; then
+
+    rm -rf output
+
+    if [ -d "output.initrd.save" ]; then
+      mv output.initrd.save output
+    fi
+
+    cp -p .config.initrd.save .config
+    rm -f .config.initrd.save
+  fi
+}
+
+umask 002
+
+PATH=/sbin:/usr/sbin:$PATH
+
+build_arch="$(awk -F'"' '/^BR2_ARCH=/ { print $2; nextfile }' .config)"
+
+if [ -z "$build_arch" ]; then
+  echo "Unknown build architecture, exiting."
+  exit 1
+fi
+
+initrd_config_file="${build_arch}-configs/initrd.config"
+
+if [ ! -f "$initrd_config_file" ]; then
+  echo "Invalid build architecture '$build_arch', exiting."
+  exit 1
+fi
+
+if [ -f "initrd.arch" ]; then
+  initrd_arch="$(cat initrd.arch)"
+else
+  initrd_arch=""
+fi
+
+if [ -f "initrd.img" -a "$initrd_arch" = "$build_arch" -a "$1" != "force" ]; then
+  echo "The initrd image (initrd.img) already exists, skipping build."
+  exit 0
+fi
+
+if [ ! -f "$initrd_config_file" ]; then
+  echo "The $initrd_config_file file does not exist, exiting."
+  exit 1
+fi
+
+save_state
+
+trap 'restore_state; exit $?' INT TERM EXIT
+
+make oldconfig
+
+time make all
+
+trap - INT TERM EXIT
+
+if [ -f "output/images/rootfs.ext2.gz" ]; then
+  echo "Installing initrd.img..."
+  cp "output/images/rootfs.ext2.gz" "initrd.img"
+  echo "$build_arch" > "initrd.arch"
+  rtn_val=0
+else
+  echo "Initrd build failed."
+  rtn_val=1
+fi
+
+restore_state
+
+make oldconfig
+
+exit $rtn_val
+

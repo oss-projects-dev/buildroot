@@ -1,0 +1,220 @@
+#!/bin/bash
+#
+# build-runnix-iso install_image.img.gz|install_image_dir [serial]
+#
+
+REQUIRED_CMDS="which sudo sha1sum"
+
+HOST_BIN="./output/host/usr/bin"
+
+REQUIRED_HOST_CMDS="xorriso"
+
+CONFIG="runnix-iso.config"
+
+ROOTFS_EXT2_GZ="output/images/rootfs.ext2.gz"
+
+KERNEL="output/images/bzImage"
+
+SYSLINUX_VERSION="$(awk -F'=' '/^SYSLINUX_VERSION/ { print $2; exit }' boot/syslinux/syslinux.mk)"
+
+SYSLINUX_DIR="output/build/syslinux-${SYSLINUX_VERSION// /}"
+
+gen_image_sha1_files()
+{
+  local dir="$1" image images IFS
+  (
+    cd "$dir"
+    images="$(ls -1 *.img.gz 2>/dev/null)"
+
+    IFS=$'\n'
+    for image in $images; do
+      sha1sum "${image}" > "${image}.sha1"
+    done
+  )
+}
+
+make_release()
+{
+  echo "
+##
+## RUNNIX-ISO Release: Version = \"$RUNVER\"
+##
+"
+
+  RUNDIR="output/build/$RUNVER"
+
+  rm -rf ${RUNDIR}
+  mkdir ${RUNDIR}
+  cp -a project/runnix-iso/files/rootfs_vfat/* ${RUNDIR}/
+  if [ "$SERIAL" = "serial" ]; then
+    cp -p project/runnix-iso/files/configs/isolinux-serial.cfg ${RUNDIR}/isolinux/isolinux.cfg
+    touch ${RUNDIR}/os/serialflag
+  fi
+  cp -p ${SYSLINUX_DIR}/bios/core/isolinux.bin ${RUNDIR}/isolinux/isolinux.bin
+  cp -p ${SYSLINUX_DIR}/bios/com32/elflink/ldlinux/ldlinux.c32 ${RUNDIR}/isolinux/ldlinux.c32
+  cp -p ${KERNEL} ${RUNDIR}/runnix/runnix
+  cp -p ${ROOTFS_EXT2_GZ} ${RUNDIR}/runnix/runnix.img
+  # EFI
+  if [ "$SERIAL" = "serial" ]; then
+    cp -p project/runnix-iso/files/configs/syslinuxEFI-serial.cfg ${RUNDIR}/EFI/BOOT/syslinux.cfg
+  fi
+  cp -p ${SYSLINUX_DIR}/efi64/efi/syslinux.efi ${RUNDIR}/EFI/BOOT/bootx64.efi
+  cp -p ${SYSLINUX_DIR}/efi64/com32/elflink/ldlinux/ldlinux.e64 ${RUNDIR}/EFI/BOOT/ldlinux.e64
+
+  if [ -n "$ISO_DIR" ]; then
+    cp "$ISO_DIR"/*.img.gz ${RUNDIR}/os/
+  elif [ -n "$ISO_FILE" ]; then
+    cp "$ISO_FILE" ${RUNDIR}/os/
+  fi
+  gen_image_sha1_files ${RUNDIR}/os
+
+  cp -p docs/ChangeLog.txt "${RUNDIR}/${ISO_NAME%.iso}.txt"
+
+  rm -f "${ISO_NAME}"
+
+  echo "Generating ISO '${ISO_NAME}' ..."
+  sudo $HOST_BIN/xorriso -as mkisofs \
+    -isohybrid-mbr ${SYSLINUX_DIR}/bios/mbr/isohdpfx.bin \
+    -o "${ISO_NAME}" \
+    -b isolinux/isolinux.bin \
+    -c isolinux/boot.cat \
+    -V ASTLINUX_ISO \
+    -J -R \
+    -no-emul-boot \
+    -boot-load-size 4 \
+    -boot-info-table \
+    -input-charset utf-8 \
+    ${RUNDIR}
+}
+
+save_state()
+{
+  cp -p .config .config.runnix-iso.save
+  cp -p ${CONFIG} .config
+
+  if [ -d "output" ]; then
+    mv output output.runnix-iso.save
+  fi
+}
+
+restore_state()
+{
+  # This may be called multiple times on a interrupt
+  # Only restore once
+  if [ -f ".config.runnix-iso.save" ]; then
+
+    rm -rf output
+
+    if [ -d "output.runnix-iso.save" ]; then
+      mv output.runnix-iso.save output
+    fi
+
+    cp -p .config.runnix-iso.save .config
+    rm -f .config.runnix-iso.save
+  fi
+}
+
+umask 002
+
+PATH=/sbin:/usr/sbin:$PATH
+
+ISO_DIR=""
+ISO_FILE=""
+
+if [ -n "$1" ] && [ -d "$1" ]; then
+  ISO_DIR="$1"
+  ISO_NAME="$(basename "$1").iso"
+elif [ -n "$1" ] && [ "${1}" != "${1%.img.gz}" ]; then
+  ISO_FILE="$1"
+  ISO_NAME="${ISO_FILE##*/}"
+  ISO_NAME="${ISO_NAME%.img.gz}.iso"
+else
+  echo "Usage: ./scripts/build-runnix-iso install_image.img.gz|install_image_dir [serial]"
+  exit 1
+fi
+
+if [ "$2" = "serial" ]; then
+  SERIAL="$2"
+  ISO_NAME="${ISO_NAME%-serial.iso}"
+  ISO_NAME="${ISO_NAME%.iso}-serial.iso"
+else
+  SERIAL=""
+fi
+
+if [ -n "$ISO_FILE" ] && [ ! -f "$ISO_FILE" ]; then
+  echo "build-runnix-iso: The $ISO_FILE file does not exist, exiting."  >&2
+  exit 1
+fi
+if [ -n "$ISO_DIR" ] && ! ls "$ISO_DIR"/*.img.gz >/dev/null 2>&1; then
+  echo "build-runnix-iso: The $ISO_DIR directory does not contain *.img.gz files, exiting."  >&2
+  exit 1
+fi
+
+for i in $REQUIRED_HOST_CMDS; do
+  if [ ! -x "$HOST_BIN/$i" ]; then
+    make host-$i
+  fi
+done
+
+error=0
+for i in $REQUIRED_HOST_CMDS; do
+  if [ ! -x "$HOST_BIN/$i" ]; then
+    error=1
+    echo "build-runnix-iso: Required HOST command \"$i\" is missing." >&2
+  fi
+done
+for i in $REQUIRED_CMDS; do
+  if ! which $i >/dev/null 2>&1; then
+    error=1
+    echo "build-runnix-iso: Required command \"$i\" is missing in your build environment." >&2
+    if [ "$i" = "which" ]; then  # no use proceeding
+      break
+    fi
+  fi
+done
+if [ $error -ne 0 ]; then
+  echo "Missing Required Command(s)." >&2
+  exit 1
+fi
+
+if [ ! -f "$CONFIG" ]; then
+  echo "The $CONFIG file does not exist, exiting."  >&2
+  exit 1
+fi
+
+# Save and Restore state if AstLinux is currently in output/
+#
+save_restore=0
+if [ -f "output/target/etc/astlinux-release" ]; then
+  save_restore=1
+fi
+
+if [ $save_restore -eq 1 ]; then
+  save_state
+
+  trap 'restore_state; exit $?' INT TERM EXIT
+fi
+
+make oldconfig
+
+time make all
+
+if [ $? -eq 0 -a -f "$ROOTFS_EXT2_GZ" -a -f "$KERNEL" -a -d "$SYSLINUX_DIR" ]; then
+  . ./scripts/ver-label/runnix_iso_release_version.sh
+  runnix_iso_release_version
+  make_release
+else
+  rm -f "$ROOTFS_EXT2_GZ"
+  echo "build: Incomplete build, no RUNNIX-ISO Release for you."
+fi
+
+if [ $save_restore -eq 1 ]; then
+  trap - INT TERM EXIT
+
+  restore_state
+
+  make oldconfig
+fi
+
+exit 0
+

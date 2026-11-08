@@ -1,0 +1,227 @@
+#!/bin/bash
+#
+# master-build output_path [ force ]
+#
+
+output_path="$1"
+
+force="$2"
+
+FAT_SIZE=256
+
+REQUIRED_CMDS="which sudo sha1sum sha256sum"
+
+BOARDS_SMP64="genx86_64 genx86_64-serial"
+
+BOARDS_SMP64VM="genx86_64-vm"
+
+RUNFS_DIR="output/build/runfs"
+
+build_board()
+{
+  local firmware="$1"
+
+  ./scripts/build $board
+
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+
+  ASTVER="$(cat ${RUNFS_DIR}/os/ver)"
+
+  if [ -z "$ASTVER" ]; then
+    echo "master-build: missing runfs version file."
+    exit 1
+  fi
+
+  ./scripts/astlinux-makeimage -z $FAT_SIZE $FAT_SIZE 0
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+
+  mkdir "$output_path/$firmware/$board"
+  mkdir -p "$output_path/img/${ASTVER}-${board}"
+
+  mv "${ASTVER}.tar.gz" "$output_path/$firmware/$board/${ASTVER}.tar.gz"
+  mv "${ASTVER}.tar.gz.sha1" "$output_path/$firmware/$board/${ASTVER}.tar.gz.sha1"
+  mv "${ASTVER}.img.gz" "$output_path/img/${ASTVER}-${board}/${board}-${ASTVER#astlinux-}-${ASTERISK_VERSION}.img.gz"
+
+  rm -rf "${ASTVER}"
+}
+
+set_smp64vm_kernel()
+{
+  sed -i 's:^BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="[^"]*":BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="project/astlinux/genx86_64/linux-smp-vm.config":' .config
+}
+
+unset_major_pci_packages()
+{
+  # disable BR2_PACKAGE_RHINO
+  sed -i 's:^BR2_PACKAGE_RHINO=y.*$:# BR2_PACKAGE_RHINO is not set:' .config
+
+  # disable BR2_PACKAGE_DAHDI_HFCS
+  sed -i 's:^BR2_PACKAGE_DAHDI_HFCS=y.*$:# BR2_PACKAGE_DAHDI_HFCS is not set:' .config
+
+  # BR2_PACKAGE_DAHDI_NO_CARD_FIRMWARE=y
+  sed -i 's:^# BR2_PACKAGE_DAHDI_NO_CARD_FIRMWARE .*$:BR2_PACKAGE_DAHDI_NO_CARD_FIRMWARE=y:' .config
+}
+
+set_openvmtools_package()
+{
+  # enable BR2_PACKAGE_OPENVMTOOLS
+  sed -i 's:^# BR2_PACKAGE_OPENVMTOOLS .*$:BR2_PACKAGE_OPENVMTOOLS=y:' .config
+}
+
+set_qemu_guest_agent_package()
+{
+  # enable BR2_PACKAGE_QEMU_GUEST_AGENT
+  sed -i 's:^# BR2_PACKAGE_QEMU_GUEST_AGENT .*$:BR2_PACKAGE_QEMU_GUEST_AGENT=y:' .config
+}
+
+set_asterisk_version()
+{
+  case $1 in
+    ast18se)
+      CONFIG="astlinux-ast18se.config"
+      ASTERISK_VERSION="$(awk -F'=' '/^ASTERISK_VERSION/ { if ($2 ~ /^ *18./) {print $2; exit} }' package/asterisk/asterisk.mk)"
+      ASTERISK_VERSION="asterisk-${ASTERISK_VERSION// /}se"
+      FIRMWARE="ast18se-firmware-1.x"
+      ;;
+    ast20)
+      CONFIG="astlinux-ast20.config"
+      ASTERISK_VERSION="$(awk -F'=' '/^ASTERISK_VERSION/ { if ($2 ~ /^ *20./) {print $2; exit} }' package/asterisk/asterisk.mk)"
+      ASTERISK_VERSION="asterisk-${ASTERISK_VERSION// /}"
+      FIRMWARE="ast20-firmware-1.x"
+      ;;
+    *)
+      echo "master-build: Unknown Asterisk Version."
+      exit 1
+      ;;
+  esac
+}
+
+if [ -z "$output_path" ]; then
+  echo "usage: master-build output_path [ force ]"
+  exit 1
+fi
+
+if [ -d "$output_path" ]; then
+  if [ "$force" = "force" ]; then
+    rm -rf "$output_path"
+    if ! mkdir "$output_path"; then
+      exit 1
+    fi
+  else
+    echo "master-build: directory \"$output_path\" exists, use 'force' verb to override."
+    exit 1
+  fi
+else
+  if ! mkdir "$output_path"; then
+    exit 1
+  fi
+fi
+
+if ! mkdir "$output_path/img"; then
+  exit 1
+fi
+if ! mkdir "$output_path/iso"; then
+  exit 1
+fi
+
+error=0
+for i in $REQUIRED_CMDS; do
+  if ! which $i >/dev/null 2>&1; then
+    error=1
+    echo "master-build: Required command \"$i\" is missing in your build environment." >&2
+    if [ "$i" = "which" ]; then  # no use proceeding
+      break
+    fi
+  fi
+done
+if [ $error -ne 0 ]; then
+  echo "Missing Required Command(s)." >&2
+  exit 1
+fi
+
+echo "
+Trying sudo, if this prompts for a password, ^C and 'sudoedit /etc/sudoers' and add a line at the end
+something like:
+
+$(id -un) ALL = NOPASSWD: ALL
+"
+if ! sudo /bin/true; then
+  echo "master-build: You need to be a sudo group member to run this script" >&2
+  exit 1
+fi
+
+echo "Regenerate the initrd"
+rm -f initrd.img
+
+#
+# Build Asterisk 18se and 20 versions of AstLinux
+#
+
+for asterisk in ast18se ast20; do
+
+  set_asterisk_version $asterisk
+
+  if ! mkdir "$output_path/$FIRMWARE"; then
+    exit 1
+  fi
+
+  # SMP64 Builds
+  echo "Cleaning out any existing builds..."
+  rm -rf output
+
+  cp "x86_64-configs/$CONFIG" .config
+
+  for board in $BOARDS_SMP64; do
+    build_board "$FIRMWARE"
+  done
+
+  # SMP64VM Builds
+  echo "Cleaning out any existing builds..."
+  rm -rf output
+
+  cp "x86_64-configs/$CONFIG" .config
+  set_smp64vm_kernel
+  unset_major_pci_packages
+  set_openvmtools_package
+  set_qemu_guest_agent_package
+
+  for board in $BOARDS_SMP64VM; do
+    build_board "$FIRMWARE"
+  done
+done
+
+# AstLinux ISO Installer
+echo "Cleaning out any existing builds..."
+rm -rf output
+
+cp runnix-iso.config .config
+
+for board in $BOARDS_SMP64 $BOARDS_SMP64VM; do
+  ISO_NAME="${ASTVER}-${board}.iso"
+  if [ "${board}" != "${board%-serial}" ]; then
+    SERIAL="serial"
+    ISO_NAME="${ISO_NAME%-serial.iso}"
+    ISO_NAME="${ISO_NAME%.iso}-serial.iso"
+  else
+    SERIAL=""
+  fi
+  ./scripts/build-runnix-iso "$output_path/img/${ASTVER}-${board}" $SERIAL
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+  if [ ! -f "$ISO_NAME" ]; then
+    exit 1
+  fi
+  mv "$ISO_NAME" "$output_path/iso/"
+done
+
+echo "
+##
+## Master Build Successful for ${ASTVER}
+##
+"
+
