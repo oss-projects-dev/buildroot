@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/usbutils/astlinux/usbutils.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 USBUTILS_VERSION = 018
 USBUTILS_SOURCE = usbutils-$(USBUTILS_VERSION).tar.xz
 USBUTILS_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/usb/usbutils
@@ -31,3 +37,5 @@ USBUTILS_POST_INSTALL_TARGET_HOOKS += USBUTILS_REMOVE_PYTHON
 endif
 
 $(eval $(meson-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

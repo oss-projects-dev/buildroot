@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/rsync/astlinux/rsync.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 RSYNC_VERSION = 3.5.0
 RSYNC_SITE = https://rsync.samba.org/ftp/rsync/src
 RSYNC_LICENSE = GPL-3.0+ with exceptions
@@ -63,3 +69,5 @@ RSYNC_CONF_OPTS += --disable-zstd
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

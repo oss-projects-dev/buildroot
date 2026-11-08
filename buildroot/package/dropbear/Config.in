@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/dropbear/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_DROPBEAR
 	bool "dropbear"
 	select BR2_PACKAGE_ZLIB if !BR2_PACKAGE_DROPBEAR_SMALL
@@ -75,3 +81,5 @@ config BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE
 	  configuration.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

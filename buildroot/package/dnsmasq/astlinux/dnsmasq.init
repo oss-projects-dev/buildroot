@@ -1,0 +1,519 @@
+#!/bin/bash
+
+. /etc/rc.conf
+
+. /etc/init.d/functions.d/network
+. /etc/init.d/functions.d/misc
+
+is_prefix_delegation()
+{
+  local dhcpv6_pd="" x IFS
+
+  if [ "$DHCPV6_CLIENT_ENABLE" = "yes" ]; then
+    unset IFS
+    for x in $IPV6_PREFIX_DELEGATION; do
+      if [ "$x" = "$1" ]; then
+        dhcpv6_pd="yes"
+        break
+      fi
+    done
+  fi
+
+  echo "$dhcpv6_pd"
+}
+
+addr_to_prefix64()
+{
+  local cnt=1 prefix="" next
+
+  if [ -n "$1" ]; then
+    while [ $cnt -le 4 ]; do
+      next="$(echo "$1" | cut -s -d':' -f$cnt)"
+      if [ -z "$next" ]; then
+        break
+      fi
+      prefix="${prefix}${prefix:+:}${next}"
+      cnt=$((cnt + 1))
+    done
+    if [ -n "$prefix" ]; then
+      prefix="${prefix}::"
+    fi
+  fi
+
+  echo "$prefix"
+}
+
+directive_exists_with_file() {
+  local directive="$1" file="$2"
+
+  if [ -f "$file" ]; then
+    if grep -q "^${directive} *=" "$file"; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+dnscrypt_tls_proxy_servers()
+{
+  local servers=""
+
+  if [ -f /etc/init.d/dnscrypt ]; then
+    if [ "$DNSCRYPT_PROXY" = "yes" ]; then
+      servers="127.0.0.1#2053"
+      if [ -n "$DNSCRYPT_2SERVER_ADDRESS" ]; then
+        servers="$servers 127.0.0.1#2054"
+      fi
+    fi
+  fi
+
+  ## Unbound has precedence
+  if [ -f /etc/init.d/unbound ]; then
+    if [ "$DNS_TLS_PROXY" = "yes" ]; then
+      servers="127.0.0.1#2853"
+    fi
+  fi
+
+  echo "$servers"
+}
+
+tftpd_check()
+{
+  if [ -f /etc/init.d/tftpd ]; then
+    # standalone tftpd package is installed ( allow 'inetd' for backward compatibility )
+    if [ "$TFTPD" = "dnsmasq" -o "$TFTPD" = "inetd" ]; then
+      return 0
+    fi
+  else
+    # no standalone tftpd package, use dnsmasq for any tftpd setting
+    if [ "$TFTPD" = "dnsmasq" -o "$TFTPD" = "tftpd" -o "$TFTPD" = "inetd" ]; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+isDHCPinterface()
+{
+  # args: IF
+  for intf in $NODHCP; do
+    if [ "$intf" = "$1" ]; then
+      return 1
+    fi
+  done
+
+  return 0
+}
+
+trueDNSMASQnet()
+{
+  # args: tag, IP, ip.dstart, ip.dend, leasetime
+  local servername="$2" gateway="$2"
+
+  if [ "$1" = "lan" ]; then
+    servername="$HOSTNAME.$DOMAIN"
+  elif [ "$1" = "ext" ]; then
+    gateway="$EXTGW"
+  fi
+
+  echo "
+dhcp-range=$1,$3,$4,$5
+dhcp-option=$1,option:router,$gateway
+dhcp-option=$1,option:dns-server,$gateway
+dhcp-option=$1,option:tftp-server,\"$servername\"
+dhcp-option=$1,150,$2"
+
+  # ntpd starts after we do, so check if its script is installed, because
+  # the config file won't yet be present.
+  if [ -f /etc/init.d/ntpd ]; then
+    echo "dhcp-option=$1,option:ntp-server,$2"
+  fi
+}
+
+falseDNSMASQnet()
+{
+  # args: IF
+  echo "# DHCP disabled on $1
+no-dhcp-interface=$1"
+}
+
+addIPV6net()
+{
+  # args: IF, tag, leasetime
+  local interface="$1" tag="$2" leasetime="$3" dhcpv6_pd="" prefix="" iname IFS
+
+  if [ "$IPV6" != "yes" ]; then
+    return 2
+  fi
+
+  unset IFS
+  for iname in $IPV6_AUTOCONF; do
+    case $iname in
+      INTIF)
+        if [ "$tag" = "lan" ]; then
+          dhcpv6_pd="$(is_prefix_delegation "$iname")"
+          prefix="$(addr_to_prefix64 "$INTIPV6")"
+          break
+        fi
+        ;;
+      INT2IF)
+        if [ "$tag" = "lan2" ]; then
+          dhcpv6_pd="$(is_prefix_delegation "$iname")"
+          prefix="$(addr_to_prefix64 "$INT2IPV6")"
+          break
+        fi
+        ;;
+      INT3IF)
+        if [ "$tag" = "lan3" ]; then
+          dhcpv6_pd="$(is_prefix_delegation "$iname")"
+          prefix="$(addr_to_prefix64 "$INT3IPV6")"
+          break
+        fi
+        ;;
+      INT4IF)
+        if [ "$tag" = "lan4" ]; then
+          dhcpv6_pd="$(is_prefix_delegation "$iname")"
+          prefix="$(addr_to_prefix64 "$INT4IPV6")"
+          break
+        fi
+        ;;
+      DMZIF)
+        if [ "$tag" = "dmz" ]; then
+          dhcpv6_pd="$(is_prefix_delegation "$iname")"
+          prefix="$(addr_to_prefix64 "$DMZIPV6")"
+          break
+        fi
+        ;;
+    esac
+  done
+
+  if [ "$dhcpv6_pd" = "yes" -a "$DHCPV6_CLIENT_REQUEST_PREFIX" != "no" ]; then
+    echo "
+dhcp-range=$tag,::1,constructor:$interface,ra-only,$leasetime"
+    return 0
+  elif [ -n "$prefix" ]; then
+    echo "
+dhcp-range=$tag,$prefix,ra-only,64,$leasetime"
+    return 0
+  fi
+
+  return 1
+}
+
+addDNSMASQnet()
+{
+  # args: IF, IP, NM, tag
+  local max_hosts range_min range_max ip_min ip_max leasetime
+
+  if [ -n "$1" -a "$1" != "none" -a -n "$2" -a -n "$3" ]; then
+    leasetime="${DHCP_LEASETIME:-24}h"
+    if isDHCPinterface $1; then
+      if [ -n "$DHCPRANGE" ]; then
+        range_min=$(echo "$DHCPRANGE" | cut -d: -f1)
+        range_max=$(echo "$DHCPRANGE" | cut -d: -f2)
+      else
+        range_min=100
+        range_max=220
+      fi
+
+      max_hosts="$(netcalc "$2" "$3" | sed -n -r -e 's/^Hosts\/Net *: *([0-9]+).*$/\1/p')"
+      if [ -n "$max_hosts" ]; then
+        if [ $range_max -gt $max_hosts ]; then
+          range_max=$(($max_hosts - ($max_hosts / 4) - 1))
+        fi
+        if [ $range_min -ge $range_max ]; then
+          range_min=$(($range_max - ($max_hosts / 4) - 1))
+        fi
+        if [ $range_min -le 0 ]; then
+          range_min=$((($max_hosts / 4) + 1))
+        fi
+        if [ $range_max -le $range_min ]; then
+          range_max=$(($range_min + ($max_hosts / 4) + 1))
+        fi
+      fi
+
+      ip_min="$(netcalc -R "$range_min:$range_max" "$2" "$3" | sed -n -r -e 's/^RangeMin *: *([0-9.]+).*$/\1/p')"
+      ip_max="$(netcalc -R "$range_min:$range_max" "$2" "$3" | sed -n -r -e 's/^RangeMax *: *([0-9.]+).*$/\1/p')"
+
+      trueDNSMASQnet $4 $2 "$ip_min" "$ip_max" $leasetime
+
+      addIPV6net $1 $4 $leasetime
+    else
+      if ! addIPV6net $1 $4 $leasetime; then
+        falseDNSMASQnet $1
+      fi
+    fi
+  fi
+}
+
+createDNSMASQbasic()
+{
+  local local_domain dnscrypt_tls_servers server IFS
+
+  # DHCP options
+  if [ "$1" = "dhcp" ]; then
+    echo "dhcp-authoritative
+read-ethers
+dhcp-leasefile=/var/db/dnsmasq.leases"
+
+    if [ -n "$NFSDROOTPATH" ]; then
+      echo "dhcp-option=lan,17,$NFSDROOTPATH"
+    fi
+
+    if [ -n "$BOOTPFILE" ]; then
+      echo "dhcp-boot=$BOOTPFILE,$HOSTNAME.$DOMAIN,$INTIP"
+    fi
+  fi
+
+  if [ "$LOCALDNS_LOCAL_DOMAIN" = "no" ]; then
+    local_domain="#"
+  else
+    local_domain=""
+  fi
+
+  # DNS options
+  echo "no-negcache
+domain-needed
+${local_domain}bogus-priv
+${local_domain}local=/$DOMAIN/
+expand-hosts
+domain=$DOMAIN"
+
+  # Some directives can only be defined once
+  if ! directive_exists_with_file "cache-size" /etc/dnsmasq.static; then
+    echo "cache-size=4096"
+  fi
+  if ! directive_exists_with_file "dns-forward-max" /etc/dnsmasq.static; then
+    echo "dns-forward-max=512"
+  fi
+
+  dnscrypt_tls_servers="$(dnscrypt_tls_proxy_servers)"
+  if [ -n "$dnscrypt_tls_servers" ]; then
+    echo "no-resolv
+proxy-dnssec"
+    unset IFS
+    for server in $dnscrypt_tls_servers; do
+      echo "server=$server"
+    done
+  else
+    echo "resolv-file=/etc/resolv-extern.conf"
+  fi
+
+  # TFTP options
+  if tftpd_check; then
+    echo "enable-tftp
+tftp-root=/tftpboot"
+  fi
+
+  # IPv6 Options
+  if [ "$IPV6" = "yes" ]; then
+    echo "quiet-ra"
+  fi
+}
+
+addDHCPhosts_options()
+{
+  local name ip mac IFS
+
+  echo "
+# because APC SmartUPS units are particular...
+dhcp-option=vendor:APC,1,\"1APC\"
+dhcp-option=vendor:APC,2,1b"
+
+  if [ -n "$STATICHOSTS" ]; then
+    echo "
+# generated from STATICHOSTS in rc.conf"
+
+    IFS=$'\n'
+    for i in $STATICHOSTS; do
+      # might have fqdn<space>hostname, etc.
+      name="$(echo "$i" | awk -F~ '{ print $1; }' | awk -F' ' '{ print $1; }')"
+      ip="$(echo "$i" | awk -F~ '{ print $2; }')"
+      mac="$(echo "$i" | awk -F~ '{ print $3; }')"
+      # Only allow IPv4 addresses in DHCP
+      get_numeric_ip_version "$ip"
+      if [ $? -eq 4 -a -n "$name" -a -n "$ip" -a -n "$mac" ]; then
+        echo "dhcp-host=$mac,$ip,$name"
+      fi
+    done
+  fi
+}
+
+which_extern_resolv()
+{
+  if [ -n "$DNS" ]; then
+    echo "/tmp/etc/resolv-static.conf"
+  elif isextppp; then
+    echo "/tmp/etc/ppp/resolv.conf"
+  else
+    echo "/tmp/etc/resolv-up.conf"
+  fi
+}
+
+is_EXTDHCP_active()
+{
+
+  # Applies to static EXTIP address, no EXT2IF and no PPPoE
+  if [ "$EXTDHCP" = "yes" -a -n "$EXTIP" -a -n "$EXTGW" -a -z "$EXT2IF" -a -z "$PPPOEIF" ]; then
+    if [ -n "$EXTIF" -a "$EXTIF" != "none" ] && isDHCPinterface $EXTIF; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+is_DHCP_active()
+{
+
+  for intf in $INTIF $INT2IF $INT3IF $INT4IF $DMZIF; do
+    if [ "$intf" != "none" ] && isDHCPinterface $intf; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+init () {
+  local DB
+
+  if tftpd_check; then
+    if [ -d /mnt/kd/tftpboot ]; then
+      ln -snf /mnt/kd/tftpboot /tmp/tftpboot
+    else
+      mkdir /tmp/tftpboot
+    fi
+  fi
+
+  : > /tmp/etc/resolv-static.conf
+  for h in $DNS; do
+    get_numeric_ip_version "$h"
+    case $? in
+      4)
+        echo "nameserver $h" >> /tmp/etc/resolv-static.conf
+        ;;
+      6)
+        if [ "$IPV6" = "yes" ]; then
+          echo "nameserver $h" >> /tmp/etc/resolv-static.conf
+        fi
+        ;;
+    esac
+  done
+
+  ext_resolv_conf=$(which_extern_resolv)
+  ln -sf $ext_resolv_conf /tmp/etc/resolv-extern.conf
+  if [ "$LOCALDNS" != "no" ]; then
+    rm -f /tmp/etc/resolv.conf
+    echo "search $DOMAIN
+nameserver 127.0.0.1" > /tmp/etc/resolv.conf
+  else
+    ln -sf $ext_resolv_conf /tmp/etc/resolv.conf
+  fi
+
+  # Regenerate /etc/hosts
+  # Allows dnsmasq to be restarted with a new STATICHOSTS
+  SYS_gen_etc_hosts > /tmp/etc/hosts
+  # Regenerate /etc/ethers
+  SYS_gen_etc_ethers > /tmp/etc/ethers
+
+  if [ -f /mnt/kd/dnsmasq.leases ]; then
+    ln -sf /mnt/kd/dnsmasq.leases /var/db/dnsmasq.leases
+  else
+    touch /var/db/dnsmasq.leases
+  fi
+
+  # dhcp-script=/etc/dnsmasq-lease.script
+  # Restore from persistent backup, DB file is on tmpfs
+  for DB in "/var/db/dnsmasq-lease.db" "/var/db/dnsmasq-lease6.db"; do
+    if [ -f "/mnt/kd/${DB##*/}" ] && [ ! -f "$DB" ]; then
+      cp "/mnt/kd/${DB##*/}" "$DB"
+    fi
+  done
+
+  rm -f /tmp/etc/dnsmasq.conf
+
+  if [ -f /mnt/kd/dnsmasq.static ]; then
+    ln -sf /mnt/kd/dnsmasq.static /tmp/etc/dnsmasq.static
+  fi
+
+  if [ -f /mnt/kd/dnsmasq.conf ]; then
+    ln -sf /mnt/kd/dnsmasq.conf /tmp/etc/dnsmasq.conf
+    return
+  fi
+
+  if is_DHCP_active || is_EXTDHCP_active; then
+    createDNSMASQbasic dhcp >> /tmp/etc/dnsmasq.conf
+
+    addDNSMASQnet "$INTIF" "$INTIP" "$INTNM" lan >> /tmp/etc/dnsmasq.conf
+
+    addDNSMASQnet "$INT2IF" "$INT2IP" "$INT2NM" lan2 >> /tmp/etc/dnsmasq.conf
+
+    addDNSMASQnet "$INT3IF" "$INT3IP" "$INT3NM" lan3 >> /tmp/etc/dnsmasq.conf
+
+    addDNSMASQnet "$INT4IF" "$INT4IP" "$INT4NM" lan4 >> /tmp/etc/dnsmasq.conf
+
+    addDNSMASQnet "$DMZIF" "$DMZIP" "$DMZNM" dmz >> /tmp/etc/dnsmasq.conf
+
+    if is_EXTDHCP_active; then
+      addDNSMASQnet "$EXTIF" "$EXTIP" "$EXTNM" ext >> /tmp/etc/dnsmasq.conf
+    fi
+
+    addDHCPhosts_options >> /tmp/etc/dnsmasq.conf
+  else
+    createDNSMASQbasic nodhcp >> /tmp/etc/dnsmasq.conf
+  fi
+
+  # include static mappings from a file
+  if [ -f /etc/dnsmasq.static ]; then
+    echo "
+conf-file=/etc/dnsmasq.static" >> /tmp/etc/dnsmasq.conf
+  else
+    echo "# Create /mnt/kd/dnsmasq.static to specify additional settings." >> /tmp/etc/dnsmasq.conf
+  fi
+}
+
+start () {
+  if [ -f /etc/dnsmasq.conf ]; then
+    echo "Starting dnsmasq..."
+    dnsmasq
+  fi
+}
+
+stop () {
+  if [ -f /var/run/dnsmasq.pid ]; then
+    echo "Stopping dnsmasq..."
+    kill $(cat /var/run/dnsmasq.pid)
+    rm -f /var/run/dnsmasq.pid
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac
+

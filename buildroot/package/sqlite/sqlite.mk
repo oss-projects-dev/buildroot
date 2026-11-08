@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/sqlite/astlinux/sqlite.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SQLITE_VERSION = 3.50.4
 SQLITE_TAR_VERSION = 3500400
 SQLITE_SOURCE = sqlite-autoconf-$(SQLITE_TAR_VERSION).tar.gz
@@ -130,3 +136,5 @@ endef
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

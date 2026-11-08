@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libidn/astlinux/libidn.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBIDN_VERSION = 1.42
 LIBIDN_SITE = $(BR2_GNU_MIRROR)/libidn
 LIBIDN_INSTALL_STAGING = YES
@@ -29,3 +35,5 @@ endef
 LIBIDN_POST_INSTALL_TARGET_HOOKS += LIBIDN_REMOVE_EMACS_STUFF
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

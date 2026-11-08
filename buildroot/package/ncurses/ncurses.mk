@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/ncurses/astlinux/ncurses.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 # When there is no snapshost yet for a new version, set it to the empty string
 NCURSES_VERSION_MAJOR = 6.4
 NCURSES_SNAPSHOT_DATE = 20230603
@@ -165,3 +171,5 @@ HOST_NCURSES_CONF_OPTS = \
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

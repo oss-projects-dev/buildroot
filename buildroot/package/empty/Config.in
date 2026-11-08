@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/empty/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_EMPTY
 	bool "empty"
 	depends on BR2_USE_MMU # uses fork()
@@ -6,3 +12,5 @@ config BR2_PACKAGE_EMPTY
 	  sessions.
 
 	  http://empty.sourceforge.net/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

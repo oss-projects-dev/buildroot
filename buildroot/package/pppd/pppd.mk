@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/pppd/astlinux/pppd.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 # The tarball provided at https://download.samba.org/pub/ppp/ does not
 # include the license files yet so we use the github tarball.
 PPPD_VERSION = 2.5.2
@@ -54,3 +60,5 @@ PPPD_CONF_OPTS += --disable-systemd
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

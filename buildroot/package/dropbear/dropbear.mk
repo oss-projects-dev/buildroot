@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/dropbear/astlinux/dropbear.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 DROPBEAR_VERSION = 2026.93
 DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
@@ -143,3 +149,5 @@ define DROPBEAR_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,0 +1,34 @@
+--- monit-5.10/src/http/processor.c.orig	2014-12-14 16:07:53.000000000 -0600
++++ monit-5.10/src/http/processor.c	2014-12-14 16:35:04.000000000 -0600
+@@ -24,6 +24,8 @@
+ 
+ #include "config.h"
+ 
++#define HTTP_BASE_URL "/admin/monit"
++
+ #ifdef HAVE_STDIO_H
+ #include <stdio.h>
+ #endif
+@@ -560,6 +562,11 @@
+                 internal_error(S, SC_BAD_REQUEST, "[error] URL too long");
+                 return NULL;
+         }
++#ifdef HTTP_BASE_URL
++        if (Str_startsWith(url, HTTP_BASE_URL)) {
++                Str_copy(url, url + strlen(HTTP_BASE_URL), strlen(url) - strlen(HTTP_BASE_URL));
++        }
++#endif
+         HttpRequest req = NULL;
+         NEW(req);
+         req->S = S;
+--- monit-5.31.0/src/http/cervlet.c.orig	2022-02-14 09:59:39.974142875 -0600
++++ monit-5.31.0/src/http/cervlet.c	2022-02-14 10:01:29.479145363 -0600
+@@ -744,7 +744,7 @@
+             if (res->status <= 300) {
+                 // #1009: Redirect back to the same url so a reload in the browser does not perform a POST again
+                 set_status(res, SC_MOVED_TEMPORARILY);
+-                set_header(res, "Location", "%s", req->url);
++                set_header(res, "Location", "/admin/monit%s", req->url);
+             }
+         }
+ }

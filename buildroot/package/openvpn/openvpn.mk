@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/openvpn/astlinux/openvpn.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 OPENVPN_VERSION = 2.6.23
 OPENVPN_SITE = https://swupdate.openvpn.net/community/releases
 OPENVPN_DEPENDENCIES = host-pkgconf libcap-ng
@@ -83,3 +89,5 @@ define OPENVPN_INSTALL_INIT_SYSV
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

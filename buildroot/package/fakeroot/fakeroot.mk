@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/fakeroot/astlinux/fakeroot.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 FAKEROOT_VERSION = 1.36
 FAKEROOT_SOURCE = fakeroot_$(FAKEROOT_VERSION).orig.tar.gz
 FAKEROOT_SITE = https://snapshot.debian.org/archive/debian/20241022T144244Z/pool/main/f/fakeroot/
@@ -21,3 +27,5 @@ FAKEROOT_LICENSE = GPL-3.0+
 FAKEROOT_LICENSE_FILES = COPYING
 
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

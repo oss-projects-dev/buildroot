@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/lua/astlinux/lua.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ifeq ($(BR2_PACKAGE_LUA_5_4),y)
 LUA_VERSION = 5.4.8
 else ifeq ($(BR2_PACKAGE_LUA_5_3),y)
@@ -125,3 +131,5 @@ endef
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

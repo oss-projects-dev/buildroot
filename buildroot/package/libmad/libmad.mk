@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libmad/astlinux/libmad.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBMAD_VERSION = 0.15.1b
 LIBMAD_SOURCE = libmad_$(LIBMAD_VERSION).orig.tar.gz
 LIBMAD_SITE = \
@@ -45,3 +51,5 @@ LIBMAD_CONF_OPTS = \
 	--$(if $(BR2_PACKAGE_LIBMAD_STRICT_ISO),enable,disable)-strict-iso
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

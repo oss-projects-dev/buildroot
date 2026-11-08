@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libpcap/astlinux/libpcap.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBPCAP_VERSION = 1.10.7
 LIBPCAP_SITE = https://www.tcpdump.org/release
 LIBPCAP_LICENSE = BSD-3-Clause
@@ -63,3 +69,5 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

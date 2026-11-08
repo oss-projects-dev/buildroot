@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/autoconf/astlinux/autoconf.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 AUTOCONF_VERSION = 2.72
 AUTOCONF_SOURCE = autoconf-$(AUTOCONF_VERSION).tar.xz
 AUTOCONF_SITE = $(BR2_GNU_MIRROR)/autoconf
@@ -27,3 +33,5 @@ AUTORECONF = $(HOST_CONFIGURE_OPTS) ACLOCAL="$(ACLOCAL)" \
 	AUTOCONF="$(AUTOCONF)" AUTOHEADER="$(AUTOHEADER)" \
 	AUTOMAKE="$(AUTOMAKE)" GTKDOCIZE=/bin/true \
 	$(HOST_DIR)/bin/autoreconf -f -i
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

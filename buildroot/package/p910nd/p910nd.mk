@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/p910nd/astlinux/p910nd.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 P910ND_VERSION = 0.97
 P910ND_SITE = $(call github,kenyapcomau,p910nd,$(P910ND_VERSION))
 P910ND_LICENSE = GPL-2.0
@@ -18,3 +24,5 @@ define P910ND_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

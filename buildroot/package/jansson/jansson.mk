@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/jansson/astlinux/jansson.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 JANSSON_VERSION = 2.14
 JANSSON_SOURCE = jansson-$(JANSSON_VERSION).tar.bz2
 JANSSON_SITE = \
@@ -15,3 +21,5 @@ JANSSON_INSTALL_STAGING = YES
 JANSSON_CONF_ENV = LIBS="-lm"
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

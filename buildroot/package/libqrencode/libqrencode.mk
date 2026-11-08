@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libqrencode/astlinux/libqrencode.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBQRENCODE_VERSION = 4.1.1
 LIBQRENCODE_SITE = $(call github,fukuchi,libqrencode,v$(LIBQRENCODE_VERSION))
 LIBQRENCODE_DEPENDENCIES = host-pkgconf
@@ -32,3 +38,5 @@ LIBQRENCODE_CONF_OPTS += --with-tools=no
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,0 +1,121 @@
+#!/bin/bash
+
+. /etc/rc.conf
+
+export FOSSIL_HOME="/mnt/kd/fossil"
+
+message="${1:-auto commit via cron}"
+
+REPO="/mnt/kd/fossil/astlinux.fossil"
+
+LOCKFILE="/var/lock/fossil-commit.lock"
+
+if [ ! -f $REPO ]; then
+  echo "Fossil repository not found: $REPO" >&2
+  exit 1
+fi
+
+if ! cd /mnt/kd; then
+  exit 1
+fi
+
+# Robust 'bash' method of creating/testing for a lockfile
+if ! ( set -o noclobber; echo "$$" > "$LOCKFILE" ) 2>/dev/null; then
+  echo "fossil-commit: already running, lockfile \"$LOCKFILE\" exists, process id: $(cat "$LOCKFILE")." >&2
+  exit 9
+fi
+
+trap 'rm -f "$LOCKFILE"; exit $?' INT TERM EXIT
+
+fossil open $REPO --keep >/dev/null
+fossil status
+
+## Check for locally added files in selected directories, add them to the repo
+
+if [ -n "$FOSSIL_DEFAULT_DIRS" ]; then
+  dirs="$FOSSIL_DEFAULT_DIRS"
+else
+  dirs="rc.conf.d crontabs avahi keepalived arno-iptables-firewall/plugins monit/monit.d openvpn/ccd wireguard/peer"
+  if [ "$ASTERISK_DAHDI_DISABLE" != "yes" ]; then
+    dirs="$dirs asterisk dahdi fop2 phoneprov/templates"
+  fi
+fi
+
+if [ -n "$FOSSIL_DEFAULT_FILES" ]; then
+  files="$FOSSIL_DEFAULT_FILES"
+else
+  files="rc.elocal rc.local rc.local.stop dnsmasq.static arno-iptables-firewall/custom-rules"
+  files="$files blocklists/whitelist.netset blocklists/whitelistv6.netset blocklists/blocked-hosts*.netset"
+fi
+
+unset IFS
+for dir in $dirs $FOSSIL_INCLUDE_DIRS; do
+  if [ "$dir" != "/mnt/kd" -a "$dir" != "/mnt/kd/" -a -d "$dir" ]; then
+    fossil add --ignore '*.bak,*.db,*.sqlite3,*.fossil' --force "$dir"
+  fi
+done
+
+for file in $files $FOSSIL_INCLUDE_FILES; do
+  if [ -f "$file" ]; then
+    if ! fossil ls "${file#/mnt/kd/}" | grep -q "${file#/mnt/kd/}"; then
+      fossil add --force "$file"
+    fi
+  fi
+done
+
+## Check for locally deleted files, remove them from the repo
+if fossil changes | grep -q '^MISSING'; then
+  fossil changes | awk '/^MISSING/ { print $2; }' | xargs fossil forget
+fi
+
+fossil commit --no-warnings -m "$message"
+rtn=$?
+
+fossil timeline -n 1 | grep -v '^--- entry limit'
+
+if [ $rtn -eq 0 -a -n "$FOSSIL_NOTIFY" ]; then
+  NOTIFY_FROM="$FOSSIL_NOTIFY_FROM"
+  # Extract from possible <a@b.tld> format
+  NOTIFY_FROM="${NOTIFY_FROM##*<}"
+  NOTIFY_FROM="${NOTIFY_FROM%%>*}"
+
+  if [ -z "$NOTIFY_FROM" -a -n "$SMTP_DOMAIN" ]; then
+    NOTIFY_FROM="noreply@$SMTP_DOMAIN"
+  fi
+
+  info="$(fossil info -v)"
+  commit="$(echo "$info" | sed -n -r -e 's#^checkout: *([^ ]+).*$#\1#p')"
+  url_host="$FOSSIL_HOSTNAME"
+  if [ -z "$url_host" ]; then
+    url_host="$(echo "$info" | sed -n -r -e 's#^access-url: *https://([^/]+)/admin/fossil.*$#\1#p')"
+    if [ -z "$url_host" ]; then
+      url_host="$HOSTNAME.$DOMAIN"
+    fi
+  fi
+
+  unset IFS
+  for TO in $FOSSIL_NOTIFY; do
+    (
+    echo "To: ${TO}${NOTIFY_FROM:+
+From: \"Fossil Commit-$HOSTNAME\" <$NOTIFY_FROM>}
+Subject: Fossil Commit on '$HOSTNAME': ${message:0:50}
+
+Fossil Commit on '$HOSTNAME':
+"
+    fossil timeline $commit -v -n 1 -W 120 | grep -v '^--- entry limit'
+    echo "---
+
+Commit: $commit"
+    for x in $url_host; do
+      echo "https://$x/admin/fossil/info/$commit"
+    done
+    ) | sendmail -t
+  done
+fi
+
+fossil close --force
+
+rm -f "$LOCKFILE"
+trap - INT TERM EXIT
+
+exit $rtn

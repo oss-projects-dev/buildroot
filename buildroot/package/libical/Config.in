@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libical/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBICAL
 	bool "libical"
 	depends on BR2_INSTALL_LIBSTDCPP
@@ -13,3 +19,5 @@ config BR2_PACKAGE_LIBICAL
 comment "libical needs a toolchain w/ C++, dynamic library, wchar"
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_USE_WCHAR || \
 		BR2_STATIC_LIBS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

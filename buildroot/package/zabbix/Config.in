@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/zabbix/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_ZABBIX
 	bool "zabbix"
 	depends on BR2_TOOLCHAIN_USES_GLIBC
@@ -84,3 +90,5 @@ endif
 
 comment "zabbix need glibc"
 	depends on !BR2_TOOLCHAIN_USES_GLIBC
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/spandsp/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_SPANDSP
 	bool "spandsp"
 	select BR2_PACKAGE_TIFF
@@ -8,3 +14,5 @@ config BR2_PACKAGE_SPANDSP
 	  a complete software FAX machine.
 
 	  https://github.com/freeswitch/spandsp
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

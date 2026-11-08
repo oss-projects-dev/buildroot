@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/mtr/astlinux/mtr.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 MTR_VERSION = 0.95
 MTR_SITE = $(call github,traviscross,mtr,v$(MTR_VERSION))
 MTR_AUTORECONF = YES
@@ -36,3 +42,5 @@ MTR_CONF_OPTS += --without-ncurses
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

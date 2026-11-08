@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libusb-compat/astlinux/libusb-compat.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBUSB_COMPAT_VERSION_MAJOR = 0.1
 LIBUSB_COMPAT_VERSION = $(LIBUSB_COMPAT_VERSION_MAJOR).8
 LIBUSB_COMPAT_SITE = https://github.com/libusb/libusb-compat-0.1/releases/download/v$(LIBUSB_COMPAT_VERSION)
@@ -22,3 +28,5 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

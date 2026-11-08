@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/iproute2/astlinux/iproute2.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 IPROUTE2_VERSION = 6.14.0
 IPROUTE2_SOURCE = iproute2-$(IPROUTE2_VERSION).tar.xz
 IPROUTE2_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/net/iproute2
@@ -71,3 +77,5 @@ define IPROUTE2_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

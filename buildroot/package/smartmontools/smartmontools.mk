@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/smartmontools/astlinux/smartmontools.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SMARTMONTOOLS_VERSION = 7.4
 SMARTMONTOOLS_SITE = http://downloads.sourceforge.net/project/smartmontools/smartmontools/$(SMARTMONTOOLS_VERSION)
 SMARTMONTOOLS_LICENSE = GPL-2.0+
@@ -33,3 +39,5 @@ SMARTMONTOOLS_CONF_OPTS += --without-libsystemd
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

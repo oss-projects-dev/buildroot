@@ -1,0 +1,11 @@
+config BR2_PACKAGE_HTOP
+	bool "htop"
+	select BR2_PACKAGE_NCURSES
+	help
+	  htop is a cross-platform interactive process viewer.
+	  It is a text-mode application (for console or X terminals)
+	  and requires ncurses.
+
+	  https://htop.dev/
+	  https://github.com/htop-dev/htop/releases
+

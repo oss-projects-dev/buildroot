@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/ipset/astlinux/ipset.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 IPSET_VERSION = 7.16
 IPSET_SOURCE = ipset-$(IPSET_VERSION).tar.bz2
 IPSET_SITE = http://ipset.netfilter.org
@@ -16,3 +22,5 @@ IPSET_INSTALL_STAGING = YES
 IPSET_SELINUX_MODULES = iptables
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,0 +1,160 @@
+#!/usr/bin/php -qC
+<?php
+if (! isset($argv)) {
+  $argv = $_SERVER['argv'];
+}
+
+//AstLinux// Adapted for AstLinux - 10-11-2013 by Lonnie Abelbeck
+//AstLinux// Single shared file vcard-parse-convert.php, use name "vcard-export"
+//AstLinux// Default for 'ldap' format
+//AstLinux// Change -n option to -b for Base_DN
+//AstLinux// Add sanitize phone numbers option, -s and -S
+//AstLinux// Add -n Normalize International E.164 prefixes option
+//AstLinux// Add -P dialprefix option
+
+/*
+ +-----------------------------------------------------------------------+
+ | Commandline vCard converter                                           |
+ | Version 0.8.7                                                         |
+ |                                                                       |
+ | Copyright (C) 2006-2012, Thomas Bruederli - Switzerland               |
+ | Licensed under the GNU GPL                                            |
+ |                                                                       |
+ | Type './vcard-export help' for usage information                           |
+ |                                                                       |
+ +-----------------------------------------------------------------------+
+ | Author: Thomas Bruederli <thomas@brotherli.ch>                        |
+ +-----------------------------------------------------------------------+
+
+*/
+
+require_once '/stat/var/www/common/vcard-parse-convert.php';
+
+$usage = <<<EOF
+Usage: vcard-export [-himnpsSv] [-P dialprefix] [-d delimiter] [-b Base_DN] [-o output_file] [-f format] input_file
+
+Options:
+    -b  Base LDAP identifier added to dn:, defaults to 'ou=addressbook,dc=ldap'
+    -d  CSV col delimiter
+    -f  Target format (ldif,*ldap*,csv,gmail,libdlusb,fritzbox)
+    -h  Include header line in CSV output
+    -i  Convert CSV output to ISO-8859-1 encoding
+    -m  Only convert cards with an e-mail address
+    -n  Normalize International E.164 prefixes (using DIALING_PREFIX_NUMBERS)
+    -o  Output file (write to stdout by default)
+    -p  Only convert cards with phone numbers
+    -s  Sanitize phone numbers to only include "+0123456789" characters
+    -S  Sanitize as with -s but also replace sequential non-numbers with a dash '-'
+    -v  Verbose output
+
+EOF;
+
+// show help
+if ($argv[1] == 'help' || $argv[1] == '--help')
+	die($usage);
+
+// read commandline arguments
+$options = 'himnpsSvP:d:b:o:f:';
+if (($opt = getopt($options)) === FALSE) {
+	die($usage);
+}
+foreach ($opt as $o => $a) {
+	foreach ($argv as $k => $aa) {
+		if (substr($aa, 0, 2) === '-'.$o) {
+			unset($argv[$k]);
+			if (strpos($options, $o.':') !== FALSE) {
+				if ($argv[$k + 1] === $a) {
+					unset($argv[$k + 1]);
+				}
+			}
+		}
+	}
+}
+$argv = array_merge($argv);
+if ($argv[1][0] === '-') {
+	die("Invalid option: ".$argv[1]."\n$usage");
+}
+
+$file = $argv[1];
+$format = $opt['f'] ? $opt['f'] : 'ldap';
+
+if (empty($file))
+	die("Not enough arguments!\n$usage");
+
+// instantiate a parser object
+$opt_array = array(
+	'mailonly' => isset($opt['m']),
+	'phoneonly' => isset($opt['p']),
+	'sanitize' => isset($opt['s']),
+	'sanitize_dash' => isset($opt['S'])
+);
+if (isset($opt['n']) && ($df = trim(shell_exec('. /etc/rc.conf; echo "$DIALING_PREFIX_NUMBERS"'))) !== '') {
+	$df_opts = explode('~', $df);
+	$opt_array['internationalprefix'] = isset($df_opts[0]) ? $df_opts[0] : '';
+	$opt_array['nationalprefix'] = isset($df_opts[1]) ? $df_opts[1] : '';
+	$opt_array['countryprefix'] = isset($df_opts[2]) ? $df_opts[2] : '';
+}
+if (isset($opt['P'])) {
+	if (($dialprefix = preg_replace('/[^0-9+-]/', '', $opt['P'])) !== '') {
+		$opt_array['dialprefix'] = $dialprefix;
+	}
+}
+
+// parse a vCard file
+$conv = new vcard_convert($opt_array);
+if ($conv->fromFile($file))
+{
+	if (isset($opt['v']))
+		echo "Detected $conv->file_charset encoding\n";
+	if (isset($opt['v']) && isset($opt['m']))
+		echo "Only convert vCards with an e-mail address\n";
+		
+		if ($format == 'ldif')
+			$out = $conv->toLdif();
+
+		else if ($format == 'ldap')
+		{
+			$identifier = $opt['b'] ? $opt['b'] : 'ou=addressbook,dc=ldap';
+			$out = $conv->toLdif($identifier);
+		}
+
+		else if ($format == 'gmail')
+			$out = $conv->toGmail();
+
+		else if ($format == 'libdlusb')
+			$out = $conv->toLibdlusb();
+
+		else if ($format == 'fritzbox')
+			$out = $conv->toFritzBox();
+			
+		else if ($format == 'csv')
+		{
+			$delimiter = $opt['d'] ? ($opt['d']=='\t' || $opt['d']=='tab' ? "\t" : $opt['d']) : ";";
+			$out = $conv->toCSV($delimiter, isset($opt['h']), isset($opt['i']) ? 'ISO-8859-1' : null);
+			
+			if (isset($opt['v']) && isset($opt['i']))
+				echo "Converting output to ISO-8859-1\n";
+		}
+		else
+			die("Unknown output format\n");
+		
+		// write to output file
+		if ($opt['o'])
+		{
+			if ($fp = @fopen($opt['o'], 'w'))
+			{
+				fwrite($fp, $out);
+				fclose($fp);
+				echo "Wrote ".$conv->export_count." cards to $opt[o]\n";
+			}
+			else
+				die("Cannot write to $opt[o]; permission denied\n");
+		}
+		else
+			echo $out;
+}
+else
+	echo "Cannot parse $file\n";
+
+
+?>

@@ -1,0 +1,157 @@
+#!/bin/bash
+
+. /etc/rc.conf
+
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+
+SCRIPTFILE="/mnt/kd/dhcp6c.script"
+
+CACHEFILE="/var/db/dhcp6c_cache"
+
+get_ipv6_global_addr()
+{
+  local interface="$1"
+
+  ip -6 -o addr show dev $interface scope global 2>/dev/null | \
+    sed -n -r -e 's|^.* inet6 ([0-9a-fA-F:]+)/.*$|\1|p' | \
+    grep -i -v '^fd' | \
+    head -n1
+}
+
+use_prefix_len()
+{
+  local len="$1"
+
+  case $len in
+    64) cut_chars="1-19"
+        prefix_label="::/64"
+        ;;
+    60) cut_chars="1-18"
+        prefix_label="0::/60"
+        ;;
+    56) cut_chars="1-17"
+        prefix_label="00::/56"
+        ;;
+    52) cut_chars="1-16"
+        prefix_label="000::/52"
+        ;;
+    48) cut_chars="1-15"
+        prefix_label="0000::/48"
+        ;;
+     *) cut_chars=""
+        prefix_label=""
+        ;;
+  esac
+}
+
+update_cache()
+{
+  local changed
+
+  echo "## dhcp6c cache
+dhcp6c_interface=$dhcp6c_interface
+dhcp6c_address=$dhcp6c_address
+dhcp6c_prefix_interfaces=$dhcp6c_prefix_interfaces
+dhcp6c_prefix_addresses=$dhcp6c_prefix_addresses" > "$CACHEFILE.new"
+  chmod 600 "$CACHEFILE.new"
+
+  if [ -f "$CACHEFILE" ] && cmp -s "$CACHEFILE" "$CACHEFILE.new"; then
+    changed="no"
+    rm -f "$CACHEFILE.new"
+  else
+    if [ -f "$CACHEFILE" ]; then
+      changed="yes"
+    else
+      changed=""
+    fi
+    mv "$CACHEFILE.new" "$CACHEFILE"
+  fi
+
+  echo "$changed"
+}
+
+setup_env()
+{
+  local conffile pd_1 prefix_len prefix_if interface ipv6 ipv6_ex cut_chars prefix_label IFS
+
+  ## Globals to export
+  dhcp6c_interface=""
+  dhcp6c_address=""
+  dhcp6c_changed=""
+  dhcp6c_prefix_interfaces=""
+  dhcp6c_prefix_addresses=""
+  dhcp6c_prefix=""
+  dhcp6c_prefix_base=""
+  dhcp6c_prefix_len=""
+  ##
+
+  conffile="/etc/wide-dhcpv6/dhcp6c-${EXTIF}.conf"
+  if [ ! -f "$conffile" ]; then
+    return
+  fi
+
+  dhcp6c_interface="$EXTIF"
+  dhcp6c_address="$(get_ipv6_global_addr $dhcp6c_interface)"
+
+  pd_1="$(cat "$conffile" | sed -n '/^id-assoc pd 1 /,/^};/ p')"
+
+  prefix_len="$(echo "$pd_1" | sed -n -r -e 's/^ +prefix +::\/([0-9]+) .*$/\1/p')"
+  prefix_if="$(echo "$pd_1" | sed -n -r -e 's/^ +prefix-interface +([^ ]+) .*$/\1/p')"
+
+  unset IFS
+  for interface in $prefix_if; do
+    dhcp6c_prefix_interfaces="$dhcp6c_prefix_interfaces,$interface"
+    dhcp6c_prefix_addresses="$dhcp6c_prefix_addresses,$(get_ipv6_global_addr $interface)"
+  done
+  # remove leading comma, this method keeps the pairs comma-aligned
+  dhcp6c_prefix_interfaces="${dhcp6c_prefix_interfaces#,}"
+  dhcp6c_prefix_addresses="${dhcp6c_prefix_addresses#,}"
+
+  dhcp6c_changed="$(update_cache)"
+
+  if [ -z "$dhcp6c_prefix_addresses" ]; then
+    return
+  fi
+
+  ipv6="$(echo "$dhcp6c_prefix_addresses" | cut -d',' -f1)"
+
+  if [ -n "$ipv6" ]; then
+    ipv6_ex="$(netcalc "$ipv6" | sed -n -r -e 's/^Expanded IPv6 *: *([0-9a-fA-F:]+).*$/\1/p')"
+
+    use_prefix_len "$prefix_len"
+    if [ -n "$cut_chars" -a -n "$prefix_label" ]; then
+      dhcp6c_prefix_len="$prefix_len"
+      dhcp6c_prefix_base="$(echo "$ipv6_ex" | cut -c $cut_chars)"
+      if [ -n "$dhcp6c_prefix_base" ]; then
+        dhcp6c_prefix="$dhcp6c_prefix_base$prefix_label"
+      fi
+    fi
+  fi
+}
+
+## Setup environmental variables
+## Create dhcp6c_cache file
+setup_env
+
+case "$dhcp6c_changed" in
+  yes) changed=" (changed)" ;;
+   no) changed=" (no change)" ;;
+    *) changed="" ;;
+esac
+logger -t dhcp6c -p kern.info "IPv6 Prefix$changed: $dhcp6c_prefix"
+
+if [ "$dhcp6c_changed" != "no" ]; then
+  if [ -f /var/tmp/aif-net-prefix-translation-global-ipv6 ]; then
+    arno-iptables-firewall status-plugins net-prefix-translation >/dev/null 2>&1
+  fi
+fi
+
+if [ -x $SCRIPTFILE ]; then
+  export dhcp6c_interface dhcp6c_address dhcp6c_changed
+  export dhcp6c_prefix_interfaces dhcp6c_prefix_addresses
+  export dhcp6c_prefix dhcp6c_prefix_base dhcp6c_prefix_len
+
+  $SCRIPTFILE >/dev/null 2>&1 &
+fi
+
+exit 0

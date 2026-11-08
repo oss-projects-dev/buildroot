@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libsrtp/astlinux/libsrtp.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBSRTP_VERSION = 2.6.0
 LIBSRTP_SITE = $(call github,cisco,libsrtp,v$(LIBSRTP_VERSION))
 LIBSRTP_INSTALL_STAGING = YES
@@ -32,3 +38,5 @@ LIBSRTP_CONF_OPTS += --disable-nss --disable-openssl
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

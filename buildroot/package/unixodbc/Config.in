@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/unixodbc/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_UNIXODBC
 	bool "unixodbc"
 	depends on !BR2_STATIC_LIBS # dlopen()
@@ -10,3 +16,5 @@ config BR2_PACKAGE_UNIXODBC
 
 comment "unixodbc needs a toolchain w/ dynamic library"
 	depends on BR2_STATIC_LIBS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

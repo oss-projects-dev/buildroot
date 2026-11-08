@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libopenssl/astlinux/libopenssl.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBOPENSSL_VERSION = 3.5.9
 LIBOPENSSL_SITE = https://github.com/openssl/openssl/releases/download/openssl-$(LIBOPENSSL_VERSION)
 LIBOPENSSL_SOURCE = openssl-$(LIBOPENSSL_VERSION).tar.gz
@@ -184,3 +190,5 @@ endif
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

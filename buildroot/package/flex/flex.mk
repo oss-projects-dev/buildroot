@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/flex/astlinux/flex.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 FLEX_VERSION = 2.6.4
 FLEX_SITE = https://github.com/westes/flex/files/981163
 FLEX_INSTALL_STAGING = YES
@@ -33,3 +39,5 @@ HOST_FLEX_CONF_OPTS = --disable-doc
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libusb/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBUSB
 	bool "libusb"
 	depends on BR2_TOOLCHAIN_HAS_THREADS
@@ -17,3 +23,5 @@ endif
 comment "libusb needs a toolchain w/ threads, gcc >= 4.9"
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || \
 		!BR2_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

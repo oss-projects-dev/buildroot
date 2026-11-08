@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/iptables/astlinux/iptables.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 IPTABLES_VERSION = 1.8.11
 IPTABLES_SOURCE = iptables-$(IPTABLES_VERSION).tar.xz
 IPTABLES_SITE = https://netfilter.org/projects/iptables/files
@@ -63,3 +69,5 @@ define IPTABLES_INSTALL_INIT_SYSV
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

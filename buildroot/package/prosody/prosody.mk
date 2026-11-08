@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/prosody/astlinux/prosody.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 PROSODY_VERSION = 0.11.14
 PROSODY_SITE = https://prosody.im/downloads/source
 PROSODY_LICENSE = MIT
@@ -61,3 +67,5 @@ endef
 PROSODY_POST_INSTALL_TARGET_HOOKS += PROSODY_REMOVE_CERT_GENERATOR
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

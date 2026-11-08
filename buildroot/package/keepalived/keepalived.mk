@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/keepalived/astlinux/keepalived.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 KEEPALIVED_VERSION = 2.2.8
 KEEPALIVED_SITE = http://www.keepalived.org/software
 KEEPALIVED_DEPENDENCIES = host-pkgconf openssl
@@ -59,3 +65,5 @@ KEEPALIVED_CONF_OPTS += --disable-track-process
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

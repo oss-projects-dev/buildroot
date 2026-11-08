@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/smartmontools/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_SMARTMONTOOLS
 	bool "smartmontools"
 	depends on BR2_INSTALL_LIBSTDCPP
@@ -10,3 +16,5 @@ config BR2_PACKAGE_SMARTMONTOOLS
 comment "smartmontools needs a toolchain w/ C++"
 	depends on BR2_USE_MMU
 	depends on !BR2_INSTALL_LIBSTDCPP
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

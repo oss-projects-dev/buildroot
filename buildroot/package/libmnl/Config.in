@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libmnl/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBMNL
 	bool "libmnl"
 	help
@@ -14,3 +20,5 @@ config BR2_PACKAGE_LIBMNL_EXAMPLES
 	  Install binary examples.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

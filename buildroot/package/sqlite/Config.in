@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/sqlite/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_SQLITE
 	bool "sqlite"
 	help
@@ -71,3 +77,5 @@ config BR2_PACKAGE_SQLITE_NO_SYNC
 	  using slow flash storage.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

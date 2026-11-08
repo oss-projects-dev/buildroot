@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/fxload/astlinux/fxload.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 FXLOAD_VERSION = 2008_10_13
 FXLOAD_SITE = http://downloads.sourceforge.net/project/linux-hotplug/fxload/$(FXLOAD_VERSION)
 FXLOAD_LICENSE = GPL-2.0+
@@ -25,3 +31,5 @@ define FXLOAD_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

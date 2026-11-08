@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/php/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_PHP_ARCH_SUPPORTS
 	bool
 	# see fiber_cpu in configure.ac
@@ -71,3 +77,5 @@ comment "php needs a toolchain w/ wchar"
 	depends on BR2_PACKAGE_PHP_ARCH_SUPPORTS
 	depends on !BR2_BINFMT_FLAT
 	depends on !BR2_USE_WCHAR
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

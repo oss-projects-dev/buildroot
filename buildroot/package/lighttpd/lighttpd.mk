@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/lighttpd/astlinux/lighttpd.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIGHTTPD_VERSION_MAJOR = 1.4
 LIGHTTPD_VERSION = $(LIGHTTPD_VERSION_MAJOR).81
 LIGHTTPD_SOURCE = lighttpd-$(LIGHTTPD_VERSION).tar.xz
@@ -207,3 +213,5 @@ define LIGHTTPD_INSTALL_INIT_SYSTEMD
 endef
 
 $(eval $(meson-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

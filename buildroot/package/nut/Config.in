@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/nut/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 comment "nut needs a toolchain w/ C++, threads"
 	depends on BR2_USE_MMU
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS
@@ -26,3 +32,5 @@ config BR2_PACKAGE_NUT_DRIVERS
 	  comma-separated list. Leave empty for all.
 
 endif # BR2_PACKAGE_NUT
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

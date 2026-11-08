@@ -1,0 +1,21 @@
+#############################################################
+#
+# strace
+#
+#############################################################
+
+STRACE_VERSION = 6.19
+STRACE_SOURCE = strace-$(STRACE_VERSION).tar.xz
+STRACE_SITE = https://github.com/strace/strace/releases/download/v$(STRACE_VERSION)
+STRACE_CUSTOM_PATCH_DIR = astlinux
+
+STRACE_CONF_OPTS = \
+	--enable-mpers=no
+
+define STRACE_REMOVE_STRACE_GRAPH
+	rm -f $(TARGET_DIR)/usr/bin/strace-graph
+endef
+
+STRACE_POST_INSTALL_TARGET_HOOKS += STRACE_REMOVE_STRACE_GRAPH
+
+$(eval $(autotools-package))

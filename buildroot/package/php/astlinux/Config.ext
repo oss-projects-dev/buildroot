@@ -1,0 +1,185 @@
+menu "PHP Extensions"
+
+config BR2_PACKAGE_PHP_EXT_TIMEZONEDB
+	bool "timezonedb"
+	default y
+	help
+	  Custom TimeZone Database (AstLinux Feature)
+	  Allows the PHP and system Zoneinfo to track each other
+	  and uses the much smaller 32-bit only tzdata
+
+	  Use: ./scripts/php-timezonedb/makearchive.sh
+	  to generate a new database tracking the target's zoneinfo
+
+config BR2_PACKAGE_PHP_EXT_SOCKETS
+	bool "socket"
+	help
+	  Sockets support
+
+config BR2_PACKAGE_PHP_EXT_POSIX
+	bool "posix"
+	default y
+	help
+	  POSIX support
+
+config BR2_PACKAGE_PHP_EXT_SESSION
+	bool "Session"
+	default y
+	help
+	  Session support
+
+config BR2_PACKAGE_PHP_EXT_HASH
+	bool "hash"
+	default y
+	help
+	  HASH message digest framework
+
+config BR2_PACKAGE_PHP_EXT_OPENSSL
+	bool "openssl"
+	select BR2_PACKAGE_OPENSSL
+	help
+	  openssl support
+
+config BR2_PACKAGE_PHP_EXT_CURL
+	bool "curl"
+	select BR2_PACKAGE_LIBCURL
+	help
+	  curl support
+
+config BR2_PACKAGE_PHP_EXT_LIBXML2
+	bool "xml2"
+	select BR2_PACKAGE_LIBXML2
+	help
+	  libxml2 support
+
+config BR2_PACKAGE_PHP_EXT_XMLPARSER
+	bool "xmlparser"
+	select BR2_PACKAGE_PHP_EXT_LIBXML2
+	help
+	  XML Parser support
+	  Also adds utf8_encode()/utf8_decode() from/to ISO-8859-1 functions
+
+config BR2_PACKAGE_PHP_EXT_SIMPLEXML
+	bool "simplexml"
+	select BR2_PACKAGE_PHP_EXT_LIBXML2
+	help
+	  SimpleXML support
+
+config BR2_PACKAGE_PHP_EXT_ZLIB
+        bool "zlib"
+        select BR2_PACKAGE_ZLIB
+        default y
+        help
+          zlib support
+
+config BR2_PACKAGE_PHP_EXT_EXIF
+	bool "EXIF"
+	help
+	  EXIF support
+
+config BR2_PACKAGE_PHP_EXT_FTP
+	bool "FTP"
+	help
+	  FTP Support
+
+config BR2_PACKAGE_PHP_EXT_GETTEXT
+	bool "gettext"
+	select BR2_PACKAGE_GETTEXT if BR2_NEEDS_GETTEXT
+	depends on BR2_USE_WCHAR
+	help
+	  gettext support
+
+comment "gettext support requires a toolchain with WCHAR support"
+	depends on !BR2_USE_WCHAR
+
+config BR2_PACKAGE_PHP_EXT_GMP
+	bool "gmp"
+	select BR2_PACKAGE_GMP
+	help
+	  GMP support
+
+config BR2_PACKAGE_PHP_EXT_JSON
+	bool "JSON"
+	help
+	  JavaScript Object Serialization support
+
+config BR2_PACKAGE_PHP_EXT_TOKENIZER
+	bool "tokenizer"
+	default y
+	help
+	  Tokenizer functions support
+
+config BR2_PACKAGE_PHP_EXT_READLINE
+	bool "readline"
+	select BR2_PACKAGE_NCURSES
+	select BR2_PACKAGE_READLINE
+	help
+	  readline support
+
+config BR2_PACKAGE_PHP_EXT_PCNTL
+	bool "PCNTL"
+	help
+	  Process Control Support
+
+config BR2_PACKAGE_PHP_EXT_SYSVMSG
+	bool "sysvmsg - System V Message queue"
+	help
+	  System V Message queue support
+
+config BR2_PACKAGE_PHP_EXT_SYSVSEM
+	bool "sysvsem - System V Semaphores"
+	help
+	  System V Sempahore support
+
+config BR2_PACKAGE_PHP_EXT_SYSVSHM
+	bool "sysvshm - System V Shared memory"
+	help
+	  System V Shared memory support
+
+config BR2_PACKAGE_PHP_EXT_ZIP
+	bool "zip"
+	help
+	  Zip read/write support
+
+config BR2_PACKAGE_PHP_EXT_CTYPE
+	bool "ctype"
+	default y
+	help
+	  Character type checking support
+
+config BR2_PACKAGE_PHP_EXT_FILTER
+	bool "filter"
+	help
+	  Input filter support
+
+config BR2_PACKAGE_PHP_EXT_CALENDAR
+	bool "calendar"
+	help
+	  Calendar and event support
+
+comment "Database extensions"
+
+config BR2_PACKAGE_PHP_EXT_PDO
+	bool "PDO"
+	help
+	  PHP Data Objects support
+
+config BR2_PACKAGE_PHP_EXT_PDO_SQLITE
+	bool "PDO_SQLite"
+	depends on BR2_PACKAGE_PHP_EXT_PDO
+	select BR2_PACKAGE_SQLITE
+	help
+	  SQLite driver for PDO
+
+config BR2_PACKAGE_PHP_EXT_PDO_MYSQL
+	bool "PDO_MySQL"
+	depends on BR2_PACKAGE_PHP_EXT_PDO
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_MYSQL_CLIENT
+	help
+	  PDO driver for MySQL
+
+comment "PDO_MySQL requires a toolchain with C++ support"
+	depends on !BR2_INSTALL_LIBSTDCPP && BR2_PACKAGE_PHP_EXT_PDO
+
+endmenu

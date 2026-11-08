@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/neon/astlinux/neon.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 NEON_VERSION = 0.33.0
 NEON_SITE = https://notroj.github.io/neon
 NEON_LICENSE = LGPL-2.0+ (library), GPL-2.0+ (manual and tests)
@@ -50,3 +56,5 @@ NEON_CONF_OPTS += --disable-webdav
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

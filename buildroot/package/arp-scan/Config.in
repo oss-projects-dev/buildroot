@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/arp-scan/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_ARP_SCAN
 	bool "arp-scan"
 	select BR2_PACKAGE_LIBPCAP
@@ -19,3 +25,5 @@ config BR2_PACKAGE_ARP_SCAN_DATA
 	  binaries.
 
 endif # BR2_PACKAGE_ARP_SCAN
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

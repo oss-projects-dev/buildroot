@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/lm-sensors/astlinux/lm-sensors.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LM_SENSORS_VERSION = 3-6-0
 LM_SENSORS_SITE = $(call github,lm-sensors,lm-sensors,V$(LM_SENSORS_VERSION))
 LM_SENSORS_INSTALL_STAGING = YES
@@ -50,3 +56,5 @@ define LM_SENSORS_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

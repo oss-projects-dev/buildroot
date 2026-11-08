@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/pcre2/astlinux/pcre2.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 PCRE2_VERSION = 10.49
 PCRE2_SITE = https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$(PCRE2_VERSION)
 PCRE2_SOURCE = pcre2-$(PCRE2_VERSION).tar.bz2
@@ -38,3 +44,5 @@ HOST_PCRE2_CONF_OPTS = --enable-pcre2-16
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

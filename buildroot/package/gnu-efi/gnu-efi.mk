@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/gnu-efi/astlinux/gnu-efi.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 GNU_EFI_VERSION = 4.0.0
 GNU_EFI_SITE = $(call github,ncroxon,gnu-efi,$(GNU_EFI_VERSION))
 GNU_EFI_INSTALL_STAGING = YES
@@ -47,3 +53,5 @@ define GNU_EFI_INSTALL_STAGING_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

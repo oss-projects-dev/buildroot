@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/fxload/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_FXLOAD
 	bool "fxload"
 	help
@@ -8,3 +14,5 @@ config BR2_PACKAGE_FXLOAD
 	  unprogrammed device appears on the bus.
 
 	  http://sourceforge.net/projects/linux-hotplug/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/squashfs/astlinux/squashfs.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SQUASHFS_VERSION = 4.6.1
 SQUASHFS_SOURCE = squashfs-tools-$(SQUASHFS_VERSION).tar.gz
 SQUASHFS_SITE = https://github.com/plougher/squashfs-tools/releases/download/$(SQUASHFS_VERSION)
@@ -97,3 +103,5 @@ endef
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/spandsp/astlinux/spandsp.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SPANDSP_VERSION = 3.0.0-6ec23e5a7e
 SPANDSP_SITE = https://files.freeswitch.org/downloads/libs
 SPANDSP_LICENSE = LGPL-2.1 (library), GPL-2.0 (test suite)
@@ -27,3 +33,5 @@ SPANDSP_CONF_OPTS = \
 	$(if $(BR2_X86_CPU_HAS_SSE42),--enable-sse4-2,--disable-sse4-2)
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

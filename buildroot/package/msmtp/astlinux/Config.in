@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MSMTP
+	bool "msmtp"
+	select BR2_PACKAGE_LIBRETLS
+	default n
+	help
+	  msmtp is an MUA/MTa like ssmtp, only better
+
+	  https://marlam.de/msmtp/

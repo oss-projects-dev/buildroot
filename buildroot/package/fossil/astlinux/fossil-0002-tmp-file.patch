@@ -1,0 +1,12 @@
+--- fossil-2.22/extsrc/sqlite3.c.orig	2023-06-02 14:29:17.627122616 -0500
++++ fossil-2.22/extsrc/sqlite3.c	2023-06-02 14:31:44.341318073 -0500
+@@ -50119,8 +50119,8 @@
+        0, /* getenv("TMP") */
+        0, /* getenv("TEMP") */
+        0, /* getenv("USERPROFILE") */
++       "/mnt/kd/fossil/tmp",
+        "/var/tmp",
+-       "/usr/tmp",
+        "/tmp",
+        ".",
+        0        /* List terminator */

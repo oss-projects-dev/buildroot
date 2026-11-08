@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/bridge-utils/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_BRIDGE_UTILS
 	bool "bridge-utils"
 	help
@@ -9,3 +15,5 @@ config BR2_PACKAGE_BRIDGE_UTILS
 	  package which supports more features.
 
 	  https://wiki.linuxfoundation.org/networking/bridge
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,0 +1,19 @@
+--- ncurses-6.4/misc/terminfo.src.orig	2023-05-07 13:52:15.596610434 -0500
++++ ncurses-6.4/misc/terminfo.src	2023-05-07 13:54:36.869494900 -0500
+@@ -4985,14 +4985,14 @@
+ xterm+nofkeys|building block for xterm fkey-variants,
+ 	npc,
+ 	kcbt=\E[Z, kent=\EOM, nel=\EE, use=ecma+index,
+-	use=ansi+rep, use=ecma+strikeout, use=vt420+lrmm,
++	use=ecma+strikeout, use=vt420+lrmm,
+ 	use=xterm+sm+1006, use=xterm+tmux, use=ecma+italics,
+ 	use=xterm+keypad, use=xterm-basic,
+ 
+ xterm-p370|xterm patch #370,
+ 	npc,
+ 	kcbt=\E[Z, kent=\EOM, nel=\EE, use=ecma+index,
+-	use=ansi+rep, use=ecma+strikeout, use=xterm+pcfkeys,
++	use=ecma+strikeout, use=xterm+pcfkeys,
+ 	use=xterm+nofkeys, use=bracketed+paste,
+ 
+ xterm-p371|xterm patch #371,

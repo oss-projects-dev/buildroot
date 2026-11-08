@@ -1,0 +1,34 @@
+--- unionfs-3.6/src/Makefile.orig	2025-01-12 13:34:28.171473489 -0600
++++ unionfs-3.6/src/Makefile	2025-01-12 13:43:21.627389633 -0600
+@@ -1,21 +1,21 @@
+-CFLAGS += -W -Wall -fPIC
++# CFLAGS += -W -Wall -fPIC
+ 
+-CPPFLAGS += $(shell pkg-config --cflags fuse3)
+-LIB = $(shell pkg-config --libs fuse3)
+-CPPFLAGS += -DFUSE_USE_VERSION=35
++# CPPFLAGS += $(shell pkg-config --cflags fuse3)
++# LIB = $(shell pkg-config --libs fuse3)
++# CPPFLAGS += -DFUSE_USE_VERSION=35
+ 
+ # set this even for 32bit systems - see https://github.com/rpodgorny/unionfs-fuse/issues/142
+ CPPFLAGS += -D_FILE_OFFSET_BITS=64
+ 
+ # define the following (and comment out the above) for libfuse2
+-#CPPFLAGS += $(shell pkg-config --cflags fuse)
+-#LIB = $(shell pkg-config --libs fuse) -lpthread
+-#CPPFLAGS += -DFUSE_USE_VERSION=29
++CPPFLAGS += $(shell pkg-config --cflags fuse)
++LIB = $(shell pkg-config --libs fuse) -lpthread
++CPPFLAGS += -DFUSE_USE_VERSION=29
+ 
+-CPPFLAGS += -DLIBC_XATTR # glibc nowadays includes xattr
++# CPPFLAGS += -DLIBC_XATTR # glibc nowadays includes xattr
+ # CPPFLAGS += -DLIBATTR_XATTR # define this to libattr xattr include
+ 
+-# CPPFLAGS += -DDISABLE_XATTR # disable xattr support
+-# CPPFLAGS += -DDISABLE_AT    # disable *at function support
++CPPFLAGS += -DDISABLE_XATTR # disable xattr support
++CPPFLAGS += -DDISABLE_AT    # disable *at function support
+ 
+ LDFLAGS +=

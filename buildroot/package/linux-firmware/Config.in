@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/linux-firmware/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LINUX_FIRMWARE
 	bool "linux-firmware"
 	help
@@ -728,3 +734,5 @@ config BR2_PACKAGE_LINUX_FIRMWARE_RP2
 endmenu
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

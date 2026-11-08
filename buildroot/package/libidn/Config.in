@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libidn/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBIDN
 	bool "libidn"
 	help
@@ -14,3 +20,5 @@ config BR2_PACKAGE_LIBIDN_BINARY
 	  Install idn command line tool
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

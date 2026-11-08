@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libedit/astlinux/libedit.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBEDIT_VERSION = 20230828-3.1
 LIBEDIT_SITE = https://www.thrysoee.dk/editline
 LIBEDIT_INSTALL_STAGING = YES
@@ -29,3 +35,5 @@ LIBEDIT_DEPENDENCIES += libbsd
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

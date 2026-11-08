@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/msmtp/astlinux/msmtp.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 MSMTP_VERSION = 1.8.28
 MSMTP_SITE = https://marlam.de/msmtp/releases
 MSMTP_SOURCE = msmtp-$(MSMTP_VERSION).tar.xz
@@ -52,3 +58,5 @@ MSMTP_CONF_OPTS += --with-tls=no
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

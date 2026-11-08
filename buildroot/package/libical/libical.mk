@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libical/astlinux/libical.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBICAL_VERSION = 1.0.1
 LIBICAL_SITE = https://github.com/libical/libical/releases/download/v$(LIBICAL_VERSION)
 LIBICAL_INSTALL_STAGING = YES
@@ -21,3 +27,5 @@ LIBICAL_CONF_OPTS = -DSHARED_ONLY=true
 LIBICAL_CONF_OPTS += -DUSE_BUILTIN_TZDATA=false
 
 $(eval $(cmake-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

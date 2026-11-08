@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/unbound/astlinux/unbound.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 UNBOUND_VERSION = 1.26.1
 UNBOUND_SITE = https://nlnetlabs.nl/downloads/unbound
 UNBOUND_INSTALL_STAGING = YES
@@ -52,3 +58,5 @@ define UNBOUND_USERS
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,0 +1,69 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+init () {
+
+  if [ -f /mnt/kd/sensors.conf ]; then
+    ln -sf /mnt/kd/sensors.conf /tmp/etc/sensors3.conf
+  elif [ -f /stat/etc/sensors.conf ]; then
+    ln -sf /stat/etc/sensors.conf /tmp/etc/sensors3.conf
+  fi
+}
+
+start () {
+
+  if [ -f /etc/sensors3.conf ]; then
+    echo "Configuring sensors..."
+
+    if [ -n "$SENSEMODS" ]; then
+      for i in $SENSEMODS; do
+        modprobe $i
+      done
+    fi
+
+    sleep 2
+
+    sensors -s
+  fi
+}
+
+stop () {
+
+  if [ -f /etc/sensors3.conf ]; then
+    echo "Stopping sensors..."
+
+    if [ -n "$SENSEMODS" ]; then
+      for i in $SENSEMODS; do
+        modprobe -r $i
+      done
+    fi
+  fi
+}
+
+case $1 in
+
+init)
+  init
+  start
+  ;;
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac

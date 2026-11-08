@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/dnsmasq/astlinux/dnsmasq.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 DNSMASQ_VERSION = 2.93
 DNSMASQ_SOURCE = dnsmasq-$(DNSMASQ_VERSION).tar.xz
 DNSMASQ_SITE = https://thekelleys.org.uk/dnsmasq
@@ -93,3 +99,5 @@ define DNSMASQ_INSTALL_INIT_SYSV
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

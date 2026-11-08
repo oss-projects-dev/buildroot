@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libsodium/astlinux/libsodium.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBSODIUM_VERSION = 1.0.22
 LIBSODIUM_SITE = https://download.libsodium.org/libsodium/releases
 LIBSODIUM_SOURCE = libsodium-$(LIBSODIUM_VERSION).tar.bz2
@@ -23,3 +29,5 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

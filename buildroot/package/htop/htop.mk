@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/htop/astlinux/htop.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 HTOP_VERSION = 3.3.0
 HTOP_SOURCE = htop-$(HTOP_VERSION).tar.xz
 HTOP_SITE = https://github.com/htop-dev/htop/releases/download/$(HTOP_VERSION)
@@ -56,3 +62,5 @@ HTOP_CONF_OPTS += --disable-unicode
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

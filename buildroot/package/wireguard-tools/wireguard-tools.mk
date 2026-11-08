@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/wireguard-tools/astlinux/wireguard-tools.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 WIREGUARD_TOOLS_VERSION = 1.0.20210914
 WIREGUARD_TOOLS_SITE = https://git.zx2c4.com/wireguard-tools/snapshot
 WIREGUARD_TOOLS_SOURCE = wireguard-tools-$(WIREGUARD_TOOLS_VERSION).tar.xz
@@ -35,3 +41,5 @@ define WIREGUARD_TOOLS_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

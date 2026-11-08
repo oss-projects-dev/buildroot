@@ -1,0 +1,85 @@
+################################################################################
+#
+# squashfs
+#
+################################################################################
+
+SQUASHFS_VERSION = 4.5.1
+SQUASHFS_SOURCE = squashfs-tools-$(SQUASHFS_VERSION).tar.gz
+SQUASHFS_SITE = https://downloads.sourceforge.net/project/squashfs/squashfs/squashfs$(SQUASHFS_VERSION)
+SQUASHFS_CUSTOM_PATCH_DIR = astlinux
+
+SQUASHFS_MAKE_ARGS = XATTR_SUPPORT=0
+
+SQUASHFS_MAKE_ARGS += LZ4_SUPPORT=0
+
+ifeq ($(BR2_PACKAGE_SQUASHFS_LZMA),y)
+SQUASHFS_DEPENDENCIES += xz
+SQUASHFS_MAKE_ARGS += LZMA_XZ_SUPPORT=1 COMP_DEFAULT=lzma
+else
+SQUASHFS_MAKE_ARGS += LZMA_XZ_SUPPORT=0
+endif
+
+ifeq ($(BR2_PACKAGE_SQUASHFS_XZ),y)
+SQUASHFS_DEPENDENCIES += xz
+SQUASHFS_MAKE_ARGS += XZ_SUPPORT=1 COMP_DEFAULT=xz
+else
+SQUASHFS_MAKE_ARGS += XZ_SUPPORT=0
+endif
+
+ifeq ($(BR2_PACKAGE_SQUASHFS_LZO),y)
+SQUASHFS_DEPENDENCIES += lzo
+SQUASHFS_MAKE_ARGS += LZO_SUPPORT=1 COMP_DEFAULT=lzo
+else
+SQUASHFS_MAKE_ARGS += LZO_SUPPORT=0
+endif
+
+ifeq ($(BR2_PACKAGE_SQUASHFS_GZIP),y)
+SQUASHFS_DEPENDENCIES += zlib
+SQUASHFS_MAKE_ARGS += GZIP_SUPPORT=1 COMP_DEFAULT=gzip
+else
+SQUASHFS_MAKE_ARGS += GZIP_SUPPORT=0
+endif
+
+# AstLinux only uses BR2_TARGET_ROOTFS_SQUASHFS4_GZIP=y
+HOST_SQUASHFS_DEPENDENCIES = host-zlib
+
+HOST_SQUASHFS_MAKE_ARGS = \
+	INSTALL_MANPAGES_DIR="" \
+	XATTR_SUPPORT=0 \
+	XZ_SUPPORT=0 \
+	GZIP_SUPPORT=1 COMP_DEFAULT=gzip \
+	LZ4_SUPPORT=0 \
+	LZO_SUPPORT=0 \
+	LZMA_XZ_SUPPORT=0
+
+define SQUASHFS_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) \
+		CC="$(TARGET_CC)" \
+		EXTRA_CFLAGS="$(TARGET_CFLAGS)" \
+		EXTRA_LDFLAGS="$(TARGET_LDFLAGS)" \
+		$(SQUASHFS_MAKE_ARGS) \
+		-C $(@D)/squashfs-tools/
+endef
+
+define SQUASHFS_INSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) $(SQUASHFS_MAKE_ARGS) \
+		-C $(@D)/squashfs-tools/ INSTALL_DIR=$(TARGET_DIR)/usr/bin install
+endef
+
+define HOST_SQUASHFS_BUILD_CMDS
+	$(HOST_MAKE_ENV) $(MAKE) \
+		CC="$(HOSTCC)" \
+		EXTRA_CFLAGS="$(HOST_CFLAGS)" \
+		EXTRA_LDFLAGS="$(HOST_LDFLAGS)" \
+		$(HOST_SQUASHFS_MAKE_ARGS) \
+		-C $(@D)/squashfs-tools/
+endef
+
+define HOST_SQUASHFS_INSTALL_CMDS
+	$(HOST_MAKE_ENV) $(MAKE) $(HOST_SQUASHFS_MAKE_ARGS) \
+		-C $(@D)/squashfs-tools/ INSTALL_DIR=$(HOST_DIR)/bin install
+endef
+
+$(eval $(generic-package))
+$(eval $(host-generic-package))

@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/luasocket/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LUASOCKET
 	bool "luasocket"
 	help
@@ -7,3 +13,5 @@ config BR2_PACKAGE_LUASOCKET
 	  FTP, HTTP, MIME and much more.
 
 	  https://github.com/lunarmodules/luasocket
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

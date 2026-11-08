@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/ngrep/astlinux/ngrep.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 NGREP_VERSION = 1.47
 NGREP_SITE = $(call github,jpr5,ngrep,$(subst .,_,V$(NGREP_VERSION)))
 NGREP_LICENSE = BSD-4-Clause-like, BSD-3-Clause (tcpkill)
@@ -32,3 +38,5 @@ NGREP_CONF_OPTS += --disable-tcpkill
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

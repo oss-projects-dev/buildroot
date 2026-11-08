@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/dhcpdump/astlinux/dhcpdump.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 DHCPDUMP_VERSION = 1.9
 DHCPDUMP_SOURCE = dhcpdump-$(DHCPDUMP_VERSION).tar.xz
 DHCPDUMP_SITE = https://github.com/bbonev/dhcpdump/releases/download/v$(DHCPDUMP_VERSION)
@@ -27,3 +33,5 @@ define DHCPDUMP_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

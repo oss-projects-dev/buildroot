@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/htop/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_HTOP
 	bool "htop"
 	depends on BR2_USE_MMU # fork()
@@ -12,3 +18,5 @@ config BR2_PACKAGE_HTOP
 comment "htop needs a toolchain w/ dynamic library"
 	depends on BR2_USE_MMU
 	depends on BR2_STATIC_LIBS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/unixodbc/astlinux/unixodbc.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 UNIXODBC_VERSION = 2.3.12
 UNIXODBC_SOURCE = unixODBC-$(UNIXODBC_VERSION).tar.gz
 UNIXODBC_SITE = http://www.unixodbc.org
@@ -49,3 +55,5 @@ UNIXODBC_CONF_OPTS += --disable-threads
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

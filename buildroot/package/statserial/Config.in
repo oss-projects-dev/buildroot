@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/statserial/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_STATSERIAL
 	bool "statserial"
 	select BR2_PACKAGE_NCURSES
@@ -9,3 +15,5 @@ config BR2_PACKAGE_STATSERIAL
 	  ports or modems.
 
 	  https://sites.google.com/site/tranter/software
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

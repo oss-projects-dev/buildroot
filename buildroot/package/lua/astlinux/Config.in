@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LUA
+	bool "lua"
+	help
+	  Lua is a powerful, fast, light-weight, embeddable scripting language.
+
+	  http://www.lua.org/
+

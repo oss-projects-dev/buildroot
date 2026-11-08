@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/asterisk/astlinux/asterisk.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 # When bumping asterisk's version, verify that the versions of pjsip,
 # libjwt and sounds below are still matching.
 ASTERISK_VERSION = 22.10.1
@@ -346,3 +352,5 @@ define HOST_ASTERISK_INSTALL_CMDS
 endef
 
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

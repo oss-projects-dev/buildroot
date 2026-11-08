@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/rsync/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_RSYNC
 	bool "rsync"
 	# fork()
@@ -8,3 +14,5 @@ config BR2_PACKAGE_RSYNC
 	  File transfer program to keep remote files in sync.
 
 	  https://rsync.samba.org/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

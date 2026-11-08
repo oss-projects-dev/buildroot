@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/tinyproxy/astlinux/tinyproxy.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 TINYPROXY_VERSION = 1.11.2
 TINYPROXY_SITE = https://github.com/tinyproxy/tinyproxy/releases/download/$(TINYPROXY_VERSION)
 TINYPROXY_SOURCE = tinyproxy-$(TINYPROXY_VERSION).tar.xz
@@ -15,3 +21,5 @@ TINYPROXY_CPE_ID_VALID = YES
 TINYPROXY_IGNORE_CVES += CVE-2025-63938
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

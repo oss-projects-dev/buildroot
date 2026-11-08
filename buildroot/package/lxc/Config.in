@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/lxc/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LXC
 	bool "lxc"
 	depends on BR2_TOOLCHAIN_HAS_THREADS
@@ -22,3 +28,5 @@ comment "lxc needs a glibc or musl toolchain w/ threads, headers >= 3.0, dynamic
 		|| !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_0 \
 		|| BR2_STATIC_LIBS \
 		|| BR2_TOOLCHAIN_USES_UCLIBC
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

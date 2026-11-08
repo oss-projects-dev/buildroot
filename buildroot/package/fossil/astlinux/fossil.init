@@ -1,0 +1,110 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+export FOSSIL_HOME="/mnt/kd/fossil"
+
+PIDFILE="/var/run/fossil.pid"
+
+TMPDIR="/mnt/kd/fossil/tmp"
+
+REPO="/mnt/kd/fossil/astlinux.fossil"
+
+init()
+{
+  if [ "$FOSSIL_SERVER" != "yes" ]; then
+    exit
+  fi
+
+  # Automatically create "/mnt/kd/fossil" directory if it doesn't exist
+  if [ ! -d /mnt/kd/fossil ]; then
+    mkdir /mnt/kd/fossil 2>/dev/null     # will fail on virgin RO filesystem, ignore stderr
+  fi
+  if [ -d /mnt/kd/fossil ]; then
+    ln -snf /mnt/kd/fossil /var/lib/fossil
+
+    if [ ! -f /root/.fossil ]; then
+      ln -sf /mnt/kd/fossil/.fossil /root/.fossil
+    fi
+    if [ ! -d $TMPDIR ]; then
+      mkdir $TMPDIR
+    fi
+    if [ ! -f $REPO ]; then
+      fossil init --sha1 --admin-user admin $REPO >/dev/null
+
+      fossil user password admin astlinux -R $REPO >/dev/null
+      fossil user default admin -R $REPO >/dev/null
+      fossil user capabilities nobody "a" -R $REPO >/dev/null
+      fossil user capabilities anonymous "" -R $REPO >/dev/null
+      fossil sqlite3 "REPLACE INTO config VALUES('project-name','${HOSTNAME}',now());" -R $REPO
+      fossil sqlite3 "REPLACE INTO config VALUES('timeline-utc','0',now());" -R $REPO
+      fossil sqlite3 "REPLACE INTO config VALUES('require-captcha','0',now());" -R $REPO
+
+      fossil-commit "initial default check-in" >/dev/null
+    fi
+  fi
+}
+
+start()
+{
+  if [ "$FOSSIL_SERVER" = "yes" ]; then
+    echo "Starting fossil..."
+
+    ARGS="server --nojail --https --localhost --port 8055 $REPO"
+
+    start-stop-daemon -S -x /usr/bin/fossil -p $PIDFILE -m -b -- $ARGS
+  fi
+}
+
+stop()
+{
+  local pid fossil_pids
+
+  # Close any open fossil checkouts
+  if [ -f /mnt/kd/.fslckout ]; then
+    echo "Closing fossil checkout..."
+    fossil-close
+  fi
+
+  if [ -f $PIDFILE ]; then
+    echo "Stopping fossil..."
+
+    start-stop-daemon -K -q -n fossil -p $PIDFILE -s TERM
+    rm -f $PIDFILE
+
+    # Terminate any remaining subprocesses
+    sleep 1
+    fossil_pids="$(pgrep -f '^/usr/bin/fossil ')"
+    for pid in $fossil_pids; do
+      kill $pid
+    done
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac
+

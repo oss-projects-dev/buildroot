@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/usbutils/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_USBUTILS
 	bool "usbutils"
 	depends on BR2_TOOLCHAIN_HAS_THREADS # libusb
@@ -14,3 +20,5 @@ comment "usbutils needs udev /dev management and toolchain w/ threads, gcc >= 4.
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || \
 		!BR2_PACKAGE_HAS_UDEV || \
 		!BR2_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

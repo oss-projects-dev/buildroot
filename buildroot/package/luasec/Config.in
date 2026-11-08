@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/luasec/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LUASEC
 	bool "luasec"
 	select BR2_PACKAGE_OPENSSL
@@ -7,3 +13,5 @@ config BR2_PACKAGE_LUASEC
 	  over LuaSocket.
 
 	  https://github.com/brunoos/luasec/wiki
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

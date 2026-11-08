@@ -1,0 +1,77 @@
+#
+# mozillaOrgPerson schema v. 0.6.3+
+#
+
+# req. core
+# req. cosine
+# req. inetorgperson
+# req. mozillaAbPersonAlpha
+
+# attribute defs
+
+attributetype ( 1.3.6.1.4.1.13769.2.1.5 
+        NAME 'mozillaPostalAddress2'
+        EQUALITY caseIgnoreListMatch
+        SUBSTR caseIgnoreListSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.41 )
+
+attributetype ( 1.3.6.1.4.1.13769.2.1.6 
+        NAME 'mozillaHomePostalAddress2'
+        EQUALITY caseIgnoreListMatch
+        SUBSTR caseIgnoreListSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.41 )
+
+attributetype ( 1.3.6.1.4.1.13769.2.1.10
+        NAME ( 'mozillaHomeFriendlyCountryName' )
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# objectClass defs 
+
+objectclass ( 1.3.6.1.4.1.13769.2.2.1 
+        NAME 'mozillaOrgPerson' 
+        SUP top 
+        AUXILIARY 
+        MAY ( 
+        sn $ 
+        givenName $ 
+        cn $ 
+        displayName $ 
+        mozillaNickname $ 
+        title $ 
+        telephoneNumber $ 
+        facsimileTelephoneNumber $ 
+        mobile $ 
+        pager $ 
+        homePhone $ 
+        street $ 
+        postalCode $ 
+        mozillaPostalAddress2 $ 
+        mozillaHomeStreet $ 
+        mozillaHomePostalAddress2 $ 
+        l $ 
+        mozillaHomeLocalityName $ 
+        st $ 
+        mozillaHomeState $ 
+        mozillaHomePostalCode $ 
+        c $ 
+        mozillaHomeCountryName $ 
+        co $ 
+        mozillaHomeFriendlyCountryName $  
+        ou $ 
+        o $ 
+        mail $ 
+        mozillaSecondEmail $ 
+        mozillaUseHtmlMail $ 
+        nsAIMid $ 
+        mozillaHomeUrl $ 
+        mozillaWorkUrl $ 
+        description $ 
+        mozillaCustom1 $ 
+        mozillaCustom2 $ 
+        mozillaCustom3 $ 
+        mozillaCustom4 ) ) 
+
+# not part of the official Mozilla schema but read by Mozilla: 'departmentNumber' and 'postOfficeBox'
+# 

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/stunnel/astlinux/stunnel.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 STUNNEL_VERSION_MAJOR = 5
 STUNNEL_VERSION = $(STUNNEL_VERSION_MAJOR).80
 STUNNEL_SITE = https://www.stunnel.org/archive/$(STUNNEL_VERSION_MAJOR).x
@@ -42,3 +48,5 @@ define STUNNEL_INSTALL_INIT_SYSV
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

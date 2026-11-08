@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/gnu-efi/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS
 	bool
 	default y if BR2_arm && BR2_ARM_CPU_HAS_ARM && !BR2_ARM_SOFT_FLOAT
@@ -16,3 +22,5 @@ config BR2_PACKAGE_GNU_EFI
 	  and the EFI development environment.
 
 	  https://github.com/ncroxon/gnu-efi
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

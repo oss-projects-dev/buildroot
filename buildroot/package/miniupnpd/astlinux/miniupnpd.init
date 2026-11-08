@@ -1,0 +1,248 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+if [ "$UPNP_ENABLE_NATPMP" != "yes" ]; then
+  UPNP_ENABLE_NATPMP="no"
+fi
+if [ "$UPNP_ENABLE_UPNP" != "yes" ]; then
+  UPNP_ENABLE_UPNP="no"
+fi
+if [ "$UPNP_SECURE_MODE" != "no" ]; then
+  UPNP_SECURE_MODE="yes"
+fi
+UPNP_BITRATE_UP="${UPNP_BITRATE_UP:-1000000}"
+UPNP_BITRATE_DOWN="${UPNP_BITRATE_DOWN:-10000000}"
+
+UPNP_MIN_LIFETIME="${UPNP_MIN_LIFETIME:-120}"
+UPNP_MAX_LIFETIME="${UPNP_MAX_LIFETIME:-86400}"
+
+MINIUPNPD="/usr/sbin/miniupnpd"
+MINIUPNPD_CONF="/tmp/etc/miniupnpd.conf"
+
+# Define persistant lease_file
+MINIUPNPD_LEASEFILE="/mnt/kd/upnp.leases"
+
+aif_miniupnpd_plugin()
+{
+  local action="$1"
+
+  if [ "$FWVERS" != "arno" ]; then
+    return
+  fi
+
+  (
+    plugin_file="/usr/share/arno-iptables-firewall/plugins/50miniupnpd.plugin"
+    if [ -f "$plugin_file" ]; then
+      tmp_source="$(mktemp "/var/tmp/aif_miniupnpd.XXXXXX")"
+      sed -n '1,/^# Mainline #/ p' "$plugin_file" > "$tmp_source"
+      echo '
+ip4tables()
+{
+  /usr/sbin/iptables "$@"
+}
+' >> "$tmp_source"
+
+      # Source only plugin functions from AIF Plugin
+      . "$tmp_source"
+
+      # Setup needed AIF variables
+      EXT_IF=""
+      NAT_IF=""
+      for intf in $EXTIF $EXT2IF; do
+        EXT_IF="$EXT_IF${EXT_IF:+ }$intf"
+        NAT_IF="$NAT_IF${NAT_IF:+ }$intf"
+      done
+
+      case $action in
+        start)
+          plugin_start
+          ;;
+        stop)
+          plugin_stop
+          ;;
+      esac
+
+      rm "$tmp_source"
+    fi
+  )
+}
+
+upnp_allow()
+{
+  local i addr port allow portrange IFS
+
+  unset IFS
+  for i in $UPNP_ALLOW; do
+
+    addr="$(echo $i | cut -d'~' -f1)"
+    case $addr in
+      */*) allow="$addr" ;;
+        *) allow="$addr/32" ;;
+    esac
+
+    port="$(echo $i | cut -d'~' -f2)"
+    if [ -z "$port" ]; then
+      portrange="1024-65535"
+    elif [ -z "$(echo "$port" | tr -d '0123456789-')" ]; then
+      portrange="$port"
+    else
+      portrange="1024-65535"
+    fi
+
+    echo "allow 1024-65535 ${allow} ${portrange}"
+  done
+}
+
+is_upnp_enabled()
+{
+  # args: IF_Name
+  local ifname IFS
+
+  unset IFS
+  for ifname in $UPNP_LISTEN; do
+    if [ "$ifname" = "$1" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+is_interface_enabled()
+{
+  # args: IF, IP, NM
+  if [ -n "$1" -a "$1" != "none" -a -n "$2" -a -n "$3" ]; then
+    return 0
+  fi
+  return 1
+}
+
+get_cidr()
+{
+  # args: IP, NM
+  local NETWORK PREFIX
+  eval $(ipcalc -np $1 $2)
+
+  echo "$NETWORK/$PREFIX"
+}
+
+init () {
+  if [ "$UPNP_ENABLE_NATPMP" != "yes" -a "$UPNP_ENABLE_UPNP" != "yes" ]; then
+    if [ -f $MINIUPNPD_CONF ]; then
+      rm -f $MINIUPNPD_CONF
+    fi
+    return
+  fi
+
+  if [ -z "$UUID" ]; then
+    # Use the UUID assigned to the asturw filesystem.
+    UUID=$(blkid | sed -n -r -e 's/^.*: LABEL="ASTURW" UUID="([^"]*)" .*$/\1/p')
+  fi
+
+  local RULES=""
+  echo "## Auto generated file. Do not edit.
+ext_ifname=$EXTIF" > $MINIUPNPD_CONF
+  if is_upnp_enabled INTIF && is_interface_enabled "$INTIF" "$INTIP" "$INTNM"; then
+    echo "listening_ip=$INTIF" >> $MINIUPNPD_CONF
+    RULES="$RULES${RULES:+\n}allow 1024-65535 $(get_cidr $INTIP $INTNM) 1024-65535"
+  fi
+  if is_upnp_enabled INT2IF && is_interface_enabled "$INT2IF" "$INT2IP" "$INT2NM"; then
+    echo "listening_ip=$INT2IF" >> $MINIUPNPD_CONF
+    RULES="$RULES${RULES:+\n}allow 1024-65535 $(get_cidr $INT2IP $INT2NM) 1024-65535"
+  fi
+  if is_upnp_enabled INT3IF && is_interface_enabled "$INT3IF" "$INT3IP" "$INT3NM"; then
+    echo "listening_ip=$INT3IF" >> $MINIUPNPD_CONF
+    RULES="$RULES${RULES:+\n}allow 1024-65535 $(get_cidr $INT3IP $INT3NM) 1024-65535"
+  fi
+  if is_upnp_enabled INT4IF && is_interface_enabled "$INT4IF" "$INT4IP" "$INT4NM"; then
+    echo "listening_ip=$INT4IF" >> $MINIUPNPD_CONF
+    RULES="$RULES${RULES:+\n}allow 1024-65535 $(get_cidr $INT4IP $INT4NM) 1024-65535"
+  fi
+  if is_upnp_enabled DMZIF && is_interface_enabled "$DMZIF" "$DMZIP" "$DMZNM"; then
+    echo "listening_ip=$DMZIF" >> $MINIUPNPD_CONF
+    RULES="$RULES${RULES:+\n}allow 1024-65535 $(get_cidr $DMZIP $DMZNM) 1024-65535"
+  fi
+
+  if [ -z "$RULES" -o -z "$UUID" ]; then
+    rm -f $MINIUPNPD_CONF
+    return
+  fi
+
+  # Symlink to persistant lease_file
+  # Note: The lease_file= can get deleted, so don't use symlink for it.
+  ln -sf "$MINIUPNPD_LEASEFILE" /var/db/upnp.leases
+
+  astlinux_release="$(cat /etc/astlinux-release)"
+
+  echo "http_port=5000
+enable_natpmp=$UPNP_ENABLE_NATPMP
+enable_upnp=$UPNP_ENABLE_UPNP
+lease_file=$MINIUPNPD_LEASEFILE
+bitrate_up=$UPNP_BITRATE_UP
+bitrate_down=$UPNP_BITRATE_DOWN
+secure_mode=$UPNP_SECURE_MODE
+min_lifetime=$UPNP_MIN_LIFETIME
+max_lifetime=$UPNP_MAX_LIFETIME
+system_uptime=yes
+notify_interval=60
+clean_ruleset_interval=600
+uuid=$UUID
+serial=000001
+friendly_name=AstLinux Router
+model_name=AstLinux Router
+model_description=$astlinux_release
+model_number=$astlinux_release" >> $MINIUPNPD_CONF
+  if [ -n "$UPNP_ALLOW" ]; then
+    upnp_allow >> $MINIUPNPD_CONF
+  else
+    echo -e "$RULES" >> $MINIUPNPD_CONF
+  fi
+  echo "deny 0-65535 0.0.0.0/0 0-65535" >> $MINIUPNPD_CONF
+}
+
+start () {
+  if [ -f $MINIUPNPD_CONF ]; then
+    echo "Starting miniupnpd..."
+    aif_miniupnpd_plugin start >/dev/null 2>&1
+    touch $MINIUPNPD_LEASEFILE
+    $MINIUPNPD -f $MINIUPNPD_CONF
+  fi
+}
+
+stop () {
+  if [ -f /var/run/miniupnpd.pid ]; then
+    echo "Stopping miniupnpd..."
+    kill $(cat /var/run/miniupnpd.pid) >/dev/null 2>&1
+    # /var/run/miniupnpd.pid automatically removed by killed process
+    aif_miniupnpd_plugin stop >/dev/null 2>&1
+  fi
+}
+
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac

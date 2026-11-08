@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/acpid/astlinux/acpid.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ACPID_VERSION = 2.0.34
 ACPID_SOURCE = acpid-$(ACPID_VERSION).tar.xz
 ACPID_SITE = http://downloads.sourceforge.net/project/acpid2
@@ -38,3 +44,5 @@ endef
 ACPID_POST_INSTALL_TARGET_HOOKS += ACPID_SET_EVENTS
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

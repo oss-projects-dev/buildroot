@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/genext2fs/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_GENEXT2FS
 	bool "genext2fs"
 	help
@@ -7,3 +13,5 @@ config BR2_PACKAGE_GENEXT2FS
 	  superuser to make device nodes.
 
 	  http://genext2fs.sourceforge.net/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

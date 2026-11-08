@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/p910nd/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_P910ND
 	bool "p910nd"
 	depends on BR2_USE_MMU # fork()
@@ -7,3 +13,5 @@ config BR2_PACKAGE_P910ND
 	  print jobs and passes them directly to a USB printer.
 
 	  http://p910nd.sourceforge.net/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

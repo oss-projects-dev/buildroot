@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/kexec/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_KEXEC_ARCH_SUPPORTS
 	bool
 	default y
@@ -30,3 +36,5 @@ endif
 comment "kexec needs a toolchain w/ headers >= 3.17"
 	depends on BR2_PACKAGE_KEXEC_ARCH_SUPPORTS
 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

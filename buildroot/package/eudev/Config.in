@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/eudev/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_EUDEV
 	bool "eudev"
 	depends on BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
@@ -50,3 +56,5 @@ comment "eudev needs eudev /dev management"
 comment "eudev needs a toolchain w/ wchar, dynamic library"
 	depends on BR2_USE_MMU
 	depends on !BR2_USE_WCHAR || BR2_STATIC_LIBS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

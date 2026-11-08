@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/perl/astlinux/perl.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 # When updating the version here, also update utils/scancpan
 PERL_VERSION_MAJOR = 40
 PERL_VERSION = 5.$(PERL_VERSION_MAJOR).5
@@ -136,3 +142,5 @@ define PERL_FINALIZE_TARGET
 	find $(TARGET_DIR)/usr/lib/perl5/ -name '.packlist' -print0 | xargs -0 rm -f
 endef
 PERL_TARGET_FINALIZE_HOOKS += PERL_FINALIZE_TARGET
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

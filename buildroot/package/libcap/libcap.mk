@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libcap/astlinux/libcap.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBCAP_VERSION = 2.73
 LIBCAP_SITE = https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2
 LIBCAP_SOURCE = libcap-$(LIBCAP_VERSION).tar.xz
@@ -76,3 +82,5 @@ endef
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

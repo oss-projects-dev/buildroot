@@ -1,0 +1,64 @@
+## "Additional DNS & DHCP Configuration"
+##
+## dnsmasq.static include file
+## http://thekelleys.org.uk/dnsmasq/docs/dnsmasq.conf.example
+##
+## The following, uncommented, commands will be included to the
+## automatically generated /etc/dnsmasq.conf
+##
+
+## IP Phone Provisioning
+## More Info: http://doc.astlinux.org/userdoc:tt_ip_phone_provisioning
+## Yealink HTTPS provisioning
+#dhcp-mac=set:yealink,00:15:65:*:*:*
+#dhcp-mac=set:yealink,80:5e:c0:*:*:*
+#dhcp-option=tag:yealink,option:tftp-server,"https://pbx/phoneprov/yealink/"
+## SNOM HTTPS provisioning
+#dhcp-mac=set:snom,00:04:13:*:*:*
+#dhcp-option=tag:snom,option:tftp-server,"https://pbx/phoneprov/snom/"
+
+## Set netbios-over-TCP/IP nameserver(s) aka WINS server(s)
+#dhcp-option=lan,44,192.168.100.2
+#dhcp-option=lan2,44,192.168.101.2
+#dhcp-option=lan3,44,192.168.102.2
+#dhcp-option=lan4,44,192.168.103.2
+#dhcp-option=dmz,44,192.168.200.2
+
+## Override default dns-server option
+## Example: Pi-hole IPv4 address 192.168.200.10
+#dhcp-option=lan,option:dns-server,192.168.200.10
+#dhcp-option=lan2,option:dns-server,192.168.200.10
+#dhcp-option=lan3,option:dns-server,192.168.200.10
+#dhcp-option=lan4,option:dns-server,192.168.200.10
+#dhcp-option=dmz,option:dns-server,192.168.200.10
+
+## UniFi DHCP option 43, Controller Assignment
+## Example: UniFi Controller IPv4 address 192.168.200.20
+#dhcp-option=vendor:ubnt,1,192.168.200.20
+
+## Set allowed TFTP interfaces, defaults to DHCP interfaces when enabled with "enable-tftp".
+## (Note: AstLinux 1.1.4 or later is required)
+#enable-tftp=eth1,eth2,eth3
+#enable-tftp=eth*
+
+## Set the boot filename for netboot/PXE using internal TFTP server
+## ( files placed in /tftpboot/ )
+#dhcp-boot=pxelinux.0
+## Tell thin client where to look for the boot files using external TFTP server
+#dhcp-boot=thinstation/pxelinux.0,pbx3,192.168.100.3
+
+## If a DHCP client claims that its name is "wpad", ignore that.
+## This fixes a security hole. see CERT Vulnerability VU#598349
+#dhcp-name-match=set:wpad-ignore,wpad
+#dhcp-ignore-names=tag:wpad-ignore
+
+## Set to always ignore DHCP-client supplied hostnames. DHCP hosts are added to the DNS using
+## only 'dhcp-host' configuration in dnsmasq and the contents of /etc/hosts and /etc/ethers.
+#dhcp-ignore-names
+
+## Enable a script to run whenever a lease is added, updated or deleted.
+## The file /var/db/dnsmasq-lease.db (and optionally /var/db/dnsmasq-lease6.db) is maintained with
+## more detailed lease info than the standard leasefile.
+## A persistent backup is saved to /mnt/kd/dnsmasq-lease.db (and optionally /mnt/kd/dnsmasq-lease6.db).
+#dhcp-script=/etc/dnsmasq-lease.script
+

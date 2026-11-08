@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/nano/astlinux/nano.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 NANO_VERSION_MAJOR = 8
 NANO_VERSION = $(NANO_VERSION_MAJOR).2
 NANO_SITE = https://www.nano-editor.org/dist/v$(NANO_VERSION_MAJOR)
@@ -41,3 +47,5 @@ endif # BR2_PACKAGE_FILE
 endif # BR2_PACKAGE_NANO_TINY
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

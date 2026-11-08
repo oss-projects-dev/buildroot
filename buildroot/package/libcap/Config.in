@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libcap/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBCAP
 	bool "libcap"
 	depends on BR2_USE_MMU # fork()
@@ -22,3 +28,5 @@ config BR2_PACKAGE_LIBCAP_TOOLS
 	  CONFIG_EXT2_FS_XATTR and CONFIG_EXT2_FS_SECURITY for ext2).
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

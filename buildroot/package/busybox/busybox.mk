@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/busybox/astlinux/busybox.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 BUSYBOX_VERSION = 1.37.0
 BUSYBOX_SITE = https://www.busybox.net/downloads
 BUSYBOX_SOURCE = busybox-$(BUSYBOX_VERSION).tar.bz2
@@ -526,3 +532,5 @@ endif
 endif
 
 $(eval $(kconfig-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

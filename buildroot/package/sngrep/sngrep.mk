@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/sngrep/astlinux/sngrep.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SNGREP_VERSION = 1.8.2
 SNGREP_SITE = \
 	https://github.com/irontec/sngrep/releases/download/v$(SNGREP_VERSION)
@@ -49,3 +55,5 @@ SNGREP_CONF_OPTS += --without-zlib
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

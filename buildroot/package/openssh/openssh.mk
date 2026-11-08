@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/openssh/astlinux/openssh.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 OPENSSH_VERSION_MAJOR = 9.9
 OPENSSH_VERSION_MINOR = p2
 OPENSSH_VERSION = $(OPENSSH_VERSION_MAJOR)$(OPENSSH_VERSION_MINOR)
@@ -184,3 +190,5 @@ OPENSSH_POST_INSTALL_TARGET_HOOKS += OPENSSH_INSTALL_KEY_UTILS
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

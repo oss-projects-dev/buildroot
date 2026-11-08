@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/luafilesystem/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LUAFILESYSTEM
 	bool "luafilesystem"
 	help
@@ -5,3 +11,5 @@ config BR2_PACKAGE_LUAFILESYSTEM
 	  the underlying directory structure and file attributes.
 
 	  http://keplerproject.github.com/luafilesystem/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

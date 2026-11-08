@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/sox/astlinux/sox.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 SOX_VERSION = 7524160b29a476f7e87bc14fddf12d349f9a3c5e
 SOX_SITE = https://git.code.sf.net/p/sox/code
 SOX_SITE_METHOD = git
@@ -214,3 +220,5 @@ SOX_CONF_OPTS += --disable-wavpack
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

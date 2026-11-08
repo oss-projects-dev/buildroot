@@ -1,0 +1,148 @@
+#!/bin/sh
+
+## Package: fop2
+## Description: Flash Operator Panel 2
+## Requirements: Asterisk AMI
+
+# No variables required
+#. /etc/rc.conf
+
+PACKAGES_DIR="/stat/var/packages"
+
+FOP2_SERVER="$PACKAGES_DIR/fop2/server/fop2_server"
+
+# Gracefully exit if the package is not installed.
+if [ ! -x $FOP2_SERVER ]; then
+  exit 0
+fi
+
+PIDFILE="/var/run/fop2.pid"
+
+# fop2 uses Perl Archive (PAR) which generates many "/tmp/par-HHHHHHHH/cache-" files
+# The value of TMPSIZEMAX should be 2x the normal par-HHHHHHHH size (to allow for two different versions)
+# plus the standard 10 MB headroom.  Removing the /tmp/par-HHHHHHHH directory on a fop2 stop would
+# eliminate the 2x requirement, but would be bad practice if another PAR application was in use.
+TMPSIZEMAX=90000
+
+set_version_specific_options()
+{
+  local ver_str
+
+  OPTIONS=""
+
+  if [ ! -f "$PACKAGES_DIR/fop2/.sha1" ]; then
+    return
+  fi
+
+  ver_str="$(sed -n -r -e 's:^.*/fop2-([^-]+)-.*$:\1:p' "$PACKAGES_DIR/fop2/.sha1")"
+
+  # Set preferences database file location
+  case "$ver_str" in
+    2.2[0-9]*) ;;
+    2.30*) ;;
+    *) OPTIONS="$OPTIONS${OPTIONS:+ }--dbdir /etc/fop2" ;;
+  esac
+}
+
+init () {
+
+  if [ ! -d /mnt/kd/fop2 ]; then
+    cp -a /stat/etc/fop2 /mnt/kd/
+  fi
+  ln -snf /mnt/kd/fop2 /tmp/etc/fop2
+
+  if [ $(df -k /tmp | awk '/ \/tmp$/ { print $2; nextfile }') -lt ${TMPSIZEMAX} ]; then
+    mount -o remount,size=${TMPSIZEMAX}k /tmp
+  fi
+}
+
+start () {
+
+  if [ -f /etc/fop2/fop2.cfg ]; then
+    echo "Starting Asterisk FOP2..."
+    set_version_specific_options
+
+    $FOP2_SERVER -d -c /etc/fop2 -p $PIDFILE $OPTIONS
+  fi
+}
+
+stop () {
+
+  if [ -f $PIDFILE ]; then
+    echo "Stopping Asterisk FOP2..."
+    kill $(cat $PIDFILE) >/dev/null 2>&1
+
+    # Wait for FOP2 to stop
+    cnt=5
+    while [ $cnt -gt 0 ] && [ -f $PIDFILE ]; do
+      cnt=$((cnt - 1))
+      sleep 1
+    done
+    rm -f $PIDFILE
+  fi
+}
+
+reload () {
+
+  if [ -f $PIDFILE ]; then
+    echo "Reloading Asterisk FOP2..."
+    kill -HUP $(cat $PIDFILE)
+  else
+    start
+  fi
+}
+
+dotest () {
+  local restart
+
+  if [ -f $PIDFILE ]; then
+    restart=1
+    stop
+  else
+    restart=0
+    init
+  fi
+  if [ -f /etc/fop2/fop2.cfg ]; then
+    echo "Testing Asterisk FOP2..."
+    $FOP2_SERVER --test -c /etc/fop2
+  fi
+  if [ $restart -eq 1 ]; then
+    start
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+reload)
+  reload
+  ;;
+
+test)
+  dotest
+  ;;
+
+*)
+  echo "Usage: start|stop|restart|reload|test"
+  ;;
+
+esac
+

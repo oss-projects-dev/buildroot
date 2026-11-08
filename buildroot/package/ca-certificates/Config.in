@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/ca-certificates/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_CA_CERTIFICATES
 	bool "CA Certificates"
 	help
@@ -10,3 +16,5 @@ config BR2_PACKAGE_CA_CERTIFICATES
 	  browsers.
 
 	  https://salsa.debian.org/debian/ca-certificates
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

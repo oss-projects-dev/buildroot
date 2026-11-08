@@ -1,0 +1,289 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+asterisk_unionfs_for_dir()
+{
+  local dir="$1" action="$2" upath asturw asturo union fuse_opt union_opt
+
+  upath="/mnt/unionfs"
+  asturw="/mnt/asturw/$dir"
+  asturo="$upath/asturo/$dir"
+  union="$upath/union/$dir"
+
+  if [ "$action" = "del" ]; then
+    if [ ! -d "$union" ]; then
+      return 1
+    fi
+
+    if umount "/$dir"; then
+      if umount "$union"; then
+        rmdir "$union"
+        umount "$asturo"
+        rmdir "$asturo"
+      fi
+    fi
+  elif [ "$action" = "add" ]; then
+    if [ -d "$union" ]; then
+      return 1
+    fi
+
+    fuse_opt="-o allow_other,use_ino,nonempty,suid"
+    union_opt="-o cow,max_files=1024"
+
+    if [ ! -d "$asturw" ]; then
+      mkdir -p "$asturw"
+    fi
+    mkdir -p "$asturo"
+    mkdir -p "$union"
+    mount --bind "/$dir" "$asturo"
+    unionfs $fuse_opt $union_opt "${asturw}=RW:${asturo}=RO" "$union"
+    mount --bind "$union" "/$dir"
+  fi
+
+  return 0
+}
+
+make_symlink_or_dir()
+{
+  # Args: symlink-to link-or-dir
+
+  if [ -d "$1" ]; then
+    if [ -d "$2" ]; then
+      rm -rf "$2"
+    fi
+    ln -snf "$1" "$2"
+    return 0
+  elif [ ! -d "$2" ]; then
+    if [ -L "$2" ]; then
+      rm -f "$2"
+    fi
+    mkdir "$2"
+    return 1
+  fi
+
+  return 2
+}
+
+init () {
+
+  mkdir -p /var/run/asterisk
+
+  mkdir -p /var/tmp/asterisk/sounds
+
+  mkdir -p /var/tmp/asterisk/agi-bin
+
+  if [ ! -d /var/log/asterisk ]; then
+    mkdir /var/log/asterisk
+  fi
+
+  ln -snf /stat/var/lib/asterisk /var/lib/asterisk
+
+  if [ ! -d /var/spool/asterisk ]; then
+    mkdir /var/spool/asterisk
+  else
+    if [ -L /var/spool/asterisk/voicemail ]; then
+      rm -f /var/spool/asterisk/voicemail
+    fi
+    if [ -L /var/spool/asterisk/monitor ]; then
+      rm -f /var/spool/asterisk/monitor
+    fi
+    if [ -L /var/spool/asterisk/meetme ]; then
+      rm -f /var/spool/asterisk/meetme
+    fi
+    if [ -L /var/spool/asterisk/dictate ]; then
+      rm -f /var/spool/asterisk/dictate
+    fi
+  fi
+  cp -a /stat/var/spool/asterisk/* /var/spool/asterisk/
+
+  make_symlink_or_dir "/mnt/kd/voicemail" "/var/spool/asterisk/voicemail"
+
+  make_symlink_or_dir "/mnt/kd/monitor" "/var/spool/asterisk/monitor"
+
+  if [ -d /mnt/kd/monitor ] && [ ! -d /mnt/kd/monitor/meetme ]; then
+    mkdir /mnt/kd/monitor/meetme
+  fi
+  make_symlink_or_dir "/mnt/kd/monitor/meetme" "/var/spool/asterisk/meetme"
+
+  make_symlink_or_dir "/mnt/kd/dictate" "/var/spool/asterisk/dictate"
+
+  if [ -d /mnt/kd/call-file ]; then
+    if [ ! -d /mnt/kd/call-file/outgoing ]; then
+      mkdir /mnt/kd/call-file/outgoing
+    fi
+    if [ ! -d /mnt/kd/call-file/outgoing_tmp ]; then
+      mkdir /mnt/kd/call-file/outgoing_tmp
+    fi
+    if [ ! -d /mnt/kd/call-file/outgoing_done ]; then
+      mkdir /mnt/kd/call-file/outgoing_done
+    fi
+  fi
+  make_symlink_or_dir "/mnt/kd/call-file/outgoing" "/var/spool/asterisk/outgoing"
+  make_symlink_or_dir "/mnt/kd/call-file/outgoing_tmp" "/var/spool/asterisk/outgoing_tmp"
+  make_symlink_or_dir "/mnt/kd/call-file/outgoing_done" "/var/spool/asterisk/outgoing_done"
+
+  make_symlink_or_dir "/mnt/kd/asterisk" "/tmp/etc/asterisk"
+  if [ $? -eq 1 ]; then
+    cp -a /stat/etc/asterisk/* /tmp/etc/asterisk/
+  fi
+
+  make_symlink_or_dir "/mnt/kd/custom-sounds" "/var/tmp/asterisk/sounds/custom-sounds"
+
+  make_symlink_or_dir "/mnt/kd/custom-agi" "/var/tmp/asterisk/agi-bin/custom-agi"
+
+  if [ -f /mnt/kd/astdb -o -f /mnt/kd/astdb.sqlite3 ]; then
+    ln -sf /mnt/kd/astdb /var/db/astdb
+
+    if [ -L /stat/var/lib/asterisk/astdb.sqlite3 ]; then
+      ln -sf /mnt/kd/astdb.sqlite3 /var/db/astdb.sqlite3
+    fi
+  fi
+
+  make_symlink_or_dir "/mnt/kd/cdr-csv" "/var/log/asterisk/cdr-csv"
+
+  make_symlink_or_dir "/mnt/kd/cdr-custom" "/var/log/asterisk/cdr-custom"
+
+  # Automatically create "/mnt/kd/cdr-sqlite3" directory if it doesn't exist
+  if [ ! -d /mnt/kd/cdr-sqlite3 ]; then
+    mkdir /mnt/kd/cdr-sqlite3 2>/dev/null     # will fail on virgin RO filesystem, ignore stderr
+  fi
+  if [ -d /mnt/kd/cdr-sqlite3 ]; then
+    ln -sf /mnt/kd/cdr-sqlite3/master.db /var/log/asterisk/master.db
+
+    if [ ! -f /mnt/kd/cdr-sqlite3/cdr-odbc.sqlite3 ]; then
+      sqlite3 -batch /mnt/kd/cdr-sqlite3/cdr-odbc.sqlite3 <<EOF
+CREATE TABLE 'cdr' (
+  'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  'calldate' TEXT,
+  'clid' TEXT,
+  'src' TEXT,
+  'dst' TEXT,
+  'dcontext' TEXT,
+  'channel' TEXT,
+  'dstchannel' TEXT,
+  'lastapp' TEXT,
+  'lastdata' TEXT,
+  'duration' REAL,
+  'billsec' REAL,
+  'disposition' TEXT,
+  'amaflags' INTEGER,
+  'accountcode' TEXT,
+  'uniqueid' TEXT,
+  'userfield' TEXT,
+  'answer' TEXT,
+  'end' TEXT,
+  'linkedid' TEXT,
+  'peeraccount' TEXT,
+  'sequence' TEXT
+);
+CREATE VIEW 'standard' AS SELECT calldate, clid, dst, dcontext, billsec, userfield from cdr ORDER BY calldate DESC;
+EOF
+    fi
+  fi
+
+  make_symlink_or_dir "/mnt/kd/cel-custom" "/var/log/asterisk/cel-custom"
+}
+
+start () {
+
+  echo "Starting Asterisk..."
+
+  if ! find /var/lib/asterisk/sounds -name 'vm-*' | grep -q '/vm-'; then
+    echo "
+WARNING!  No core asterisk sounds are installed.
+Core-English-ulaw Sound Package   ==>  upgrade-asterisk-sounds upgrade core en ulaw
+Music-on-Hold ulaw Sound Package  ==>  upgrade-asterisk-sounds upgrade moh en ulaw
+"
+  fi
+
+  if grep -A1 '\[admin\]' /etc/asterisk/manager.conf | grep -q 'astlinux'; then
+    echo "
+WARNING WARNING WARNING
+
+YOU STILL HAVE NOT CHANGED YOUR ASTERISK MANAGER PASSWORD
+ANYONE THAT KNOWS YOU ARE USING ASTLINUX CAN DESTROY YOUR
+SYSTEM. PLEASE CHANGE THIS IN /etc/asterisk/manager.conf
+IMMEDIATELY!
+
+WARNING WARNING WARNING
+"
+  fi
+
+  if [ -f /etc/asterisk/extensions.conf ]; then
+
+    if [ "$ASTERISK_RW_MODULES_DIR" = "yes" ]; then
+      asterisk_unionfs_for_dir usr/lib/asterisk/modules add
+    else
+      asterisk_unionfs_for_dir usr/lib/asterisk/modules del
+    fi
+
+    ulimit -s unlimited
+    if [ "$SAFE_ASTERISK" = "yes" ]; then
+      start-stop-daemon -S -x /usr/sbin/safe_asterisk -b -- -p
+    else
+      asterisk -p
+    fi
+
+    # Wait for asterisk to startup
+    cnt=10
+    while [ $cnt -gt 0 ] && [ ! -f /var/run/asterisk/asterisk.pid ]; do
+      cnt=$((cnt - 1))
+      sleep 1
+    done
+  fi
+
+  if [ -n "$ASTVERBOSE" ]; then
+    asterisk -rx "core set verbose $ASTVERBOSE" > /dev/null
+  fi
+
+  if [ -n "$MONITOR_ASTERISK_SIP_TRUNKS" -o -n "$MONITOR_ASTERISK_SIP_PEERS" ]; then
+    asterisk-sip-monitor-ctrl start
+  fi
+}
+
+stop () {
+
+  asterisk-sip-monitor-ctrl stop
+
+  if [ -f /var/run/asterisk/asterisk.pid ]; then
+    echo "Stopping Asterisk..."
+    kill $(cat /var/run/asterisk/asterisk.pid)
+
+    if [ "$SAFE_ASTERISK" = "yes" ]; then
+      sleep 1
+    fi
+  fi
+}
+
+if [ "$ASTERISK_DAHDI_DISABLE" = "yes" ]; then
+  echo "Disabled: Asterisk"
+  exit
+fi
+
+case $1 in
+
+init)
+  init
+  start
+  ;;
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac

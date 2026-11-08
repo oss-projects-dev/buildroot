@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libpng/astlinux/libpng.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBPNG_VERSION = 1.6.59
 LIBPNG_SERIES = 16
 LIBPNG_SOURCE = libpng-$(LIBPNG_VERSION).tar.xz
@@ -38,3 +44,5 @@ LIBPNG_CONF_ENV = \
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

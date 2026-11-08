@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/openssh/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_OPENSSH
 	bool "openssh"
 	depends on BR2_USE_MMU # fork()
@@ -41,3 +47,5 @@ config BR2_PACKAGE_OPENSSH_SANDBOX
 	  This is normally preferable, but may cause seccomp problems
 	  for certain combinations of C libraries and kernel versions.
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

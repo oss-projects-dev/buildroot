@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/monit/astlinux/monit.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 MONIT_VERSION = 5.34.3
 MONIT_SITE = https://mmonit.com/monit/dist
 MONIT_LICENSE = AGPL-3.0 with OpenSSL exception
@@ -49,3 +55,5 @@ MONIT_CONF_OPTS += --without-zlib
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

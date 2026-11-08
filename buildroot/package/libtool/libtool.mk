@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libtool/astlinux/libtool.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBTOOL_VERSION = 2.4.6
 LIBTOOL_SOURCE = libtool-$(LIBTOOL_VERSION).tar.xz
 LIBTOOL_SITE = $(BR2_GNU_MIRROR)/libtool
@@ -54,3 +60,5 @@ $(eval $(host-autotools-package))
 # variables used by other packages
 LIBTOOL = $(HOST_DIR)/bin/libtool
 LIBTOOLIZE = $(HOST_DIR)/bin/libtoolize
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

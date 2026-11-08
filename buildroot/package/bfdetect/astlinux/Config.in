@@ -1,0 +1,9 @@
+config BR2_PACKAGE_BFDETECT
+	bool "bfdetect"
+	default n
+
+	help
+	  Simple app that detects a Beronet Berofix card
+
+	  http://wiki.beronet.com/index.php/Download
+

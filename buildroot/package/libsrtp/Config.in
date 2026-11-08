@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libsrtp/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBSRTP
 	bool "libsrtp"
 	help
@@ -6,3 +12,5 @@ config BR2_PACKAGE_LIBSRTP
 	  Transform (UST), and a supporting cryptographic kernel.
 
 	  https://github.com/cisco/libsrtp
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

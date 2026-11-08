@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/kmod/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_KMOD
 	bool "kmod"
 	depends on !BR2_STATIC_LIBS
@@ -19,3 +25,5 @@ endif
 
 comment "kmod needs a toolchain w/ dynamic library"
 	depends on BR2_STATIC_LIBS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

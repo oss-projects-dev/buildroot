@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/stunnel/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_STUNNEL
 	bool "stunnel"
 	depends on BR2_USE_MMU # fork()
@@ -9,3 +15,5 @@ config BR2_PACKAGE_STUNNEL
 	  connection.
 
 	  http://www.stunnel.org/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

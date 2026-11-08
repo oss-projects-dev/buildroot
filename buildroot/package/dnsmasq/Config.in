@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/dnsmasq/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_DNSMASQ
 	bool "dnsmasq"
 	depends on BR2_USE_MMU # fork()
@@ -49,3 +55,5 @@ config BR2_PACKAGE_DNSMASQ_CONNTRACK
 	  Enable DNS query connection marking in netfilter.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

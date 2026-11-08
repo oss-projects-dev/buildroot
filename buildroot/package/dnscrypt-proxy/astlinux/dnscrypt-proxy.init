@@ -1,0 +1,87 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+PIDFILE="/var/run/dnscrypt-proxy.pid"
+
+PID2FILE="/var/run/dnscrypt-proxy2.pid"
+
+init () {
+  :
+}
+
+start () {
+
+  if [ "$DNSCRYPT_PROXY" = "yes" ]; then
+    if [ "$DNS_TLS_PROXY" = "yes" ]; then
+      logger -s -t dnscrypt -p kern.info "Failed starting DNSCrypt, DNS-TLS is also enabled."
+      exit 1
+    fi
+    echo "Starting dnscrypt..."
+
+    # Default to OpenDNS
+    address="${DNSCRYPT_SERVER_ADDRESS:-208.67.220.220:443}"
+    name="${DNSCRYPT_PROVIDER_NAME:-2.dnscrypt-cert.opendns.com}"
+    key="${DNSCRYPT_PROVIDER_KEY:-B735:1140:206F:225D:3E2B:D822:D7FD:691E:A1C3:3CC8:D666:8D0C:BE04:BFAB:CA43:FB79}"
+
+    if [ "$DNSCRYPT_EPHEMERAL_KEYS" = "yes" ]; then
+      ephemeral_keys="--ephemeral-keys"
+    else
+      ephemeral_keys=""
+    fi
+
+    dnscrypt-proxy -d --local-address 127.0.0.1:2053 -n 520 -m ${DNSCRYPT_VERBOSITY:-5} -p $PIDFILE $ephemeral_keys \
+                   --resolver-address "$address" --provider-name "$name" --provider-key "$key"
+
+    if [ -n "$DNSCRYPT_2SERVER_ADDRESS" ]; then
+
+      # Default to OpenDNS
+      name="${DNSCRYPT_2PROVIDER_NAME:-2.dnscrypt-cert.opendns.com}"
+      key="${DNSCRYPT_2PROVIDER_KEY:-B735:1140:206F:225D:3E2B:D822:D7FD:691E:A1C3:3CC8:D666:8D0C:BE04:BFAB:CA43:FB79}"
+
+      dnscrypt-proxy -d --local-address 127.0.0.1:2054 -n 520 -m ${DNSCRYPT_VERBOSITY:-5} -p $PID2FILE $ephemeral_keys \
+                     --resolver-address "$DNSCRYPT_2SERVER_ADDRESS" --provider-name "$name" --provider-key "$key"
+    fi
+  fi
+}
+
+stop () {
+
+  if [ -f $PIDFILE ]; then
+    echo "Stopping dnscrypt..."
+
+    kill $(cat $PIDFILE) >/dev/null 2>&1
+  fi
+
+  if [ -f $PID2FILE ]; then
+    kill $(cat $PID2FILE) >/dev/null 2>&1
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac
+

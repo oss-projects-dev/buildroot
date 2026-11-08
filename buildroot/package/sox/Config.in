@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/sox/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_SOX
 	bool "sox"
 	help
@@ -10,3 +16,5 @@ config BR2_PACKAGE_SOX
 	  most platforms.
 
 	  http://sox.sourceforge.net/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

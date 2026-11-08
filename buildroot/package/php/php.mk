@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/php/astlinux/php.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 PHP_VERSION = 8.3.36
 PHP_SITE = https://www.php.net/distributions
 PHP_SOURCE = php-$(PHP_VERSION).tar.xz
@@ -391,3 +397,5 @@ HOST_PHP_PRE_CONFIGURE_HOOKS += HOST_PHP_BUILDCONF
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

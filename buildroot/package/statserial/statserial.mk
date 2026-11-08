@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/statserial/astlinux/statserial.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 STATSERIAL_VERSION = 1.1
 STATSERIAL_SITE = http://www.ibiblio.org/pub/Linux/system/serial
 STATSERIAL_DEPENDENCIES = ncurses
@@ -19,3 +25,5 @@ define STATSERIAL_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

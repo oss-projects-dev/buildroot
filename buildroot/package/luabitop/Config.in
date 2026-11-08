@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/luabitop/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LUABITOP
 	bool "luabitop"
 	depends on BR2_PACKAGE_LUA_5_1
@@ -9,3 +15,5 @@ config BR2_PACKAGE_LUABITOP
 
 comment "luabitop needs Lua 5.1"
 	depends on !BR2_PACKAGE_LUA_5_1
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/linux-firmware/astlinux/linux-firmware.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LINUX_FIRMWARE_VERSION = 20250211
 LINUX_FIRMWARE_SOURCE = linux-firmware-$(LINUX_FIRMWARE_VERSION).tar.xz
 LINUX_FIRMWARE_SITE = $(BR2_KERNEL_MIRROR)/linux/kernel/firmware
@@ -983,3 +989,5 @@ define LINUX_FIRMWARE_INSTALL_IMAGES_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/bridge-utils/astlinux/bridge-utils.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 BRIDGE_UTILS_VERSION = 1.7.1
 BRIDGE_UTILS_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/net/bridge-utils
 BRIDGE_UTILS_SOURCE = bridge-utils-$(BRIDGE_UTILS_VERSION).tar.xz
@@ -18,3 +24,5 @@ BRIDGE_UTILS_SELINUX_MODULES = brctl
 BRIDGE_UTILS_CONF_OPTS = --with-linux-headers=$(STAGING_DIR)/usr/include
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/vsftpd/astlinux/vsftpd.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 VSFTPD_VERSION = 3.0.5
 VSFTPD_SITE = https://security.appspot.com/downloads
 VSFTPD_LIBS = -lcrypt
@@ -76,3 +82,5 @@ define VSFTPD_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

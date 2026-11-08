@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libxml2/astlinux/libxml2.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBXML2_VERSION_MAJOR = 2.15
 LIBXML2_VERSION = $(LIBXML2_VERSION_MAJOR).4
 LIBXML2_SOURCE = libxml2-$(LIBXML2_VERSION).tar.xz
@@ -73,3 +79,5 @@ $(eval $(host-autotools-package))
 
 # libxml2 for the host
 LIBXML2_HOST_BINARY = $(HOST_DIR)/bin/xmllint
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

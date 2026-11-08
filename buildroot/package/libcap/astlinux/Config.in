@@ -1,0 +1,12 @@
+config BR2_PACKAGE_LIBCAP
+	bool "libcap"
+	help
+	 This library implements the user-space interfaces to the
+	 POSIX 1003.1e capabilities available in Linux kernels. These
+	 capabilities are a partitioning of the all powerful root
+	 privilege into a set of distinct privileges.
+
+	 https://sites.google.com/site/fullycapable/
+
+	 https://git.kernel.org/pub/scm/libs/libcap/libcap.git/
+

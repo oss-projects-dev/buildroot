@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/strongswan/astlinux/strongswan.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 STRONGSWAN_VERSION = 5.9.14
 STRONGSWAN_SOURCE = strongswan-$(STRONGSWAN_VERSION).tar.bz2
 STRONGSWAN_SITE = http://download.strongswan.org
@@ -106,3 +112,5 @@ define STRONGSWAN_LINUX_CONFIG_FIXUPS
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

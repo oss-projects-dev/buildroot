@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/iftop/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_IFTOP
 	bool "iftop"
 	depends on BR2_TOOLCHAIN_HAS_THREADS
@@ -14,3 +20,5 @@ config BR2_PACKAGE_IFTOP
 
 comment "iftop needs a toolchain w/ threads"
 	depends on !BR2_TOOLCHAIN_HAS_THREADS
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

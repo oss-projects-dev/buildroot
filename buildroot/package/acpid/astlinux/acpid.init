@@ -1,0 +1,56 @@
+#!/bin/sh
+
+. /etc/rc.conf
+
+PIDFILE="/var/run/acpid.pid"
+
+init () {
+  :
+}
+
+start () {
+
+  ## Only checking for (power) button
+  if [ -x /usr/sbin/acpid -a -e /sys/bus/acpi/drivers/button ]; then
+    echo "Starting acpid..."
+
+    /usr/sbin/acpid -p $PIDFILE
+  fi
+}
+
+stop () {
+
+  if [ -f $PIDFILE ]; then
+    echo "Stopping acpid..."
+
+    kill $(cat $PIDFILE) >/dev/null 2>&1
+  fi
+}
+
+case $1 in
+
+start)
+  start
+  ;;
+
+stop)
+  stop
+  ;;
+
+init)
+  init
+  start
+  ;;
+
+restart)
+  stop
+  sleep 2
+  start
+  ;;
+
+*)
+  echo "Usage: start|stop|restart"
+  ;;
+
+esac
+

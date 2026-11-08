@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/bc/astlinux/bc.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 BC_VERSION = 1.07.1
 BC_SITE = $(BR2_GNU_MIRROR)/bc
 BC_DEPENDENCIES = host-flex
@@ -17,3 +23,5 @@ BC_CONF_ENV = MAKEINFO=true
 BC_AUTORECONF = YES
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

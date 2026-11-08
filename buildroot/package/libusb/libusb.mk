@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libusb/astlinux/libusb.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBUSB_VERSION_MAJOR = 1.0
 LIBUSB_VERSION = $(LIBUSB_VERSION_MAJOR).30
 LIBUSB_SOURCE = libusb-$(LIBUSB_VERSION).tar.bz2
@@ -36,3 +42,5 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

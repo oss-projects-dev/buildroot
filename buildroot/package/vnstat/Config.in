@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/vnstat/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_VNSTAT
 	bool "vnstat"
 	depends on BR2_USE_MMU # fork()
@@ -16,3 +22,5 @@ config BR2_PACKAGE_VNSTAT
 comment "vnstat needs a toolchain w/ wchar"
 	depends on BR2_USE_MMU
 	depends on !BR2_USE_WCHAR
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

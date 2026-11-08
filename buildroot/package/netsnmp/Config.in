@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/netsnmp/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_NETSNMP
 	bool "netsnmp"
 	depends on BR2_USE_MMU # fork()
@@ -59,3 +65,5 @@ config BR2_PACKAGE_NETSNMP_OPENSSL_INTERNAL
 	  security. It will not enable the usage of SNMP over (D)TLS.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

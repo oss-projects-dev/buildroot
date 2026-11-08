@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/zabbix/astlinux/zabbix.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ZABBIX_VERSION_MAJOR = 7.2
 ZABBIX_VERSION = $(ZABBIX_VERSION_MAJOR).15
 ZABBIX_SITE = https://cdn.zabbix.com/zabbix/sources/oldstable/$(ZABBIX_VERSION_MAJOR)
@@ -144,3 +150,5 @@ define ZABBIX_INSTALL_INIT_SYSTEMD
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

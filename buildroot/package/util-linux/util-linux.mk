@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/util-linux/astlinux/util-linux.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 # When making changes to this file, please check if
 # util-linux-libs/util-linux-libs.mk needs to be updated accordingly as well.
 
@@ -360,3 +366,5 @@ $(eval $(host-autotools-package))
 # Must be included after the autotools-package call, to make sure all variables
 # are available
 include package/util-linux/util-linux-libs/util-linux-libs.mk
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/ethtool/astlinux/ethtool.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ETHTOOL_VERSION = 6.14
 ETHTOOL_SOURCE = ethtool-$(ETHTOOL_VERSION).tar.xz
 ETHTOOL_SITE = $(BR2_KERNEL_MIRROR)/software/network/ethtool
@@ -21,3 +27,5 @@ ETHTOOL_CONF_OPTS += --disable-netlink
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

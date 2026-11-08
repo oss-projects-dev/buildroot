@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/automake/astlinux/automake.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 AUTOMAKE_VERSION = 1.16.5
 AUTOMAKE_SOURCE = automake-$(AUTOMAKE_VERSION).tar.xz
 AUTOMAKE_SITE = $(BR2_GNU_MIRROR)/automake
@@ -36,3 +42,5 @@ ACLOCAL_DIR = $(STAGING_DIR)/usr/share/aclocal
 ACLOCAL = $(HOST_DIR)/bin/aclocal
 ACLOCAL_PATH = $(ACLOCAL_DIR):$(ACLOCAL_HOST_DIR)
 export ACLOCAL_PATH
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

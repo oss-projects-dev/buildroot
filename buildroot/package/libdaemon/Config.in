@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/libdaemon/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBDAEMON
 	bool "libdaemon"
 	# needs fork()
@@ -7,3 +13,5 @@ config BR2_PACKAGE_LIBDAEMON
 	  writing of UNIX daemons.
 
 	  http://0pointer.de/lennart/projects/libdaemon/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

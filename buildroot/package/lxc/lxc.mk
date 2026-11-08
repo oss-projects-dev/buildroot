@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/lxc/astlinux/lxc.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LXC_VERSION = 5.0.3
 LXC_SITE = https://linuxcontainers.org/downloads/lxc
 LXC_LICENSE = GPL-2.0 (some tools), LGPL-2.1+
@@ -85,3 +91,5 @@ LXC_CONF_OPTS += -Dinit-script=
 endif
 
 $(eval $(meson-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/chrony/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_CHRONY
 	bool "chrony"
 	depends on BR2_USE_MMU # fork()
@@ -18,3 +24,5 @@ config BR2_PACKAGE_CHRONY_DEBUG_LOGGING
 	  not be compiled in.
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

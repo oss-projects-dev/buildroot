@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/netcalc/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_NETCALC
 	bool "netcalc"
 	help
@@ -6,3 +12,5 @@ config BR2_PACKAGE_NETCALC
 	  and IPv6 are supported.
 
 	  https://github.com/troglobit/netcalc/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/lzo/astlinux/lzo.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LZO_VERSION = 2.10
 LZO_SITE = http://www.oberhumer.com/opensource/lzo/download
 LZO_LICENSE = GPL-2.0+
@@ -28,3 +34,5 @@ HOST_LZO_CONF_OPTS += -DENABLE_SHARED=ON -DENABLE_STATIC=OFF
 
 $(eval $(cmake-package))
 $(eval $(host-cmake-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

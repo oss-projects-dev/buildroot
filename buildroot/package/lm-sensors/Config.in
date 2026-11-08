@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/lm-sensors/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LM_SENSORS
 	bool "lm-sensors"
 	help
@@ -55,3 +61,5 @@ comment "sensors-detect needs perl"
 	depends on !BR2_PACKAGE_PERL
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

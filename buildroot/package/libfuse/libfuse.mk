@@ -4,6 +4,12 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+include package/libfuse/astlinux/libfuse.mk
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 LIBFUSE_VERSION = 2.9.9
 LIBFUSE_SOURCE = fuse-$(LIBFUSE_VERSION).tar.gz
 LIBFUSE_SITE = https://github.com/libfuse/libfuse/releases/download/fuse-$(LIBFUSE_VERSION)
@@ -46,3 +52,5 @@ define LIBFUSE_PERMISSIONS
 endef
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

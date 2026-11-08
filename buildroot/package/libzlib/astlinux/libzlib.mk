@@ -1,0 +1,79 @@
+#############################################################
+#
+# zlib
+#
+#############################################################
+
+LIBZLIB_VERSION = 1.4
+LIBZLIB_SOURCE = zlib-$(LIBZLIB_VERSION).tar.gz
+LIBZLIB_SITE = https://zlib.net
+LIBZLIB_CUSTOM_PATCH_DIR = astlinux
+LIBZLIB_INSTALL_STAGING = YES
+
+ifeq ($(BR2_STATIC_LIBS),y)
+LIBZLIB_PIC :=
+LIBZLIB_SHARED := --static
+else
+LIBZLIB_PIC := -fPIC
+LIBZLIB_SHARED := --shared
+endif
+
+define LIBZLIB_CONFIGURE_CMDS
+	(cd $(@D); rm -rf config.cache; \
+		$(TARGET_CONFIGURE_ARGS) \
+		$(TARGET_CONFIGURE_OPTS) \
+		CFLAGS="$(TARGET_CFLAGS) $(LIBZLIB_PIC)" \
+		./configure \
+		$(LIBZLIB_SHARED) \
+		--prefix=/usr \
+	)
+endef
+
+define HOST_LIBZLIB_CONFIGURE_CMDS
+	(cd $(@D); rm -rf config.cache; \
+		$(HOST_CONFIGURE_ARGS) \
+		$(HOST_CONFIGURE_OPTS) \
+		./configure \
+		--prefix="$(HOST_DIR)" \
+		--sysconfdir="$(HOST_DIR)/etc" \
+	)
+endef
+
+define LIBZLIB_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D)
+endef
+
+define HOST_LIBZLIB_BUILD_CMDS
+	$(HOST_MAKE_ENV) $(MAKE1) -C $(@D)
+endef
+
+define LIBZLIB_INSTALL_STAGING_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) LDCONFIG=true install
+endef
+
+define LIBZLIB_INSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) LDCONFIG=true install
+endef
+
+define HOST_LIBZLIB_INSTALL_CMDS
+	$(HOST_MAKE_ENV) $(MAKE1) -C $(@D) LDCONFIG=true install
+endef
+
+define LIBZLIB_CLEAN_CMDS
+	-$(MAKE1) -C $(@D) clean
+endef
+
+define LIBZLIB_UNINSTALL_STAGING_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) uninstall
+endef
+
+define LIBZLIB_UNINSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) uninstall
+endef
+
+define HOST_LIBZLIB_UNINSTALL_TARGET_CMDS
+	$(HOST_MAKE_ENV) $(MAKE1) -C $(@D) uninstall
+endef
+
+$(eval $(generic-package))
+$(eval $(host-generic-package))

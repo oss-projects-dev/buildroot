@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/mtr/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_MTR
 	bool "mtr"
 	depends on BR2_USE_MMU # fork()
@@ -6,3 +12,5 @@ config BR2_PACKAGE_MTR
 	  programs in a single network diagnostic tool.
 
 	  http://www.bitwizard.nl/mtr/
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

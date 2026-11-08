@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/strace/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_STRACE
 	bool "strace"
 	# needs at least kernel headers 5.0 on xtensa
@@ -25,3 +31,5 @@ comment "strace needs a musl toolchain w/ headers >= 5.0 on aarch64"
 	depends on BR2_aarch64 || BR2_aarch64_be
 	depends on BR2_TOOLCHAIN_USES_MUSL
 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_0
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

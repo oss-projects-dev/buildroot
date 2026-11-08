@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/util-linux/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 menuconfig BR2_PACKAGE_UTIL_LINUX
 	bool "util-linux"
 	help
@@ -525,3 +531,5 @@ config BR2_PACKAGE_UTIL_LINUX_ZRAMCTL
 	  Set up and control zram devices
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

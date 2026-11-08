@@ -1,3 +1,9 @@
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+include package/e2fsprogs/astlinux/Config.in
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 menuconfig BR2_PACKAGE_E2FSPROGS
 	bool "e2fsprogs"
 	depends on BR2_USE_MMU # util-linux/libblkid
@@ -74,3 +80,5 @@ config BR2_PACKAGE_E2FSPROGS_RESIZE2FS
 	  ext2/ext3/ext4 file system resizer
 
 endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

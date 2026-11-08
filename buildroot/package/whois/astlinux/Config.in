@@ -1,0 +1,8 @@
+config BR2_PACKAGE_WHOIS
+	bool "whois"
+	depends on BR2_USE_WCHAR # gettext
+	help
+	  Improved whois client.
+
+	  https://github.com/rfc1036/whois
+
