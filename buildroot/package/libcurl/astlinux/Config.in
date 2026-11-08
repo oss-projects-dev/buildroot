@@ -6,7 +6,7 @@ config BR2_PACKAGE_LIBCURL
 
 	  https://curl.haxx.se/
 
-config BR2_PACKAGE_CURL
+config BR2_PACKAGE_LIBCURL_CURL
 	bool "curl binary"
 	depends on BR2_PACKAGE_LIBCURL
 	help
