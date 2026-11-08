@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/lua/astlinux/Config.in
+endif
 
-include package/lua/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_LUA
 	bool "lua"
@@ -92,4 +95,4 @@ endchoice
 
 endif
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

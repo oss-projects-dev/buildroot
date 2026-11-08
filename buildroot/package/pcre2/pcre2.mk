@@ -4,9 +4,10 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-
 include package/pcre2/astlinux/pcre2.mk
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 

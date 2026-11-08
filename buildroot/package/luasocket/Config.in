@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/luasocket/astlinux/Config.in
+endif
 
-include package/luasocket/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_LUASOCKET
 	bool "luasocket"
@@ -14,4 +17,4 @@ config BR2_PACKAGE_LUASOCKET
 
 	  https://github.com/lunarmodules/luasocket
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

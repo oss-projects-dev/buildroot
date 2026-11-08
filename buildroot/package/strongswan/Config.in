@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/strongswan/astlinux/Config.in
+endif
 
-include package/strongswan/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 comment "strongswan needs a toolchain w/ threads, dynamic library"
 	depends on BR2_USE_MMU
@@ -218,4 +221,4 @@ config BR2_PACKAGE_STRONGSWAN_VICI
 
 endif
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,1 +1,1 @@
-include package/jitterentropy-rngd/astlinux/Config.in
+source package/jitterentropy-rngd/astlinux/Config.in

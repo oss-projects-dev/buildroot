@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/lighttpd/astlinux/Config.in
+endif
 
-include package/lighttpd/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 comment "lighttpd needs a toolchain w/ dynamic library"
 	depends on BR2_USE_MMU
@@ -176,4 +179,4 @@ config BR2_PACKAGE_LIGHTTPD_ZSTD
 
 endif
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

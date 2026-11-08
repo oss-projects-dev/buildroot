@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/wireguard-tools/astlinux/Config.in
+endif
 
-include package/wireguard-tools/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_WIREGUARD_TOOLS
 	bool "wireguard tools"
@@ -26,4 +29,4 @@ config BR2_PACKAGE_WIREGUARD_TOOLS
 comment "wireguard-tools needs a toolchain w/ headers >= 3.10"
 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_10
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

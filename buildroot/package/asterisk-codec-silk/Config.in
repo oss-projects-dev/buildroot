@@ -1,1 +1,1 @@
-include package/asterisk-codec-silk/astlinux/Config.in
+source package/asterisk-codec-silk/astlinux/Config.in

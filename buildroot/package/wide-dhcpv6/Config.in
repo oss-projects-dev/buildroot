@@ -1,1 +1,1 @@
-include package/wide-dhcpv6/astlinux/Config.in
+source package/wide-dhcpv6/astlinux/Config.in

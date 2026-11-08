@@ -1,19 +1,6 @@
 menu "Target packages"
 
-config BR2_BUILD_USE_CUSTOM_SCRIPTS
-        bool "Use Custom OS Scripts to Build"
-        help
-          This allows to use custom package build files.
-
-if BR2_BUILD_USE_CUSTOM_SCRIPTS
-
-config BR2_BUILD_USE_ASTLINUX_SCRIPTS
-        bool "Use AstLinux Scripts"
-        help
-          This allows to use AstLinux package build files.
-
-endif
-
+	source "package/Custom.in"
 	source "package/busybox/Config.in"
 	source "package/skeleton/Config.in"
 	source "package/skeleton-custom/Config.in"

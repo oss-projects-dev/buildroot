@@ -4,9 +4,10 @@
 #
 ################################################################################
 
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
-
 include package/busybox/astlinux/busybox.mk
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 

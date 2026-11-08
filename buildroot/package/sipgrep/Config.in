@@ -1,1 +1,1 @@
-include package/sipgrep/astlinux/Config.in
+source package/sipgrep/astlinux/Config.in

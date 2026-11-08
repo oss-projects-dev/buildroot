@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/ethtool/astlinux/Config.in
+endif
 
-include package/ethtool/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_ETHTOOL
 	bool "ethtool"
@@ -20,4 +23,4 @@ config BR2_PACKAGE_ETHTOOL_PRETTY_PRINT
 	  Enables ethtool's pretty printing for drivers
 	  and SFP modules.
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

@@ -1,1 +1,1 @@
-include package/mac2vendor/astlinux/Config.in
+source package/mac2vendor/astlinux/Config.in

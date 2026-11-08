@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/gnu-efi/astlinux/Config.in
+endif
 
-include package/gnu-efi/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS
 	bool
@@ -23,4 +26,4 @@ config BR2_PACKAGE_GNU_EFI
 
 	  https://github.com/ncroxon/gnu-efi
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

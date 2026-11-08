@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/libdaemon/astlinux/Config.in
+endif
 
-include package/libdaemon/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_LIBDAEMON
 	bool "libdaemon"
@@ -14,4 +17,4 @@ config BR2_PACKAGE_LIBDAEMON
 
 	  http://0pointer.de/lennart/projects/libdaemon/
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

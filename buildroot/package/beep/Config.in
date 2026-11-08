@@ -1,1 +1,1 @@
-include package/beep/astlinux/Config.in
+source package/beep/astlinux/Config.in

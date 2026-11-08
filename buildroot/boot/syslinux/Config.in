@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source boot/syslinux/astlinux/Config.in
+endif
 
-include boot/syslinux/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_TARGET_SYSLINUX
 	bool "syslinux"
@@ -66,4 +69,4 @@ endif # BR2_TARGET_SYSLINUX_LEGACY_BIOS
 
 endif # BR2_TARGET_SYSLINUX
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

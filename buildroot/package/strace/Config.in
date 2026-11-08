@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/strace/astlinux/Config.in
+endif
 
-include package/strace/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_STRACE
 	bool "strace"
@@ -32,4 +35,4 @@ comment "strace needs a musl toolchain w/ headers >= 5.0 on aarch64"
 	depends on BR2_TOOLCHAIN_USES_MUSL
 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_0
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

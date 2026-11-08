@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/arp-scan/astlinux/Config.in
+endif
 
-include package/arp-scan/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_ARP_SCAN
 	bool "arp-scan"
@@ -26,4 +29,4 @@ config BR2_PACKAGE_ARP_SCAN_DATA
 
 endif # BR2_PACKAGE_ARP_SCAN
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS

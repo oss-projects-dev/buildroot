@@ -1,1 +1,1 @@
-include boot/runnix/astlinux/Config.in
+source boot/runnix/astlinux/Config.in

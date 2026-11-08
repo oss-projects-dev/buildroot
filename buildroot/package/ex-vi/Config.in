@@ -1,1 +1,1 @@
-include package/ex-vi/astlinux/Config.in
+source package/ex-vi/astlinux/Config.in

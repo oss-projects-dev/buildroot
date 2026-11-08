@@ -1,1 +1,1 @@
-include package/clix/astlinux/Config.in
+source package/clix/astlinux/Config.in

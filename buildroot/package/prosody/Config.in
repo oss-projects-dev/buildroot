@@ -1,8 +1,11 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
 if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+source package/prosody/astlinux/Config.in
+endif
 
-include package/prosody/astlinux/Config.in
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 config BR2_PACKAGE_PROSODY
 	bool "prosody"
@@ -31,4 +34,4 @@ comment "prosody needs the lua interpreter, dynamic library"
 comment "prosody needs a Lua <= 5.3"
 	depends on BR2_PACKAGE_LUA_5_4
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS
