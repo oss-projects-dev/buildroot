@@ -634,9 +634,9 @@ sdk: prepare-sdk $(BR2_TAR_HOST_DEPENDENCY)
 	@$(call MESSAGE,"Generating SDK tarball")
 	$(if $(BR2_SDK_PREFIX),,$(error BR2_SDK_PREFIX can not be empty))
 	$(Q)mkdir -p $(BINARIES_DIR)
-	$(TAR) czf "$(BINARIES_DIR)/$(BR2_SDK_PREFIX).tar.gz" \
+	$(TAR) czf "$(BINARIES_DIR)/$(BR2_SDK_PREFIX)-$(call qstrip,$(BR2_GCC_VERSION)).tar.gz" \
 		--owner=0 --group=0 --numeric-owner \
-		--transform='s#^$(patsubst /%,%,$(HOST_DIR))#$(BR2_SDK_PREFIX)#' \
+		--transform='s#^$(patsubst /%,%,$(HOST_DIR))#$(BR2_SDK_PREFIX)-$(call qstrip,$(BR2_GCC_VERSION))#' \
 		-C / $(patsubst /%,%,$(HOST_DIR))
 
 RSYNC_VCS_EXCLUSIONS = \
