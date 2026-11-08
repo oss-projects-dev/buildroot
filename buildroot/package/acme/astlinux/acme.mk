@@ -36,11 +36,11 @@ define ACME_DNSAPI_INSTALL_FILES
 endef
 
 define ACME_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0644 package/acme/deploy/astlinux.sh $(TARGET_DIR)/stat/etc/acme/deploy/astlinux.sh
-	$(INSTALL) -D -m 0644 package/acme/deploy/custom.sh $(TARGET_DIR)/stat/etc/acme/deploy/custom.sh
+	$(INSTALL) -D -m 0644 package/acme/astlinux/deploy/astlinux.sh $(TARGET_DIR)/stat/etc/acme/deploy/astlinux.sh
+	$(INSTALL) -D -m 0644 package/acme/astlinux/deploy/custom.sh $(TARGET_DIR)/stat/etc/acme/deploy/custom.sh
 	$(INSTALL) -D -m 0644 $(@D)/deploy/ssh.sh $(TARGET_DIR)/stat/etc/acme/deploy/ssh.sh
 	$(INSTALL) -D -m 0644 $(@D)/notify/mail.sh $(TARGET_DIR)/stat/etc/acme/notify/mail.sh
-	$(INSTALL) -D -m 0755 package/acme/acme-client.sh $(TARGET_DIR)/usr/sbin/acme-client
+	$(INSTALL) -D -m 0755 package/acme/astlinux/acme-client.sh $(TARGET_DIR)/usr/sbin/acme-client
 	$(INSTALL) -D -m 0755 $(@D)/acme.sh $(TARGET_DIR)/stat/etc/acme/acme.sh
 	$(ACME_DNSAPI_INSTALL_FILES)
 	ln -sf /mnt/kd/acme $(TARGET_DIR)/etc/acme

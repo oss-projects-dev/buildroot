@@ -21,7 +21,7 @@ LOGROTATE_CONF_OPTS += --without-acl
 endif
 
 define LOGROTATE_INSTALL_TARGET_CONF
-	$(INSTALL) -m 0644 package/logrotate/logrotate.conf $(TARGET_DIR)/etc/logrotate.conf
+	$(INSTALL) -m 0644 package/logrotate/astlinux/logrotate.conf $(TARGET_DIR)/etc/logrotate.conf
 	if [ ! -d $(TARGET_DIR)/etc/logrotate.d ]; then \
 		$(INSTALL) -d -m 0755 $(TARGET_DIR)/etc/logrotate.d; \
 	fi

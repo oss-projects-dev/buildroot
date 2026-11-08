@@ -33,13 +33,13 @@ FOSSIL_UNINSTALL_STAGING_OPTS = --version
 
 define FOSSIL_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/fossil $(TARGET_DIR)/usr/bin/fossil
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-open $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-close $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-commit $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-revert $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-diff $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/scripts/fossil-status $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/fossil/fossil.init $(TARGET_DIR)/etc/init.d/fossil
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-open $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-close $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-commit $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-revert $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-diff $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/scripts/fossil-status $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/fossil/astlinux/fossil.init $(TARGET_DIR)/etc/init.d/fossil
 	ln -sf ../../init.d/fossil $(TARGET_DIR)/etc/runlevels/default/S75fossil
 	ln -sf ../../init.d/fossil $(TARGET_DIR)/etc/runlevels/default/K15fossil
 endef

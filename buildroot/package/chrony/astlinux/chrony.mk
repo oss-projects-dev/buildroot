@@ -55,7 +55,7 @@ endef
 define CHRONY_INSTALL_TARGET_CMDS
 	#touch $(@D)/doc/chrony{.conf,c,d}.man.in  # needed for snapshot tarball missing man pages
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR="$(TARGET_DIR)" install
-	$(INSTALL) -D -m 755 package/chrony/ntpd.init $(TARGET_DIR)/etc/init.d/ntpd
+	$(INSTALL) -D -m 755 package/chrony/astlinux/ntpd.init $(TARGET_DIR)/etc/init.d/ntpd
 	ln -sf /tmp/etc/chrony.conf $(TARGET_DIR)/etc/chrony.conf
 endef
 

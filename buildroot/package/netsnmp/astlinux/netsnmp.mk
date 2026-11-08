@@ -72,7 +72,7 @@ endif
 define NETSNMP_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) \
 		DESTDIR=$(TARGET_DIR) install
-	$(INSTALL) -D -m 0755 package/netsnmp/netsnmp.init \
+	$(INSTALL) -D -m 0755 package/netsnmp/astlinux/netsnmp.init \
 		$(TARGET_DIR)/etc/init.d/snmpd
 	ln -snf /tmp/etc/snmp $(TARGET_DIR)/etc/snmp
 	for mib in $(NETSNMP_BLOAT_MIBS); do \

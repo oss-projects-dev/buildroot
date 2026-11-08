@@ -12,7 +12,7 @@ ACPID_CUSTOM_PATCH_DIR = astlinux
 define ACPID_SET_EVENTS_FILES
 	mkdir -p $(TARGET_DIR)/etc/acpi/events
 	/bin/echo -e "event=button[ /]power\naction=/sbin/poweroff" > $(TARGET_DIR)/etc/acpi/events/powerbtn
-	$(INSTALL) -D -m 755 package/acpid/acpid.init $(TARGET_DIR)/etc/init.d/acpid
+	$(INSTALL) -D -m 755 package/acpid/astlinux/acpid.init $(TARGET_DIR)/etc/init.d/acpid
 	ln -sf ../../init.d/acpid $(TARGET_DIR)/etc/runlevels/default/S24acpid
 	ln -sf ../../init.d/acpid $(TARGET_DIR)/etc/runlevels/default/K01acpid
 endef

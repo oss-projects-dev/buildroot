@@ -19,7 +19,7 @@ WIDE_DHCPV6_MAKE_OPTS = dhcp6c
 
 define WIDE_DHCPV6_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/dhcp6c $(TARGET_DIR)/usr/sbin/
-	$(INSTALL) -D -m 0755 package/wide-dhcpv6/dhcp6c.script $(TARGET_DIR)/etc/dhcp6c.script
+	$(INSTALL) -D -m 0755 package/wide-dhcpv6/astlinux/dhcp6c.script $(TARGET_DIR)/etc/dhcp6c.script
 	ln -sf /tmp/etc/wide-dhcpv6 $(TARGET_DIR)/etc/wide-dhcpv6
 endef
 

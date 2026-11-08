@@ -22,7 +22,7 @@ UNIXODBC_CONF_OPTS = \
 
 define UNIXODBC_INSTALL_TARGET_CMDS
 	cp -a $(STAGING_DIR)/usr/lib/libodbc*so* $(TARGET_DIR)/usr/lib/
-	$(INSTALL) -m 0755 -D package/unixodbc/unixodbc.init $(TARGET_DIR)/etc/init.d/unixodbc
+	$(INSTALL) -m 0755 -D package/unixodbc/astlinux/unixodbc.init $(TARGET_DIR)/etc/init.d/unixodbc
 	$(INSTALL) -m 0755 -D $(STAGING_DIR)/usr/bin/isql $(TARGET_DIR)/usr/bin/isql
 	$(INSTALL) -m 0755 -D $(STAGING_DIR)/usr/bin/odbcinst $(TARGET_DIR)/usr/bin/odbcinst
 	ln -sf /tmp/etc/odbc.ini $(TARGET_DIR)/etc/odbc.ini

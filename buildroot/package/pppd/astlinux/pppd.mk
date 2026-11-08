@@ -37,7 +37,7 @@ define PPPD_INSTALL_TARGET_CMDS
 			$(TARGET_DIR)/usr/sbin/$$sbin; \
 	done
 	for sbin in pppoe-start pppoe-stop pppoe-restart pppoe-status; do \
-		$(INSTALL) -D -m 0755 package/pppd/pppoe/$$sbin \
+		$(INSTALL) -D -m 0755 package/pppd/astlinux/pppoe/$$sbin \
 			$(TARGET_DIR)/usr/sbin/$$sbin; \
 	done
 	$(INSTALL) -D $(PPPD_DIR)/pppd/plugins/minconn.so \

@@ -15,7 +15,7 @@ endef
 
 define JITTERENTROPY_RNGD_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/jitterentropy-rngd $(TARGET_DIR)/usr/sbin/jitterentropy-rngd
-	$(INSTALL) -m 0755 -D package/jitterentropy-rngd/jitterentropy-rngd.init $(TARGET_DIR)/etc/init.d/jitterentropy-rngd
+	$(INSTALL) -m 0755 -D package/jitterentropy-rngd/astlinux/jitterentropy-rngd.init $(TARGET_DIR)/etc/init.d/jitterentropy-rngd
 	ln -sf ../../init.d/jitterentropy-rngd $(TARGET_DIR)/etc/runlevels/default/S00jitterentropy-rngd
 	ln -sf ../../init.d/jitterentropy-rngd $(TARGET_DIR)/etc/runlevels/default/K00jitterentropy-rngd
 endef

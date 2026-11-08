@@ -25,8 +25,8 @@ TARSNAP_CONF_OPTS = \
 	--with-conf-no-sample
 
 define TARSNAP_POST_INSTALL
-	$(INSTALL) -m 0644 -D package/tarsnap/tarsnap.conf $(TARGET_DIR)/etc/tarsnap.conf
-	$(INSTALL) -m 0755 -D package/tarsnap/tarsnap-backup.sh $(TARGET_DIR)/usr/bin/tarsnap-backup
+	$(INSTALL) -m 0644 -D package/tarsnap/astlinux/tarsnap.conf $(TARGET_DIR)/etc/tarsnap.conf
+	$(INSTALL) -m 0755 -D package/tarsnap/astlinux/tarsnap-backup.sh $(TARGET_DIR)/usr/bin/tarsnap-backup
 endef
 
 TARSNAP_POST_INSTALL_TARGET_HOOKS = TARSNAP_POST_INSTALL

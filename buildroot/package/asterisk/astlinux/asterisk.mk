@@ -227,8 +227,8 @@ $(ASTERISK_DIR)/.source: $(DL_DIR)/$(ASTERISK_SOURCE)
 	touch $@
 
 $(ASTERISK_DIR)/.patched: $(ASTERISK_DIR)/.source
-	toolchain/patch-kernel.sh $(ASTERISK_DIR) package/asterisk/patches/ asterisk-$(ASTERISK_VERSION_SINGLE)$(ASTERISK_LABEL)-\*.patch
-	toolchain/patch-kernel.sh $(ASTERISK_DIR) package/asterisk/patches/ asterisk-$(ASTERISK_VERSION_TUPLE)-\*.patch
+	toolchain/patch-kernel.sh $(ASTERISK_DIR) package/asterisk/astlinux/patches/ asterisk-$(ASTERISK_VERSION_SINGLE)$(ASTERISK_LABEL)-\*.patch
+	toolchain/patch-kernel.sh $(ASTERISK_DIR) package/asterisk/astlinux/patches/ asterisk-$(ASTERISK_VERSION_TUPLE)-\*.patch
 	touch $@
 
 $(ASTERISK_DIR)/.configured: $(ASTERISK_DIR)/.patched | host-automake host-pkgconf host-ncurses host-bison host-flex host-libxml2 \
@@ -330,12 +330,12 @@ $(TARGET_DIR)/$(ASTERISK_TARGET_BINARY): $(ASTERISK_DIR)/$(ASTERISK_BINARY)
 	   $(TARGET_DIR)/usr/include/asterisk \
 	   $(STAGING_DIR)/usr/include/
 	rm -Rf $(TARGET_DIR)/usr/share/man
-	$(INSTALL) -D -m 0755 package/asterisk/asterisk.init $(TARGET_DIR)/etc/init.d/asterisk
-	$(INSTALL) -D -m 0644 package/asterisk/asterisk.logrotate $(TARGET_DIR)/etc/logrotate.d/asterisk
-	$(INSTALL) -D -m 0755 package/asterisk/upgrade-asterisk-sounds $(TARGET_DIR)/usr/sbin/upgrade-asterisk-sounds
-	$(INSTALL) -D -m 0755 package/asterisk/safe_asterisk $(TARGET_DIR)/usr/sbin/safe_asterisk
-	$(INSTALL) -D -m 0755 package/asterisk/asterisk-sip-monitor $(TARGET_DIR)/usr/sbin/asterisk-sip-monitor
-	$(INSTALL) -D -m 0755 package/asterisk/asterisk-sip-monitor-ctrl $(TARGET_DIR)/usr/sbin/asterisk-sip-monitor-ctrl
+	$(INSTALL) -D -m 0755 package/asterisk/astlinux/asterisk.init $(TARGET_DIR)/etc/init.d/asterisk
+	$(INSTALL) -D -m 0644 package/asterisk/astlinux/asterisk.logrotate $(TARGET_DIR)/etc/logrotate.d/asterisk
+	$(INSTALL) -D -m 0755 package/asterisk/astlinux/upgrade-asterisk-sounds $(TARGET_DIR)/usr/sbin/upgrade-asterisk-sounds
+	$(INSTALL) -D -m 0755 package/asterisk/astlinux/safe_asterisk $(TARGET_DIR)/usr/sbin/safe_asterisk
+	$(INSTALL) -D -m 0755 package/asterisk/astlinux/asterisk-sip-monitor $(TARGET_DIR)/usr/sbin/asterisk-sip-monitor
+	$(INSTALL) -D -m 0755 package/asterisk/astlinux/asterisk-sip-monitor-ctrl $(TARGET_DIR)/usr/sbin/asterisk-sip-monitor-ctrl
 	$(INSTALL) -D -m 0755 $(ASTERISK_DIR)/contrib/scripts/ast_tls_cert $(TARGET_DIR)/usr/sbin/ast_tls_cert
 	mkdir -p $(TARGET_DIR)/stat/var/lib/asterisk/licenses
 	mv $(TARGET_DIR)/var/lib/asterisk/* $(TARGET_DIR)/stat/var/lib/asterisk/
@@ -354,15 +354,15 @@ $(TARGET_DIR)/$(ASTERISK_TARGET_BINARY): $(ASTERISK_DIR)/$(ASTERISK_BINARY)
 	rm -f $(TARGET_DIR)/stat/var/lib/asterisk/moh/macroform-robot_dity.*
 	rm -f $(TARGET_DIR)/stat/var/lib/asterisk/moh/macroform-cold_day.*
 	mv $(TARGET_DIR)/etc/asterisk $(TARGET_DIR)/stat/etc/
-	$(INSTALL) -D -m 0644 package/asterisk/logger.conf $(TARGET_DIR)/stat/etc/asterisk/logger.conf
+	$(INSTALL) -D -m 0644 package/asterisk/astlinux/logger.conf $(TARGET_DIR)/stat/etc/asterisk/logger.conf
 
 	ln -sf /tmp/etc/asterisk $(TARGET_DIR)/etc/asterisk
 	ln -sf /var/tmp/asterisk/sounds/custom-sounds $(TARGET_DIR)/stat/var/lib/asterisk/sounds/custom-sounds
 	ln -sf /var/tmp/asterisk/agi-bin/custom-agi $(TARGET_DIR)/stat/var/lib/asterisk/agi-bin/custom-agi
 
 	if [ -d $(TARGET_DIR)/usr/share/snmp/mibs ]; then \
-	  $(INSTALL) -D -m 0644 package/asterisk/mibs/ASTERISK-MIB.txt $(TARGET_DIR)/usr/share/snmp/mibs/ ; \
-	  $(INSTALL) -D -m 0644 package/asterisk/mibs/DIGIUM-MIB.txt $(TARGET_DIR)/usr/share/snmp/mibs/ ; \
+	  $(INSTALL) -D -m 0644 package/asterisk/astlinux/mibs/ASTERISK-MIB.txt $(TARGET_DIR)/usr/share/snmp/mibs/ ; \
+	  $(INSTALL) -D -m 0644 package/asterisk/astlinux/mibs/DIGIUM-MIB.txt $(TARGET_DIR)/usr/share/snmp/mibs/ ; \
 	fi
 
 asterisk: $(TARGET_DIR)/$(ASTERISK_TARGET_BINARY)

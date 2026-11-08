@@ -164,7 +164,7 @@ define AVAHI_INSTALL_DAEMON_INIT_SYSV
 	cp -a $(TARGET_DIR)/etc/avahi/* $(TARGET_DIR)/stat/etc/avahi/
 	rm -rf $(TARGET_DIR)/etc/avahi
 	ln -s /tmp/etc/avahi $(TARGET_DIR)/etc/avahi
-	$(INSTALL) -D -m 0755 package/avahi/avahi.init $(TARGET_DIR)/etc/init.d/avahi
+	$(INSTALL) -D -m 0755 package/avahi/astlinux/avahi.init $(TARGET_DIR)/etc/init.d/avahi
 	ln -sf ../../init.d/avahi $(TARGET_DIR)/etc/runlevels/default/S92avahi
 	ln -sf ../../init.d/avahi $(TARGET_DIR)/etc/runlevels/default/K05avahi
 endef
@@ -175,7 +175,7 @@ define AVAHI_DAEMON_DEFAULT_FIXUP
 	        $(TARGET_DIR)/stat/etc/avahi/avahi-daemon.conf
 	rm -f $(TARGET_DIR)/stat/etc/avahi/avahi-dnsconfd.action
 	rm -f $(TARGET_DIR)/stat/etc/avahi/services/*.service
-	cp -a package/avahi/services/*.service* $(TARGET_DIR)/stat/etc/avahi/services/
+	cp -a package/avahi/astlinux/services/*.service* $(TARGET_DIR)/stat/etc/avahi/services/
 endef
 
 AVAHI_POST_INSTALL_TARGET_HOOKS += AVAHI_INSTALL_DAEMON_INIT_SYSV

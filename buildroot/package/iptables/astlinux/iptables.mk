@@ -37,7 +37,7 @@ define IPTABLES_TARGET_IPV6_REMOVE
 endef
 
 define IPTABLES_TARGET_INSTALL
-	$(INSTALL) -D -m 0755 package/iptables/iptables.init $(TARGET_DIR)/etc/init.d/iptables
+	$(INSTALL) -D -m 0755 package/iptables/astlinux/iptables.init $(TARGET_DIR)/etc/init.d/iptables
 endef
 
 IPTABLES_POST_INSTALL_TARGET_HOOKS += IPTABLES_TARGET_SYMLINK_CREATE

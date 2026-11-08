@@ -15,7 +15,7 @@ VNSTAT_CONF_OPTS = \
 define VNSTAT_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/vnstat $(TARGET_DIR)/usr/bin/vnstat
 	$(INSTALL) -D -m 0755 $(@D)/vnstatd $(TARGET_DIR)/usr/sbin/vnstatd
-	$(INSTALL) -D -m 0755 package/vnstat/vnstat.init $(TARGET_DIR)/etc/init.d/vnstat
+	$(INSTALL) -D -m 0755 package/vnstat/astlinux/vnstat.init $(TARGET_DIR)/etc/init.d/vnstat
 	ln -sf /tmp/etc/vnstat.conf $(TARGET_DIR)/etc/vnstat.conf
 	ln -sf ../../init.d/vnstat $(TARGET_DIR)/etc/runlevels/default/S98vnstat
 	ln -sf ../../init.d/vnstat $(TARGET_DIR)/etc/runlevels/default/K01vnstat

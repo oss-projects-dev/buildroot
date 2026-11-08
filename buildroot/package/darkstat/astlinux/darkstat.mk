@@ -25,7 +25,7 @@ DARKSTAT_MAKE_ENV = \
 
 define DARKSTAT_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/darkstat $(TARGET_DIR)/usr/sbin/
-	$(INSTALL) -D -m 0755 package/darkstat/darkstat.init $(TARGET_DIR)/etc/init.d/darkstat
+	$(INSTALL) -D -m 0755 package/darkstat/astlinux/darkstat.init $(TARGET_DIR)/etc/init.d/darkstat
 	ln -sf ../../init.d/darkstat $(TARGET_DIR)/etc/runlevels/default/S75darkstat
 	ln -sf ../../init.d/darkstat $(TARGET_DIR)/etc/runlevels/default/K15darkstat
 endef

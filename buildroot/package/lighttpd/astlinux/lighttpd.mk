@@ -55,11 +55,11 @@ LIGHTTPD_CONF_OPTS += --without-webdav-props --without-webdav-locks
 endif
 
 define LIGHTTPD_INSTALL_INITSCRIPT
-	$(INSTALL) -D -m 0644 package/lighttpd/lighttpd.conf $(TARGET_DIR)/stat/etc/lighttpd.conf
-	$(INSTALL) -D -m 0644 package/lighttpd/lighttpd-wiki.html $(TARGET_DIR)/stat/etc/docs/lighttpd-wiki.html
-	$(INSTALL) -D -m 0644 package/lighttpd/php.ini.conf $(TARGET_DIR)/stat/etc/php.ini.conf
-	$(INSTALL) -D -m 0755 package/lighttpd/lighttpd.init $(TARGET_DIR)/etc/init.d/lighttpd
-	$(INSTALL) -D -m 0644 package/lighttpd/lighttpd.logrotate $(TARGET_DIR)/etc/logrotate.d/lighttpd
+	$(INSTALL) -D -m 0644 package/lighttpd/astlinux/lighttpd.conf $(TARGET_DIR)/stat/etc/lighttpd.conf
+	$(INSTALL) -D -m 0644 package/lighttpd/astlinux/lighttpd-wiki.html $(TARGET_DIR)/stat/etc/docs/lighttpd-wiki.html
+	$(INSTALL) -D -m 0644 package/lighttpd/astlinux/php.ini.conf $(TARGET_DIR)/stat/etc/php.ini.conf
+	$(INSTALL) -D -m 0755 package/lighttpd/astlinux/lighttpd.init $(TARGET_DIR)/etc/init.d/lighttpd
+	$(INSTALL) -D -m 0644 package/lighttpd/astlinux/lighttpd.logrotate $(TARGET_DIR)/etc/logrotate.d/lighttpd
 	ln -sf /tmp/etc/lighttpd.conf $(TARGET_DIR)/etc/lighttpd.conf
 endef
 

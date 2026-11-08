@@ -22,7 +22,7 @@ endif
 
 define DNSCRYPT_PROXY_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/src/proxy/dnscrypt-proxy $(TARGET_DIR)/usr/sbin/
-	$(INSTALL) -D -m 0755 package/dnscrypt-proxy/dnscrypt-proxy.init $(TARGET_DIR)/etc/init.d/dnscrypt
+	$(INSTALL) -D -m 0755 package/dnscrypt-proxy/astlinux/dnscrypt-proxy.init $(TARGET_DIR)/etc/init.d/dnscrypt
 	ln -sf ../../init.d/dnscrypt $(TARGET_DIR)/etc/runlevels/default/S18dnscrypt
 	ln -sf ../../init.d/dnscrypt $(TARGET_DIR)/etc/runlevels/default/K15dnscrypt
 endef

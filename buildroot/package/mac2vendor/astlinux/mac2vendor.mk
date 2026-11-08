@@ -25,7 +25,7 @@ define MAC2VENDOR_EXTRACT_CMDS
 endef
 
 define MAC2VENDOR_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0755 package/mac2vendor/mac2vendor $(TARGET_DIR)/usr/sbin/mac2vendor
+	$(INSTALL) -D -m 0755 package/mac2vendor/astlinux/mac2vendor $(TARGET_DIR)/usr/sbin/mac2vendor
 	$(INSTALL) -d -m 0755 $(TARGET_DIR)/usr/share/oui-db
 	cp $(@D)/oui-db/* $(TARGET_DIR)/usr/share/oui-db/
 	chmod a-w $(TARGET_DIR)/usr/share/oui-db/*

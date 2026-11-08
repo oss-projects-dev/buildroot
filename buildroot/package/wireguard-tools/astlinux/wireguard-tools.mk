@@ -24,9 +24,9 @@ endef
 
 define WIREGUARD_TOOLS_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/src/wg $(TARGET_DIR)/usr/bin/wg
-	$(INSTALL) -m 0755 -D package/wireguard-tools/wireguard-monitor $(TARGET_DIR)/usr/sbin/wireguard-monitor
-	$(INSTALL) -m 0755 -D package/wireguard-tools/wireguard-mobile-client $(TARGET_DIR)/usr/sbin/wireguard-mobile-client
-	$(INSTALL) -m 0755 -D package/wireguard-tools/wireguard.init $(TARGET_DIR)/etc/init.d/wireguard
+	$(INSTALL) -m 0755 -D package/wireguard-tools/astlinux/wireguard-monitor $(TARGET_DIR)/usr/sbin/wireguard-monitor
+	$(INSTALL) -m 0755 -D package/wireguard-tools/astlinux/wireguard-mobile-client $(TARGET_DIR)/usr/sbin/wireguard-mobile-client
+	$(INSTALL) -m 0755 -D package/wireguard-tools/astlinux/wireguard.init $(TARGET_DIR)/etc/init.d/wireguard
 	ln -sf /tmp/etc/wireguard $(TARGET_DIR)/etc/wireguard
 	ln -sf ../../init.d/wireguard $(TARGET_DIR)/etc/runlevels/default/S31wireguard
 	ln -sf ../../init.d/wireguard $(TARGET_DIR)/etc/runlevels/default/K20wireguard

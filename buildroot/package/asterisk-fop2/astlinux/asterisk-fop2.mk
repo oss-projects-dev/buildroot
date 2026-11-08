@@ -11,10 +11,10 @@ ASTERISK_FOP2_CUSTOM_PATCH_DIR = astlinux
 # Note: be sure to edit "project/astlinux/target_skeleton/usr/sbin/upgrade-package" on version change
 
 define ASTERISK_FOP2_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0755 package/asterisk-fop2/fop2.init $(TARGET_DIR)/etc/init.d/fop2
-	$(INSTALL) -D -m 0644 package/asterisk-fop2/config/fop2.cfg $(TARGET_DIR)/stat/etc/fop2/fop2.cfg
-	$(INSTALL) -D -m 0644 package/asterisk-fop2/config/buttons.cfg $(TARGET_DIR)/stat/etc/fop2/buttons.cfg
-	$(INSTALL) -D -m 0644 package/asterisk-fop2/config/users.cfg $(TARGET_DIR)/stat/etc/fop2/users.cfg
+	$(INSTALL) -D -m 0755 package/asterisk-fop2/astlinux/fop2.init $(TARGET_DIR)/etc/init.d/fop2
+	$(INSTALL) -D -m 0644 package/asterisk-fop2/astlinux/config/fop2.cfg $(TARGET_DIR)/stat/etc/fop2/fop2.cfg
+	$(INSTALL) -D -m 0644 package/asterisk-fop2/astlinux/config/buttons.cfg $(TARGET_DIR)/stat/etc/fop2/buttons.cfg
+	$(INSTALL) -D -m 0644 package/asterisk-fop2/astlinux/config/users.cfg $(TARGET_DIR)/stat/etc/fop2/users.cfg
 	mkdir -p $(TARGET_DIR)/usr/local
 	ln -snf /stat/var/packages/fop2/server $(TARGET_DIR)/usr/local/fop2
 	ln -snf /tmp/etc/fop2 $(TARGET_DIR)/etc/fop2

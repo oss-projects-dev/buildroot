@@ -15,9 +15,9 @@ S3FS_CONF_OPTS = \
 	--with-openssl
 
 define S3FS_POST_INSTALL
-	$(INSTALL) -m 0644 -D package/s3fs/mime.types $(TARGET_DIR)/usr/share/mime.types
+	$(INSTALL) -m 0644 -D package/s3fs/astlinux/mime.types $(TARGET_DIR)/usr/share/mime.types
 	ln -sf /usr/share/mime.types $(TARGET_DIR)/etc/mime.types
-	$(INSTALL) -m 0755 -D package/s3fs/s3fs.init $(TARGET_DIR)/etc/init.d/s3fs
+	$(INSTALL) -m 0755 -D package/s3fs/astlinux/s3fs.init $(TARGET_DIR)/etc/init.d/s3fs
 	ln -sf ../../init.d/s3fs $(TARGET_DIR)/etc/runlevels/default/S55s3fs
 	ln -sf ../../init.d/s3fs $(TARGET_DIR)/etc/runlevels/default/K11s3fs
 endef

@@ -29,7 +29,7 @@ define UNBOUND_INSTALL_TARGET_CMDS
 	ln -sf ../sbin/unbound-host $(TARGET_DIR)/usr/bin/host
 	cp -a $(STAGING_DIR)/usr/lib/libunbound.so* $(TARGET_DIR)/usr/lib/
 	ln -sf /tmp/etc/unbound $(TARGET_DIR)/etc/unbound
-	$(INSTALL) -D -m 0755 package/unbound/unbound.init $(TARGET_DIR)/etc/init.d/unbound
+	$(INSTALL) -D -m 0755 package/unbound/astlinux/unbound.init $(TARGET_DIR)/etc/init.d/unbound
 	ln -sf ../../init.d/unbound $(TARGET_DIR)/etc/runlevels/default/S18unbound
 	ln -sf ../../init.d/unbound $(TARGET_DIR)/etc/runlevels/default/K15unbound
 endef

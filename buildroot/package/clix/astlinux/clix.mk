@@ -10,7 +10,7 @@ CLIX_CUSTOM_PATCH_DIR = astlinux
 
 define CLIX_INSTALL_TARGET_CMDS
 	install -D -m 755 $(@D)/clix.bin $(TARGET_DIR)/usr/bin/clix
-	install -D -m 755 package/clix/sendxmpp $(TARGET_DIR)/usr/bin/sendxmpp
+	install -D -m 755 package/clix/astlinux/sendxmpp $(TARGET_DIR)/usr/bin/sendxmpp
 endef
 
 define CLIX_UNINSTALL_TARGET_CMDS

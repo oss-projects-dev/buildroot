@@ -54,11 +54,11 @@ endef
 LXC_POST_INSTALL_TARGET_HOOKS = LXC_REMOVE_TARGET_FILES
 
 define LXC_POST_INSTALL
-	$(INSTALL) -m 0644 -D package/lxc/default.conf $(TARGET_DIR)/etc/lxc/default.conf
-	$(INSTALL) -m 0644 -D package/lxc/config/*.conf $(TARGET_DIR)/usr/share/lxc/config/
-	$(INSTALL) -m 0755 -D package/lxc/scripts/cgroupfs-mount $(TARGET_DIR)/usr/bin/cgroupfs-mount
-	$(INSTALL) -m 0755 -D package/lxc/scripts/cgroupfs-umount $(TARGET_DIR)/usr/bin/cgroupfs-umount
-	$(INSTALL) -m 0755 -D package/lxc/lxc.init $(TARGET_DIR)/etc/init.d/lxc
+	$(INSTALL) -m 0644 -D package/lxc/astlinux/default.conf $(TARGET_DIR)/etc/lxc/default.conf
+	$(INSTALL) -m 0644 -D package/lxc/astlinux/config/*.conf $(TARGET_DIR)/usr/share/lxc/config/
+	$(INSTALL) -m 0755 -D package/lxc/astlinux/scripts/cgroupfs-mount $(TARGET_DIR)/usr/bin/cgroupfs-mount
+	$(INSTALL) -m 0755 -D package/lxc/astlinux/scripts/cgroupfs-umount $(TARGET_DIR)/usr/bin/cgroupfs-umount
+	$(INSTALL) -m 0755 -D package/lxc/astlinux/lxc.init $(TARGET_DIR)/etc/init.d/lxc
 	ln -sf ../../init.d/lxc $(TARGET_DIR)/etc/runlevels/default/S98lxc
 	ln -sf ../../init.d/lxc $(TARGET_DIR)/etc/runlevels/default/K00lxc
 endef

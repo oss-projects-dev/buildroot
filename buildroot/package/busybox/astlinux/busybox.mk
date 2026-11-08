@@ -38,7 +38,7 @@ endif
 # If mdev will be used for device creation enable it
 ifeq ($(BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV),y)
 define BUSYBOX_INSTALL_MDEV_CONF
-	$(INSTALL) -D -m 0644 package/busybox/mdev.conf \
+	$(INSTALL) -D -m 0644 package/busybox/astlinux/mdev.conf \
 		$(TARGET_DIR)/etc/mdev.conf
 endef
 define BUSYBOX_SET_MDEV
@@ -75,7 +75,7 @@ endif
 
 define BUSYBOX_INSTALL_UDHCPC_SCRIPT
 	if grep -q CONFIG_UDHCPC=y $(@D)/.config; then \
-		$(INSTALL) -m 0755 -D package/busybox/udhcpc.script \
+		$(INSTALL) -m 0755 -D package/busybox/astlinux/udhcpc.script \
 			$(TARGET_DIR)/usr/share/udhcpc/default.script; \
 	fi
 endef
@@ -104,10 +104,10 @@ define BUSYBOX_INSTALL_TARGET_CMDS
 	$(BUSYBOX_INSTALL_UDHCPC_SCRIPT)
 	$(BUSYBOX_INSTALL_MDEV_CONF)
 	if [ -e $(TARGET_DIR)/usr/bin/passwd ]; then \
-	  $(INSTALL) -m 0755 -D package/busybox/passwd.wrapper $(TARGET_DIR)/usr/bin/passwd ; \
+	  $(INSTALL) -m 0755 -D package/busybox/astlinux/passwd.wrapper $(TARGET_DIR)/usr/bin/passwd ; \
 	fi
 	if [ -e $(TARGET_DIR)/sbin/poweroff ]; then \
-	  $(INSTALL) -m 0755 -D package/busybox/shutdown.wrapper $(TARGET_DIR)/sbin/shutdown ; \
+	  $(INSTALL) -m 0755 -D package/busybox/astlinux/shutdown.wrapper $(TARGET_DIR)/sbin/shutdown ; \
 	fi
 endef
 

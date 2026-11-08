@@ -38,10 +38,10 @@ define OPENLDAP_INSTALL_TARGET_SERVER
 	cp -a $(STAGING_DIR)/etc/openldap/schema $(TARGET_DIR)/etc/openldap/
 	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/libexec/slapd $(TARGET_DIR)/usr/sbin/
 	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/ldap* $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/openldap/slapd.init $(TARGET_DIR)/etc/init.d/slapd
-	$(INSTALL) -m 0444 -D package/openldap/schema/*.schema $(TARGET_DIR)/etc/openldap/schema/
-	$(INSTALL) -m 0755 -D package/openldap/scripts/ldap* $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D package/openldap/vcard-export $(TARGET_DIR)/usr/sbin/
+	$(INSTALL) -m 0755 -D package/openldap/astlinux/slapd.init $(TARGET_DIR)/etc/init.d/slapd
+	$(INSTALL) -m 0444 -D package/openldap/astlinux/schema/*.schema $(TARGET_DIR)/etc/openldap/schema/
+	$(INSTALL) -m 0755 -D package/openldap/astlinux/scripts/ldap* $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -m 0755 -D package/openldap/astlinux/vcard-export $(TARGET_DIR)/usr/sbin/
 	ln -sf /tmp/etc/openldap/slapd.conf $(TARGET_DIR)/etc/openldap/slapd.conf
 	ln -sf ../../init.d/slapd $(TARGET_DIR)/etc/runlevels/default/S45slapd
 	ln -sf ../../init.d/slapd $(TARGET_DIR)/etc/runlevels/default/K16slapd
@@ -55,7 +55,7 @@ define OPENLDAP_INSTALL_TARGET_CMDS
 		 $(TARGET_DIR)/usr/lib/liblber*.so*
 	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/ldapsearch $(TARGET_DIR)/usr/bin/ldapsearch
 	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/ldapwhoami $(TARGET_DIR)/usr/bin/ldapwhoami
-	$(INSTALL) -m 0755 -D package/openldap/ldap.init $(TARGET_DIR)/etc/init.d/ldap
+	$(INSTALL) -m 0755 -D package/openldap/astlinux/ldap.init $(TARGET_DIR)/etc/init.d/ldap
 	mkdir -p $(TARGET_DIR)/etc/openldap
 	ln -sf /tmp/etc/openldap/ldap.conf $(TARGET_DIR)/etc/openldap/ldap.conf
 	ln -sf ../../init.d/ldap $(TARGET_DIR)/etc/runlevels/default/S01ldap

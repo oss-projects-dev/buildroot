@@ -27,7 +27,7 @@ SHELLINABOX_POST_BUILD_HOOKS = SHELLINABOX_GREEN_ON_BLACK
 
 define SHELLINABOX_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/shellinaboxd $(TARGET_DIR)/usr/bin/shellinaboxd
-	$(INSTALL) -D -m 0755 package/shellinabox/shellinaboxd.init $(TARGET_DIR)/etc/init.d/shellinaboxd
+	$(INSTALL) -D -m 0755 package/shellinabox/astlinux/shellinaboxd.init $(TARGET_DIR)/etc/init.d/shellinaboxd
 	$(INSTALL) -D -m 0644 $(@D)/shellinabox/black-on-white.css $(TARGET_DIR)/usr/share/shellinabox/00xBlack_on_White.css
 	$(INSTALL) -D -m 0644 $(@D)/shellinabox/white-on-black.css $(TARGET_DIR)/usr/share/shellinabox/01-White_on_Black.css
 	$(INSTALL) -D -m 0644 $(@D)/shellinabox/green-on-black.css $(TARGET_DIR)/usr/share/shellinabox/02-Green_on_Black.css

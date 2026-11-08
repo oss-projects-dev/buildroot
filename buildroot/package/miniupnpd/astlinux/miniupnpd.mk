@@ -29,7 +29,7 @@ define MINIUPNPD_BUILD_CMDS
 endef
 
 define MINIUPNPD_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0755 package/miniupnpd/miniupnpd.init $(TARGET_DIR)/etc/init.d/miniupnpd
+	$(INSTALL) -D -m 0755 package/miniupnpd/astlinux/miniupnpd.init $(TARGET_DIR)/etc/init.d/miniupnpd
 	$(INSTALL) -D $(@D)/miniupnpd $(TARGET_DIR)/usr/sbin/miniupnpd
 #	-mkdir $(TARGET_DIR)/etc/miniupnpd
 #	$(INSTALL) -D $(@D)/netfilter/iptables_*.sh $(TARGET_DIR)/etc/miniupnpd/

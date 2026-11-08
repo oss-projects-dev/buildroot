@@ -33,7 +33,7 @@ endef
 
 define VSFTPD_INSTALL_TARGET_CMDS
 	install -D -m 755 $(@D)/vsftpd $(TARGET_DIR)/usr/sbin/vsftpd
-	install -D -m 755 package/vsftpd/vsftpd.init $(TARGET_DIR)/etc/init.d/vsftpd
+	install -D -m 755 package/vsftpd/astlinux/vsftpd.init $(TARGET_DIR)/etc/init.d/vsftpd
 	ln -sf /tmp/etc/vsftpd.conf $(TARGET_DIR)/etc/vsftpd.conf
 	install -d -m 700 $(TARGET_DIR)/usr/share/empty
 endef

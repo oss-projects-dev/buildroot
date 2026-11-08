@@ -28,8 +28,8 @@ define NE_INSTALL_TARGET_CMDS
 	  $(INSTALL) -m 0444 -D $(@D)/syntax/$$i.jsf $(TARGET_DIR)/usr/share/ne/syntax/ ; \
 	done
 	## Install supporting files
-	$(INSTALL) -m 0444 -D package/ne/share/dot-keys $(TARGET_DIR)/usr/share/ne/.keys
-	$(INSTALL) -m 0444 -D package/ne/share/extensions $(TARGET_DIR)/usr/share/ne/extensions
+	$(INSTALL) -m 0444 -D package/ne/astlinux/share/dot-keys $(TARGET_DIR)/usr/share/ne/.keys
+	$(INSTALL) -m 0444 -D package/ne/astlinux/share/extensions $(TARGET_DIR)/usr/share/ne/extensions
 endef
 
 define NE_UNINSTALL_TARGET_CMDS

@@ -21,13 +21,13 @@ MSMTP_CONF_OPTS += \
 define MSMTP_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/src/msmtp $(TARGET_DIR)/usr/sbin/msmtp
 	$(INSTALL) -m 0755 -D $(@D)/src/msmtpd $(TARGET_DIR)/usr/sbin/msmtpd
-	$(INSTALL) -m 0755 -D package/msmtp/msmtp.init $(TARGET_DIR)/etc/init.d/msmtp
-	$(INSTALL) -m 0755 -D package/msmtp/msmtpd.init $(TARGET_DIR)/etc/init.d/msmtpd
-	$(INSTALL) -m 0755 -D package/msmtp/msmtpqueue.sh $(TARGET_DIR)/usr/sbin/msmtpqueue
-	$(INSTALL) -m 0755 -D package/msmtp/sendmail.sh $(TARGET_DIR)/usr/sbin/sendmail
-	$(INSTALL) -m 0755 -D package/msmtp/testmail.sh $(TARGET_DIR)/usr/sbin/testmail
-	$(INSTALL) -m 0755 -D package/msmtp/mime-pack.sh $(TARGET_DIR)/usr/sbin/mime-pack
-	$(INSTALL) -m 0755 -D package/msmtp/mail.sh $(TARGET_DIR)/bin/mail
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/msmtp.init $(TARGET_DIR)/etc/init.d/msmtp
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/msmtpd.init $(TARGET_DIR)/etc/init.d/msmtpd
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/msmtpqueue.sh $(TARGET_DIR)/usr/sbin/msmtpqueue
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/sendmail.sh $(TARGET_DIR)/usr/sbin/sendmail
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/testmail.sh $(TARGET_DIR)/usr/sbin/testmail
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/mime-pack.sh $(TARGET_DIR)/usr/sbin/mime-pack
+	$(INSTALL) -m 0755 -D package/msmtp/astlinux/mail.sh $(TARGET_DIR)/bin/mail
 	ln -sf ../../bin/mail $(TARGET_DIR)/usr/bin/mail
 	ln -sf /tmp/etc/msmtprc $(TARGET_DIR)/etc/msmtprc
 	ln -sf ../../init.d/msmtp $(TARGET_DIR)/etc/runlevels/default/S34msmtp

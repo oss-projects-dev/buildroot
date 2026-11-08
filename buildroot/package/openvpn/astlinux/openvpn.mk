@@ -35,11 +35,11 @@ endif
 
 define OPENVPN_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 755 $(@D)/src/openvpn/openvpn $(TARGET_DIR)/usr/sbin/openvpn
-	$(INSTALL) -m 755 -D package/openvpn/openvpn.init $(TARGET_DIR)/etc/init.d/openvpn
-	$(INSTALL) -m 644 -D package/openvpn/openvpn.logrotate $(TARGET_DIR)/etc/logrotate.d/openvpn
-	$(INSTALL) -m 755 -D package/openvpn/openvpnclient.init $(TARGET_DIR)/etc/init.d/openvpnclient
-	$(INSTALL) -m 755 -D package/openvpn/tls-verify.sh $(TARGET_DIR)/usr/sbin/openvpn-tls-verify
-	$(INSTALL) -m 755 -D package/openvpn/user-pass-verify.sh $(TARGET_DIR)/usr/sbin/openvpn-user-pass-verify
+	$(INSTALL) -m 755 -D package/openvpn/astlinux/openvpn.init $(TARGET_DIR)/etc/init.d/openvpn
+	$(INSTALL) -m 644 -D package/openvpn/astlinux/openvpn.logrotate $(TARGET_DIR)/etc/logrotate.d/openvpn
+	$(INSTALL) -m 755 -D package/openvpn/astlinux/openvpnclient.init $(TARGET_DIR)/etc/init.d/openvpnclient
+	$(INSTALL) -m 755 -D package/openvpn/astlinux/tls-verify.sh $(TARGET_DIR)/usr/sbin/openvpn-tls-verify
+	$(INSTALL) -m 755 -D package/openvpn/astlinux/user-pass-verify.sh $(TARGET_DIR)/usr/sbin/openvpn-user-pass-verify
 	ln -sf /tmp/etc/openvpn.conf $(TARGET_DIR)/etc/openvpn.conf
 	ln -sf /tmp/etc/openvpnclient.conf $(TARGET_DIR)/etc/openvpnclient.conf
 	ln -sf /tmp/etc/openvpn $(TARGET_DIR)/etc/openvpn

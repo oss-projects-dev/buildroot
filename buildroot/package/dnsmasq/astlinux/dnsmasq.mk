@@ -58,9 +58,9 @@ endef
 
 define DNSMASQ_INSTALL_TARGET_CMDS
 	$(DNSMASQ_MAKE_ENV) $(MAKE) -C $(@D) $(DNSMASQ_MAKE_OPT) install
-	$(INSTALL) -m 0755 -D package/dnsmasq/dnsmasq.init $(TARGET_DIR)/etc/init.d/dnsmasq
-	$(INSTALL) -m 0644 -D package/dnsmasq/dnsmasq.static $(TARGET_DIR)/stat/etc/dnsmasq.static
-	$(INSTALL) -m 0744 -D package/dnsmasq/scripts/dnsmasq-lease.script.sh $(TARGET_DIR)/etc/dnsmasq-lease.script
+	$(INSTALL) -m 0755 -D package/dnsmasq/astlinux/dnsmasq.init $(TARGET_DIR)/etc/init.d/dnsmasq
+	$(INSTALL) -m 0644 -D package/dnsmasq/astlinux/dnsmasq.static $(TARGET_DIR)/stat/etc/dnsmasq.static
+	$(INSTALL) -m 0744 -D package/dnsmasq/astlinux/scripts/dnsmasq-lease.script.sh $(TARGET_DIR)/etc/dnsmasq-lease.script
 	ln -sf /tmp/etc/dnsmasq.conf $(TARGET_DIR)/etc/dnsmasq.conf
 	ln -sf /tmp/etc/dnsmasq.static $(TARGET_DIR)/etc/dnsmasq.static
 endef

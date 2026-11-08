@@ -53,7 +53,7 @@ define ZABBIX_INSTALL_TARGET_CMDS
 	  $(INSTALL) -m 0755 -D $(@D)/src/zabbix_proxy/zabbix_proxy $(TARGET_DIR)/usr/bin/zabbix_proxy ; \
           ln -sf /tmp/etc/zabbix_proxy.conf $(TARGET_DIR)/etc/zabbix_proxy.conf ; \
 	fi
-	$(INSTALL) -m 0755 -D package/zabbix/zabbix.init $(TARGET_DIR)/etc/init.d/zabbix
+	$(INSTALL) -m 0755 -D package/zabbix/astlinux/zabbix.init $(TARGET_DIR)/etc/init.d/zabbix
 	ln -sf /tmp/etc/zabbix_agentd.conf $(TARGET_DIR)/etc/zabbix_agentd.conf
 	ln -sf ../../init.d/zabbix $(TARGET_DIR)/etc/runlevels/default/S98zabbix
 	ln -sf ../../init.d/zabbix $(TARGET_DIR)/etc/runlevels/default/K01zabbix

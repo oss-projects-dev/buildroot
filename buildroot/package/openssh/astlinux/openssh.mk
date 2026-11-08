@@ -35,7 +35,7 @@ OPENSSH_CONF_OPTS += --without-selinux
 OPENSSH_INSTALL_TARGET_OPTS = DESTDIR=$(TARGET_DIR) -C $(@D) install-nosysconf
 
 define OPENSSH_INSTALL_INITSCRIPT
-	$(INSTALL) -D -m 755 package/openssh/sshd.init $(TARGET_DIR)/etc/init.d/sshd
+	$(INSTALL) -D -m 755 package/openssh/astlinux/sshd.init $(TARGET_DIR)/etc/init.d/sshd
 	ln -snf /tmp/etc/ssh $(TARGET_DIR)/etc/ssh
 endef
 

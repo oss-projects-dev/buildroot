@@ -10,9 +10,9 @@ SMARTMONTOOLS_CUSTOM_PATCH_DIR = astlinux
 
 define SMARTMONTOOLS_LATEST_DRIVEDB
 	# Upstream Drive DB:
-	# curl -o package/smartmontools/drivedb.h 'https://sourceforge.net/p/smartmontools/code/HEAD/tree/trunk/smartmontools/drivedb.h?format=raw'
+	# curl -o package/smartmontools/astlinux/drivedb.h 'https://sourceforge.net/p/smartmontools/code/HEAD/tree/trunk/smartmontools/drivedb.h?format=raw'
 	# Install local snapshot
-	cp package/smartmontools/drivedb.h $(@D)/drivedb.h
+	cp package/smartmontools/astlinux/drivedb.h $(@D)/drivedb.h
 endef
 SMARTMONTOOLS_POST_EXTRACT_HOOKS += SMARTMONTOOLS_LATEST_DRIVEDB
 
@@ -22,7 +22,7 @@ SMARTMONTOOLS_CONF_OPTS = \
 
 define SMARTMONTOOLS_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/smartctl $(TARGET_DIR)/usr/sbin/smartctl
-	$(INSTALL) -m 0755 -D package/smartmontools/smart-status.sh $(TARGET_DIR)/usr/sbin/smart-status
+	$(INSTALL) -m 0755 -D package/smartmontools/astlinux/smart-status.sh $(TARGET_DIR)/usr/sbin/smart-status
 	ln -sf /tmp/etc/smart_drivedb.h $(TARGET_DIR)/etc/smart_drivedb.h
 endef
 

@@ -12,7 +12,7 @@ TINYPROXY_SOURCE = tinyproxy-$(TINYPROXY_VERSION).tar.xz
 define TINYPROXY_POST_INSTALL
 	$(INSTALL) -D -m 0644 $(TARGET_DIR)/etc/tinyproxy/tinyproxy.conf $(TARGET_DIR)/stat/etc/tinyproxy.conf
 	rm -rf $(TARGET_DIR)/etc/tinyproxy
-	$(INSTALL) -D -m 0755 package/tinyproxy/tinyproxy.init $(TARGET_DIR)/etc/init.d/tinyproxy
+	$(INSTALL) -D -m 0755 package/tinyproxy/astlinux/tinyproxy.init $(TARGET_DIR)/etc/init.d/tinyproxy
 	ln -sf /tmp/etc/tinyproxy.conf $(TARGET_DIR)/etc/tinyproxy.conf
 	ln -sf ../../init.d/tinyproxy $(TARGET_DIR)/etc/runlevels/default/S33tinyproxy
 	ln -sf ../../init.d/tinyproxy $(TARGET_DIR)/etc/runlevels/default/K25tinyproxy	

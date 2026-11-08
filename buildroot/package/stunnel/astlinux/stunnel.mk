@@ -19,7 +19,7 @@ STUNNEL_CONF_OPTS = \
 
 define STUNNEL_INSTALL_TARGET_CMDS
 	ln -snf /tmp/etc/stunnel $(TARGET_DIR)/etc/stunnel
-	$(INSTALL) -m 0755 -D package/stunnel/stunnel.init $(TARGET_DIR)/etc/init.d/stunnel
+	$(INSTALL) -m 0755 -D package/stunnel/astlinux/stunnel.init $(TARGET_DIR)/etc/init.d/stunnel
 	$(INSTALL) -m 0755 -D $(@D)/src/stunnel $(TARGET_DIR)/usr/sbin/stunnel
 endef
 

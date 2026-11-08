@@ -30,7 +30,7 @@ endif
 
 define KEEPALIVED_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/keepalived/keepalived $(TARGET_DIR)/usr/sbin/keepalived
-	$(INSTALL) -m 0755 -D package/keepalived/keepalived.init $(TARGET_DIR)/etc/init.d/keepalived
+	$(INSTALL) -m 0755 -D package/keepalived/astlinux/keepalived.init $(TARGET_DIR)/etc/init.d/keepalived
 	ln -sf /tmp/etc/keepalived $(TARGET_DIR)/etc/keepalived
 	ln -sf ../../init.d/keepalived $(TARGET_DIR)/etc/runlevels/default/S12keepalived
 	ln -sf ../../init.d/keepalived $(TARGET_DIR)/etc/runlevels/default/K28keepalived

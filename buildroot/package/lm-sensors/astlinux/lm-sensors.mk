@@ -38,7 +38,7 @@ endef
 
 define LM_SENSORS_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) $(LM_SENSORS_MAKE_OPTS) DESTDIR=$(TARGET_DIR) install
-	$(INSTALL) -D -m 0755 package/lm-sensors/lm-sensors.init $(TARGET_DIR)/etc/init.d/lmsensors
+	$(INSTALL) -D -m 0755 package/lm-sensors/astlinux/lm-sensors.init $(TARGET_DIR)/etc/init.d/lmsensors
 	mv $(TARGET_DIR)/etc/sensors3.conf $(TARGET_DIR)/stat/etc/sensors.conf.default
 	ln -sf /tmp/etc/sensors3.conf $(TARGET_DIR)/etc/sensors3.conf
 	rm -f $(addprefix $(TARGET_DIR)/usr/,$(LM_SENSORS_BINS_))
