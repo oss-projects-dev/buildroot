@@ -1,4 +1,4 @@
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS1),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 
 #############################################################
@@ -57,7 +57,7 @@ LIBTOOLIZE = $(HOST_DIR)/bin/libtoolize
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
 ################################################################################
 #
@@ -116,4 +116,4 @@ $(eval $(host-autotools-package))
 LIBTOOL = $(HOST_DIR)/bin/libtool
 LIBTOOLIZE = $(HOST_DIR)/bin/libtoolize
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1

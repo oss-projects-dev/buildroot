@@ -1,4 +1,4 @@
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS1),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 
 #############################################################
@@ -39,7 +39,7 @@ export ACLOCAL_PATH
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
 ################################################################################
 #
@@ -80,4 +80,4 @@ ACLOCAL = $(HOST_DIR)/bin/aclocal
 ACLOCAL_PATH = $(ACLOCAL_DIR):$(ACLOCAL_HOST_DIR)
 export ACLOCAL_PATH
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1

@@ -1,4 +1,4 @@
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS1),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 
 #############################################################
@@ -22,7 +22,7 @@ $(eval $(host-autotools-package))
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
 ################################################################################
 #
@@ -44,4 +44,4 @@ HOST_BISON_CONF_ENV = ac_cv_libtextstyle=no
 
 $(eval $(host-autotools-package))
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1
