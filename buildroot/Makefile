@@ -1324,6 +1324,27 @@ check-package-external:
 	$(Q)./utils/check-package --failed-only `git ls-tree -r --name-only HEAD` \
 		> .checkpackageignore
 
+CP := $(shell which cp || type -p cp) -av
+
+.PHONY: saveconfig
+saveconfig: savedefconfig
+	@if [ ! -f $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig ]; then \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; \
+	elif cmp -s $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; then \
+		echo "No change in Configuration : $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig"; \
+	else \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig.$(shell date +%Y%m%d%H%M%S); \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; \
+	fi
+	@if [ ! -f $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config ]; then \
+		cp -av $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; \
+	elif cmp -s $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; then \
+		echo "No change in Configuration : $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config"; \
+	else \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config.$(shell date +%Y%m%d%H%M%S); \
+		cp -av $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; \
+	fi
+
 include docs/manual/manual.mk
 -include $(foreach dir,$(BR2_EXTERNAL_DIRS),$(sort $(wildcard $(dir)/docs/*/*.mk)))
 
