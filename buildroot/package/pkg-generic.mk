@@ -612,6 +612,12 @@ ifndef $(2)_SITE_METHOD
  endif
 endif
 
+ifndef $(2)_CUSTOM_PATCH_DIR
+ ifdef $(3)_CUSTOM_PATCH_DIR
+  $(2)_CUSTOM_PATCH_DIR = $$($(3)_CUSTOM_PATCH_DIR)
+ endif
+endif
+
 ifndef $(2)_DL_OPTS
  ifdef $(3)_DL_OPTS
   $(2)_DL_OPTS = $$($(3)_DL_OPTS)
