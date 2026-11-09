@@ -66,7 +66,9 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
 
   # below changes have to be done for all files before merging with buildroot files so both are separate
   # add custom-patch-dir
-  sed -e "/_SITE /a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" -i $custom_folder_name/*.mk
+  sed -e "/_SITE /a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
+      -e "/_SITE:=/a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
+      -i $custom_folder_name/*.mk
   # change default package path for files to custom_folder_name  
   sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" -i $custom_folder_name/*.mk
 )
@@ -403,6 +405,9 @@ sed -e 's@select BR2_PACKAGE_LUA$@#select BR2_PACKAGE_LUA@g' -i $MERGE_FOLDER/pa
 
 # php
 sed -e '24,28s/^/#/' -e '62s/^/#/' -i $MERGE_FOLDER/package/php/Config.in
+
+# runnix - do not enable by default
+sed -e 's@default y@#default y@g' -i $MERGE_FOLDER/boot/runnix/Config.in
 
 # curl
 sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
