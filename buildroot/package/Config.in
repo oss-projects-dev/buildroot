@@ -1509,6 +1509,7 @@ menu "Tcl libraries/modules"
 	source "package/tcllib/Config.in"
 endmenu
 endif
+	source "package/webinterface/Config.in"
 endmenu
 
 menu "Libraries"
@@ -2118,6 +2119,7 @@ menu "Networking"
 	source "package/paho-mqtt-c/Config.in"
 	source "package/paho-mqtt-cpp/Config.in"
 	source "package/pistache/Config.in"
+	source "package/pjsip-ast20/Config.in"
 	source "package/qdecoder/Config.in"
 	source "package/qpid-proton/Config.in"
 	source "package/rabbitmq-c/Config.in"
@@ -2398,6 +2400,7 @@ menu "Miscellaneous"
 	source "package/shared-mime-info/Config.in"
 	source "package/snooze/Config.in"
 	source "package/sunwait/Config.in"
+	source "package/system-vendor/Config.in"
 	source "package/taskd/Config.in"
 	source "package/wine/Config.in"
 	source "package/xmrig/Config.in"

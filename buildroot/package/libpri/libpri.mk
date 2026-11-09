@@ -1,3 +1,49 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# libpri
+#
+############################################################
+
+LIBPRI_VERSION = 1.6.1
+LIBPRI_SOURCE = libpri-$(LIBPRI_VERSION).tar.gz
+LIBPRI_SITE = https://downloads.asterisk.org/pub/telephony/libpri/releases
+LIBPRI_CUSTOM_PATCH_DIR = astlinux
+LIBPRI_INSTALL_STAGING = YES
+LIBPRI_DEPENDENCIES += dahdi-tools
+
+define LIBPRI_CONFIGURE_CMDS
+        @echo "No configure"
+endef
+
+LIBPRI_MAKE_OPTS = \
+	OSARCH=Linux \
+	INSTALL_BASE=/usr \
+	$(TARGET_CONFIGURE_OPTS) \
+	CFLAGS="$(TARGET_CFLAGS) -fPIC"
+
+LIBPRI_INSTALL_STAGING_OPTS = \
+	OSARCH=Linux \
+	INSTALL_BASE=/usr \
+	INSTALL_PREFIX=$(STAGING_DIR) \
+	$(TARGET_CONFIGURE_OPTS) \
+	install
+
+LIBPRI_INSTALL_TARGET_OPTS = \
+	OSARCH=Linux \
+	INSTALL_BASE=/usr \
+	INSTALL_PREFIX=$(TARGET_DIR) \
+	$(TARGET_CONFIGURE_OPTS) \
+	install
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # libpri
@@ -51,3 +97,5 @@ define LIBPRI_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

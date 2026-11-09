@@ -1,3 +1,30 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+################################################################################
+#
+# iperf3
+#
+################################################################################
+
+IPERF3_VERSION = 3.22
+IPERF3_SOURCE = iperf-$(IPERF3_VERSION).tar.gz
+IPERF3_SITE = https://downloads.es.net/pub/iperf
+IPERF3_CUSTOM_PATCH_DIR = astlinux
+
+ifeq ($(BR2_PACKAGE_OPENSSL),y)
+IPERF3_CONF_OPTS += --with-openssl=$(STAGING_DIR)/usr
+IPERF3_DEPENDENCIES += openssl
+else
+IPERF3_CONF_OPTS += --without-openssl
+endif
+
+$(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # iperf3
@@ -29,3 +56,5 @@ IPERF3_CONF_OPTS += --without-openssl
 endif
 
 $(eval $(autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

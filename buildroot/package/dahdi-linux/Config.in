@@ -1,3 +1,43 @@
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+config BR2_PACKAGE_DAHDI_LINUX
+	bool "dahdi-linux"
+	default n
+	depends on BR2_LINUX_KERNEL
+	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_LIBUSB_COMPAT
+	help
+		Dahdi - Linux drivers and utilities for Digium cards
+		for use with Asterisk:
+
+		http://www.asterisk.org
+
+config BR2_PACKAGE_DAHDI_OSLEC
+	bool "dahdi_echocan_oslec"
+	default n
+	depends on BR2_PACKAGE_DAHDI_LINUX
+	help
+		Adds modules "echo" and "dahdi_echocan_oslec"
+
+		http://www.rowetel.com/blog/?page_id=454
+
+config BR2_PACKAGE_DAHDI_NO_CARD_FIRMWARE
+	bool "dahdi_no_card_firmware"
+	default n
+	depends on BR2_PACKAGE_DAHDI_LINUX
+	help
+		Reduce image size by removing PCI / PCI-e card firmware files.
+
+		It saves 8.8 MB (DAHDI 2.10) of uncompressed space.
+
+
+endif
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_DAHDI_LINUX
 	bool "dahdi-linux"
 	depends on BR2_LINUX_KERNEL
@@ -13,3 +53,5 @@ config BR2_PACKAGE_DAHDI_LINUX
 
 comment "dahdi-linux needs a Linux kernel to be built"
 	depends on !BR2_LINUX_KERNEL
+
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS
