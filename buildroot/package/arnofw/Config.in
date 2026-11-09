@@ -1,0 +1,10 @@
+config BR2_PACKAGE_ARNOFW
+	bool "Arno's Firewall Support"
+	default n
+	help
+	  Arno's IPtables Firewall is a complete Firewall script.	
+
+	  Customized by the AstLinux Project
+
+	  Original: https://github.com/arno-iptables-firewall/aif/
+	            https://rocky.eld.leidenuniv.nl/

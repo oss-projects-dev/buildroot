@@ -225,6 +225,7 @@ process boot syslinux
 
 process package acme                
 process package acpid               
+process package arnofw              
 process package arp-scan            
 process package asterisk            
 process package asterisk-codec-silk 
@@ -265,6 +266,7 @@ process package gntp-send
 process package gnu-efi             
 process package gperf               
 process package htop                
+process package htpasswd            
 process package iftop               
 process package iksemel             
 process package iperf               
@@ -337,6 +339,7 @@ process package pciutils
 process package pcre                
 process package pcre2               
 process package perl                
+process package phoneprov-tools     
 process package php                 
 #process package pkg-config          - replaced by pkgconf
 process package popt                

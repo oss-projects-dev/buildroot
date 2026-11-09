@@ -1,0 +1,576 @@
+#!/bin/bash
+##
+## Mass Deployment of IP Phones
+##
+## phoneprov-tools
+##
+## Copyright (C) 2014-2021 Lonnie Abelbeck and Michael Keuter
+##
+## This is free software, licensed under the GNU General Public License
+## version 3 as published by the Free Software Foundation; you can
+## redistribute it and/or modify it under the terms of the GNU
+## General Public License; and comes with ABSOLUTELY NO WARRANTY.
+
+. /etc/rc.conf
+
+usage()
+{
+  echo '
+Usage: phoneprov-build [options...] template mac_addr extension[/CID_Name][;ext2[/cid2];...] password [ account ]
+
+Options:
+  -f, --force-overwrite   Overwrite existing files
+  -h, --help              Show this help text
+  -i, --if-name           Interface Name: INTIF, INT2IF, INT3IF, INT4IF, EXTIF, ethN, brN
+                                          Defaults to config variable PHONEPROV_GW_IF
+'
+  exit 1
+}
+
+find_ipv4_from_if()
+{
+  ip -o addr show dev "$1" \
+    | awk '$3 == "inet" { split($4, field, "/"); print field[1]; nextfile; }'
+}
+
+is_context() {
+  local context="$1" file="$2"
+
+  grep -q "^\[${context}\]" "$file"
+}
+
+extract_context() {
+  local context="$1" file="$2" match_ext
+
+  # Properly match if '*' exists in the extension, replace * with \*
+  match_ext="${ext//\*/\*}"
+
+  sed -n "/^\[${context}\]/,/^\[/ p" "$file" | \
+  sed -e 's/^\[.*//' \
+      -e "/^#<.*!${match_ext}!.*>/ d" \
+      -e "s/^#<${match_ext}>//" \
+      -e 's/^#<!.*!>//' \
+      -e 's/^#.*//' \
+      -e '/^$/ d'
+}
+
+extract_var() {
+  local var="$1"
+
+  echo "$OPTIONS" | sed -n -r -e "s/^${var} *= *([^ ]*).*$/\1/p" | tail -n1
+}
+
+exit_no_overwrite() {
+  local file="$1"
+
+  if [ $force_overwrite -eq 0 -a -f "$file" ]; then
+    echo "phoneprov-build: File \"$file\" exists." >&2
+    exit 2
+  fi
+}
+
+merge_variables()
+{
+  sed -e 's/^\\#/#/' \
+      -e 's/^\\\[/\[/' \
+      -e "s|@TEMPLATE@|${template}|g" \
+      -e "s|@MODEL@|${model}|g" \
+      -e "s|@VENDOR@|${vendor}|g" \
+      -e "s|@MAC_ADDR@|${mac_addr}|g" \
+      -e "s|@MAC@|${mac}|g" \
+      -e "s|@MAC4@|${mac4}|g" \
+      -e "s|@MAC6@|${mac6}|g" \
+      -e "s|@EXT@|${ext}|g" \
+      -e "s|@CID_NAME@|${cid_name}|g" \
+      -e "s|@CID_NUM@|${cid_num}|g" \
+      -e "s|@PASSWORD@|${password}|g" \
+      -e "s|@ACCOUNT@|${account}|g" \
+      -e "s|@USERNAME@|${username}|g" \
+      -e "s|@SIP_SERVER_IPV4@|${sip_server_ipv4}|g"
+}
+
+merge_indexed_variables()
+{
+  sed -e "s|@EXT1@|${EXT[1]}|g" \
+      -e "s|@CID_NAME1@|${CID_NAME[1]}|g" \
+      -e "s|@CID_NUM1@|${CID_NUM[1]}|g" \
+      -e "s|@PASSWORD1@|${PASSWORD[1]}|g" \
+      -e "s|@ACCOUNT1@|${ACCOUNT[1]}|g" \
+      -e "s|@USERNAME1@|${USERNAME[1]}|g" \
+      -e "s|@EXT2@|${EXT[2]}|g" \
+      -e "s|@CID_NAME2@|${CID_NAME[2]}|g" \
+      -e "s|@CID_NUM2@|${CID_NUM[2]}|g" \
+      -e "s|@PASSWORD2@|${PASSWORD[2]}|g" \
+      -e "s|@ACCOUNT2@|${ACCOUNT[2]}|g" \
+      -e "s|@USERNAME2@|${USERNAME[2]}|g" \
+      -e "s|@EXT3@|${EXT[3]}|g" \
+      -e "s|@CID_NAME3@|${CID_NAME[3]}|g" \
+      -e "s|@CID_NUM3@|${CID_NUM[3]}|g" \
+      -e "s|@PASSWORD3@|${PASSWORD[3]}|g" \
+      -e "s|@ACCOUNT3@|${ACCOUNT[3]}|g" \
+      -e "s|@USERNAME3@|${USERNAME[3]}|g" \
+      -e "s|@EXT4@|${EXT[4]}|g" \
+      -e "s|@CID_NAME4@|${CID_NAME[4]}|g" \
+      -e "s|@CID_NUM4@|${CID_NUM[4]}|g" \
+      -e "s|@PASSWORD4@|${PASSWORD[4]}|g" \
+      -e "s|@ACCOUNT4@|${ACCOUNT[4]}|g" \
+      -e "s|@USERNAME4@|${USERNAME[4]}|g" \
+      -e "s|@EXT5@|${EXT[5]}|g" \
+      -e "s|@CID_NAME5@|${CID_NAME[5]}|g" \
+      -e "s|@CID_NUM5@|${CID_NUM[5]}|g" \
+      -e "s|@PASSWORD5@|${PASSWORD[5]}|g" \
+      -e "s|@ACCOUNT5@|${ACCOUNT[5]}|g" \
+      -e "s|@USERNAME5@|${USERNAME[5]}|g" \
+      -e "s|@EXT6@|${EXT[6]}|g" \
+      -e "s|@CID_NAME6@|${CID_NAME[6]}|g" \
+      -e "s|@CID_NUM6@|${CID_NUM[6]}|g" \
+      -e "s|@PASSWORD6@|${PASSWORD[6]}|g" \
+      -e "s|@ACCOUNT6@|${ACCOUNT[6]}|g" \
+      -e "s|@USERNAME6@|${USERNAME[6]}|g"
+}
+
+index_var() {
+  local index="$1" var="$2"
+
+  if [ $index -gt 1 ]; then
+    echo "$var" | cut -s -d';' -f"$index"
+  else
+    echo "$var" | cut -d';' -f"$index"
+  fi
+}
+
+define_indexed_vars() {
+  local i="$1" cid_name_num
+
+  EXT[$i]="$(index_var $i "$raw_ext" | cut -d'/' -f1)"
+  if [ -z "${EXT[$i]}" ]; then
+    EXT[$i]="$ext"
+  fi
+
+  CID_NAME[$i]="$(index_var $i "$raw_ext" | cut -s -d'/' -f2- | tr '_' ' ')"
+  cid_name_num="$(gen_cid_name_num "${CID_NAME[$i]}" "${EXT[$i]}")"
+  CID_NAME[$i]="${cid_name_num%%<*}"
+  CID_NUM[$i]="${cid_name_num#*<}"
+
+  PASSWORD[$i]="$(index_var $i "$raw_password")"
+  if [ -z "${PASSWORD[$i]}" ]; then
+    PASSWORD[$i]="$password"
+  fi
+  ACCOUNT[$i]="$(index_var $i "$raw_account")"
+  if [ -z "${ACCOUNT[$i]}" ]; then
+    ACCOUNT[$i]="${auto_account_prefix}${EXT[$i]}${auto_account_suffix}"
+  fi
+  USERNAME[$i]="${ACCOUNT[$i]}"
+}
+
+gen_cid_name_num() {
+  local name="$1" num="$2" ext_name ext_num
+
+  if [[ $name =~ \<[[:space:]]*([0-9#*]+)[[:space:]]*\> ]]; then
+    ext_num="${BASH_REMATCH[1]}"
+  else
+    ext_num="$num"
+  fi
+  if [[ $name =~ ^([^\<]+) ]]; then
+    ext_name="${BASH_REMATCH[1]}"
+  else
+    ext_name="$num"
+  fi
+  echo "${ext_name% }<$ext_num"
+}
+
+sql_init()
+{
+  sqlite3 -batch "$ASTERISK_ODBC_SQLITE3" <<EOF
+DROP TABLE IF EXISTS 'phoneprov_build';
+CREATE TABLE 'phoneprov_build' (
+  'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  'ext' TEXT DEFAULT '',
+  'cid_name' TEXT DEFAULT '',
+  'cid_num' TEXT DEFAULT '',
+  'account' TEXT DEFAULT '',
+  'line' INTEGER DEFAULT 1,
+  'mac_addr' TEXT DEFAULT '',
+  'template' TEXT DEFAULT '',
+  'model' TEXT DEFAULT '',
+  'vendor' TEXT DEFAULT '',
+  'sip_driver' TEXT DEFAULT ''
+);
+EOF
+}
+
+sql_add_extensions() {
+  local i
+
+  for i in 1 2 3 4 5 6; do
+    # Only add unique extensions
+    if [ "$i" = "1" -o "${EXT[$i]}" != "$ext" ]; then
+      echo "INSERT INTO 'phoneprov_build' (
+'ext',
+'cid_name',
+'cid_num',
+'account',
+'line',
+'mac_addr',
+'template',
+'model',
+'vendor',
+'sip_driver'
+)
+VALUES (
+'${EXT[$i]}',
+'${CID_NAME[$i]}',
+'${CID_NUM[$i]}',
+'${ACCOUNT[$i]}',
+'${i}',
+'${mac_addr}',
+'${template}',
+'${model}',
+'${vendor}',
+'${sip_driver}'
+);"
+    fi
+  done
+}
+
+sql_add()
+{
+  sql_add_extensions | sqlite3 -batch "$ASTERISK_ODBC_SQLITE3"
+}
+
+ARGS="$(getopt --name phoneprov-build \
+               --long force-overwrite,help,if-name: \
+               --options fhi: \
+               -- "$@")"
+if [ $? -ne 0 ]; then
+  usage
+fi
+eval set -- $ARGS
+
+force_overwrite=0
+if_name="${PHONEPROV_GW_IF:-INTIF}"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -f|--force-overwrite)  force_overwrite=1 ;;
+    -h|--help)             usage ;;
+    -i|--if-name)          if_name="$2"; shift ;;
+    --) shift; break ;;
+  esac
+  shift
+done
+
+template="$1"
+mac_addr="$2"
+raw_ext="$3"
+raw_password="$4"
+raw_account="$5"
+
+ext="$(index_var 1 "$raw_ext" | cut -d'/' -f1)"
+cid_name="$(index_var 1 "$raw_ext" | cut -s -d'/' -f2- | tr '_' ' ')"
+password="$(index_var 1 "$raw_password")"
+account="$(index_var 1 "$raw_account")"
+
+PHONEPROV_DIR="${PHONEPROV_BASE_DIR:-/mnt/kd/phoneprov}"
+TEMPLATE_DIR="$PHONEPROV_DIR/templates"
+
+DIALPLAN_DIR="/mnt/kd/asterisk/includes"
+SIP_DIR="/mnt/kd/asterisk/includes"
+
+ASTERISK_ODBC_SQLITE3="/mnt/kd/asterisk-odbc.sqlite3"
+
+DIALPLANS=(dialplan dialplan2 dialplan3 dialplan4 dialplan5 dialplan6)
+EXTENS=(exten exten2 exten3 exten4 exten5 exten6)
+
+case $if_name in
+  INTIF)
+    sip_server_if="$INTIF"
+    sip_server_ipv4="$INTIP"
+    ;;
+  INT2IF)
+    sip_server_if="$INT2IF"
+    sip_server_ipv4="$INT2IP"
+    ;;
+  INT3IF)
+    sip_server_if="$INT3IF"
+    sip_server_ipv4="$INT3IP"
+    ;;
+  INT4IF)
+    sip_server_if="$INT4IF"
+    sip_server_ipv4="$INT4IP"
+    ;;
+  EXTIF)
+    sip_server_if="$EXTIF"
+    sip_server_ipv4="$(find_ipv4_from_if $EXTIF)"
+    ;;
+  eth*[0-9]|br*[0-9])
+    sip_server_if="$if_name"
+    sip_server_ipv4="$(find_ipv4_from_if $if_name)"
+    ;;
+  *)
+    usage
+    ;;
+esac
+
+# Explicitly define the gateway IPv4 address
+if [ -n "$PHONEPROV_GW_IP" ]; then
+  sip_server_ipv4="$PHONEPROV_GW_IP"
+fi
+
+if [ -z "$sip_server_ipv4" ]; then
+  echo "phoneprov-build: Invalid Interface: $sip_server_if" >&2
+  exit 1
+fi
+
+if [ -z "$mac_addr" -o -z "$ext" ]; then
+  usage
+fi
+
+cid_name_num="$(gen_cid_name_num "$cid_name" "$ext")"
+cid_name="${cid_name_num%%<*}"
+cid_num="${cid_name_num#*<}"
+
+case $mac_addr in
+  ??:??:??:??:??:??)
+    ;;
+  *)
+    echo "phoneprov-build: Invalid MAC address: $mac_addr" >&2
+    exit 1
+    ;;
+esac
+mac="$(echo "$mac_addr" | tr -d ':')"
+
+if [ ! -f "$TEMPLATE_DIR/$template.conf" ]; then
+  echo "phoneprov-build: Template file \"$TEMPLATE_DIR/$template.conf\" not found." >&2
+  exit 1
+fi
+
+if ! is_context "general" "$TEMPLATE_DIR/$template.conf"; then
+  echo "phoneprov-build: No [general] context defined, invalid template file." >&2
+  exit 1
+fi
+
+# Extract General Definitions
+OPTIONS="$(extract_context "general" "$TEMPLATE_DIR/$template.conf")"
+
+macaddress_case="$(extract_var macaddress_case)"
+case $macaddress_case in
+  upper) mac="$(echo "$mac" | tr '[:lower:]' '[:upper:]')"
+    ;;
+  lower) mac="$(echo "$mac" | tr '[:upper:]' '[:lower:]')"
+    ;;
+esac
+mac4="${mac:8}"
+mac6="${mac:6}"
+
+model="$(extract_var model)"
+if [ -z "$model" ]; then
+  model="$template"
+fi
+vendor="$(extract_var vendor)"
+if [ -z "$vendor" ]; then
+  vendor="$model"
+fi
+
+OPTIONS="$(echo "$OPTIONS" | merge_variables)"
+
+auto_account_prefix="$(extract_var auto_account_prefix)"
+auto_account_suffix="$(extract_var auto_account_suffix)"
+
+auto_account_case="$(extract_var auto_account_case)"
+case $auto_account_case in
+  upper) auto_account_prefix="$(echo "$auto_account_prefix" | tr '[:lower:]' '[:upper:]')"
+         auto_account_suffix="$(echo "$auto_account_suffix" | tr '[:lower:]' '[:upper:]')"
+         ;;
+  lower) auto_account_prefix="$(echo "$auto_account_prefix" | tr '[:upper:]' '[:lower:]')"
+         auto_account_suffix="$(echo "$auto_account_suffix" | tr '[:upper:]' '[:lower:]')"
+         ;;
+esac
+
+prov_path="$(extract_var prov_path)"
+if [ -z "$prov_path" ]; then
+  prov_path="$PHONEPROV_DIR/$vendor"
+fi
+prov_file="$(extract_var prov_file)"
+if [ -z "$prov_file" ]; then
+  prov_file="$mac.cfg"
+fi
+dialplan_path="$(extract_var dialplan_path)"
+if [ -z "$dialplan_path" ]; then
+  dialplan_path="$DIALPLAN_DIR"
+fi
+for d in ${!DIALPLANS[*]}; do
+  dialplan_file[$d]="$(extract_var ${DIALPLANS[$d]}_file)"
+  if [ -z "${dialplan_file[$d]}" ]; then
+    dialplan_file[$d]="astlinux-phoneprov-${EXTENS[$d]}.conf"
+  fi
+  dialplan_context[$d]="$(extract_var ${DIALPLANS[$d]}_context)"
+done
+sip_path="$(extract_var sip_path)"
+if [ -z "$sip_path" ]; then
+  sip_path="$SIP_DIR"
+fi
+sip_file="$(extract_var sip_file)"
+if [ -z "$sip_file" ]; then
+  sip_file="astlinux-phoneprov-sip.conf"
+fi
+pjsip_path="$(extract_var pjsip_path)"
+if [ -z "$pjsip_path" ]; then
+  pjsip_path="$SIP_DIR"
+fi
+pjsip_file="$(extract_var pjsip_file)"
+if [ -z "$pjsip_file" ]; then
+  pjsip_file="astlinux-phoneprov-pjsip.conf"
+fi
+sql_enable="$(extract_var sql_enable)"
+if [ -z "$sql_enable" ]; then
+  sql_enable="yes"
+else
+  sql_enable="$(echo "$sql_enable" | tr '[:upper:]' '[:lower:]')"
+fi
+sip_driver="$(extract_var sip_driver)"
+if [ -z "$sip_driver" ]; then
+  sip_driver="sip"
+else
+  sip_driver="$(echo "$sip_driver" | tr '[:upper:]' '[:lower:]')"
+fi
+
+# Special case to initialize dialplan and sip output files
+if [ "$ext" = "init" -o "$ext" = "init-dialplan" -o "$ext" = "init-sip" ]; then
+  if [ "$ext" = "init" -o "$ext" = "init-dialplan" ]; then
+    for d in ${!DIALPLANS[*]}; do
+      if is_context "${DIALPLANS[$d]}" "$TEMPLATE_DIR/$template.conf"; then
+        exit_no_overwrite "$dialplan_path/${dialplan_file[$d]}"
+        if [ ! -d "$dialplan_path" ]; then
+          mkdir -p "$dialplan_path"
+        fi
+        echo ";
+; ###################################################
+; ### AstLinux auto-provisioned IP-Phone dialplan ###
+; ###################################################
+;
+; Include in your extensions.conf file by using:
+; #include $dialplan_path/${dialplan_file[$d]}
+" > "$dialplan_path/${dialplan_file[$d]}"
+        if [ -n "${dialplan_context[$d]}" ]; then
+          echo "[${dialplan_context[$d]}]" >> "$dialplan_path/${dialplan_file[$d]}"
+        fi
+      fi
+    done
+  fi
+  if [ "$ext" = "init" -o "$ext" = "init-sip" ]; then
+    if is_context "sip" "$TEMPLATE_DIR/$template.conf"; then
+      exit_no_overwrite "$sip_path/$sip_file"
+      if [ ! -d "$sip_path" ]; then
+        mkdir -p "$sip_path"
+      fi
+      echo ";
+; #############################################################
+; ### AstLinux auto-provisioned IP-Phone SIP configurations ###
+; #############################################################
+;
+; Include in your sip.conf file by using:
+; #include $sip_path/$sip_file
+
+" > "$sip_path/$sip_file"
+    fi
+    if is_context "pjsip" "$TEMPLATE_DIR/$template.conf"; then
+      exit_no_overwrite "$pjsip_path/$pjsip_file"
+      if [ ! -d "$pjsip_path" ]; then
+        mkdir -p "$pjsip_path"
+      fi
+      echo ";
+; ###############################################################
+; ### AstLinux auto-provisioned IP-Phone PJSIP configurations ###
+; ###############################################################
+;
+; Include in your pjsip.conf file by using:
+; #include $pjsip_path/$pjsip_file
+
+" > "$pjsip_path/$pjsip_file"
+    fi
+  fi
+
+  # Initialize SQL table entry
+  if [ "$sql_enable" = "yes" ]; then
+    sql_init
+  fi
+  exit 0
+fi
+
+if [ -z "$password" ]; then
+  echo "phoneprov-build: no password defined." >&2
+  exit 3
+fi
+
+if [ -z "$account" ]; then
+  account="${auto_account_prefix}${ext}${auto_account_suffix}"
+fi
+
+# Same as account
+username="$account"
+
+# Define indexed variables
+
+EXT[1]="$ext"
+CID_NAME[1]="$cid_name"
+CID_NUM[1]="$cid_num"
+PASSWORD[1]="$password"
+ACCOUNT[1]="$account"
+USERNAME[1]="$username"
+
+for index in 2 3 4 5 6; do
+  define_indexed_vars $index
+done
+
+# main
+
+is_context_phoneprov=0
+if is_context "phoneprov" "$TEMPLATE_DIR/$template.conf"; then
+  exit_no_overwrite "$prov_path/$prov_file"
+  is_context_phoneprov=1
+fi
+
+for d in ${!DIALPLANS[*]}; do
+  if is_context "${DIALPLANS[$d]}" "$TEMPLATE_DIR/$template.conf"; then
+    if [ ! -d "$dialplan_path" ]; then
+      mkdir -p "$dialplan_path"
+    fi
+    extract_context "${DIALPLANS[$d]}" "$TEMPLATE_DIR/$template.conf" | \
+      merge_variables | merge_indexed_variables >> "$dialplan_path/${dialplan_file[$d]}"
+  fi
+done
+
+if is_context "sip" "$TEMPLATE_DIR/$template.conf"; then
+  if [ ! -d "$sip_path" ]; then
+    mkdir -p "$sip_path"
+  fi
+  extract_context "sip" "$TEMPLATE_DIR/$template.conf" | \
+    merge_variables | merge_indexed_variables >> "$sip_path/$sip_file"
+  # Add an empty line
+  echo "" >> "$sip_path/$sip_file"
+fi
+
+if is_context "pjsip" "$TEMPLATE_DIR/$template.conf"; then
+  if [ ! -d "$pjsip_path" ]; then
+    mkdir -p "$pjsip_path"
+  fi
+  extract_context "pjsip" "$TEMPLATE_DIR/$template.conf" | \
+    merge_variables | merge_indexed_variables >> "$pjsip_path/$pjsip_file"
+  # Add an empty line
+  echo "" >> "$pjsip_path/$pjsip_file"
+fi
+
+if [ $is_context_phoneprov -eq 1 ]; then
+  if [ ! -d "$prov_path" ]; then
+    mkdir -p "$prov_path"
+  fi
+  extract_context "phoneprov" "$TEMPLATE_DIR/$template.conf" | \
+    merge_variables | merge_indexed_variables > "$prov_path/$prov_file"
+fi
+
+# Add SQL table entry
+if [ "$sql_enable" = "yes" ]; then
+  sql_add
+fi
+
+exit 0
