@@ -8,7 +8,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #############################################################
 POPT_VERSION = 1.16
 # rpm5.org down
-POPT_SITE = http://anduin.linuxfromscratch.org/sources/BLFS/svn/p/
+POPT_SITE = http://anduin.linuxfromscratch.org/sources/BLFS/svn/p
 POPT_CUSTOM_PATCH_DIR = astlinux
 POPT_INSTALL_STAGING = YES
 

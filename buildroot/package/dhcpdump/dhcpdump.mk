@@ -8,7 +8,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #############################################################
 
 DHCPDUMP_VERSION = 1.8
-DHCPDUMP_SITE    = http://www.mavetju.org/download/
+DHCPDUMP_SITE    = http://www.mavetju.org/download
 DHCPDUMP_CUSTOM_PATCH_DIR = astlinux
 DHCPDUMP_SOURCE  = dhcpdump-$(DHCPDUMP_VERSION).tar.gz
 

@@ -8,7 +8,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #############################################################
 STATSERIAL_VERSION = 1.1
 STATSERIAL_SOURCE = statserial-$(STATSERIAL_VERSION).tar.gz
-STATSERIAL_SITE = http://www.ibiblio.org/pub/Linux/system/serial/
+STATSERIAL_SITE = http://www.ibiblio.org/pub/Linux/system/serial
 STATSERIAL_CUSTOM_PATCH_DIR = astlinux
 STATSERIAL_DEPENDENCIES = ncurses
 
