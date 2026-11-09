@@ -1,18 +1,18 @@
-#if BR2_BUILD_USE_CUSTOM_SCRIPTS
-#if BR2_BUILD_USE_ASTLINUX_SCRIPTS
-#
+if BR2_BUILD_USE_CUSTOM_SCRIPTS1
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
 #config BR2_PACKAGE_OPENSSL
 #	bool "openssl"
 #	select BR2_PACKAGE_ZLIB
 #	help
 #	  A collaborative effort to develop a robust, commercial-grade, fully
-	  featured, and Open Source toolkit implementing the Secure Sockets
-	  Layer (SSL v2/v3) and Transport Security (TLS v1) as well as a
-	  full-strength general-purpose cryptography library.
+#	  featured, and Open Source toolkit implementing the Secure Sockets
+#	  Layer (SSL v2/v3) and Transport Security (TLS v1) as well as a
+#	  full-strength general-purpose cryptography library.
+#
+#	  https://www.openssl.org/
 
-	  https://www.openssl.org/
-
-if BR2_PACKAGE_OPENSSL
+if BR2_PACKAGE_LIBOPENSSL
 
 config BR2_PACKAGE_LIBOPENSSL_BIN
 	bool "openssl binary"
@@ -40,9 +40,9 @@ endif
 
 endif
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
-if !BR2_BUILD_USE_CUSTOM_SCRIPTS
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
 if BR2_PACKAGE_LIBOPENSSL
 
@@ -277,4 +277,4 @@ config BR2_PACKAGE_LIBOPENSSL_ENABLE_SSL_TRACE
 
 endif # BR2_PACKAGE_LIBOPENSSL
 
-#endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS1

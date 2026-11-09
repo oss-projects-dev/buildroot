@@ -1,15 +1,15 @@
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS1),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 
 #############################################################
 #
 # openssl
-##
-##############################################################
 #
-#LIBOPENSSL_VERSION = 1.1.1w
-#LIBOPENSSL_SITE = https://www.openssl.org/source
-#LIBOPENSSL_CUSTOM_PATCH_DIR = astlinux
+#############################################################
+
+LIBOPENSSL_VERSION = 1.1.1w
+LIBOPENSSL_SITE = https://www.openssl.org/source
+LIBOPENSSL_CUSTOM_PATCH_DIR = astlinux
 LIBOPENSSL_INSTALL_STAGING = YES
 LIBOPENSSL_DEPENDENCIES = zlib
 LIBOPENSSL_TARGET_ARCH = linux-generic32
@@ -113,7 +113,7 @@ $(eval $(generic-package))
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS1
 
 ################################################################################
 #
@@ -302,4 +302,4 @@ endif
 $(eval $(generic-package))
 $(eval $(host-generic-package))
 
-#endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1
