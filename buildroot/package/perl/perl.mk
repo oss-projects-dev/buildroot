@@ -26,6 +26,7 @@ PERL_CROSS_VERSION = 1.3.5
 PERL_CROSS_SITE = https://github.com/arsv/perl-cross/releases/download/$(PERL_CROSS_VERSION)
 PERL_CUSTOM_PATCH_DIR = astlinux
 PERL_CROSS_SOURCE = perl-cross-$(PERL_CROSS_VERSION).tar.gz
+PERL_EXTRA_DOWNLOADS = $(PERL_CROSS_SITE)/$(PERL_CROSS_SOURCE)
 
 # We use the perlcross hack to cross-compile perl. It should
 # be extracted over the perl sources, so we don't define that
@@ -35,7 +36,7 @@ PERL_CROSS_SOURCE = perl-cross-$(PERL_CROSS_VERSION).tar.gz
 define PERL_CROSS_DOWNLOAD
 	$(call DOWNLOAD,$(PERL_CROSS_SITE),$(PERL_CROSS_SOURCE))
 endef
-PERL_POST_DOWNLOAD_HOOKS += PERL_CROSS_DOWNLOAD
+#PERL_POST_DOWNLOAD_HOOKS += PERL_CROSS_DOWNLOAD
 
 define PERL_CROSS_EXTRACT
 	$(INFLATE$(suffix $(PERL_CROSS_SOURCE))) $(DL_DIR)/$(PERL_CROSS_SOURCE) | \
