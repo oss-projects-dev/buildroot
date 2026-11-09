@@ -50,7 +50,7 @@ DNSMASQ_COPTS += -DNO_IPSET
 endif
 
 define DNSMASQ_FIX_PKGCONFIG
-	$(SED) 's^PKG_CONFIG = pkgconf^PKG_CONFIG = $(PKG_CONFIG_HOST_BINARY)^' \
+	$(SED) 's^PKG_CONFIG = pkg-config^PKG_CONFIG = $(PKG_CONFIG_HOST_BINARY)^' \
 		$(DNSMASQ_DIR)/Makefile
 endef
 

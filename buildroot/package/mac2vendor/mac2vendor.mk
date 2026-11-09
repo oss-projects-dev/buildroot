@@ -17,7 +17,7 @@ MAC2VENDOR_CUSTOM_PATCH_DIR = astlinux
 define MAC2VENDOR_EXTRACT_CMDS
 	mkdir -p $(@D)/oui-db
 	for i in 0 1 2 3 4 5 6 7 8 9 A B C D E F; do \
-	  sed -e 's/^ *//' -e 's/\r$$//' $(DL_DIR)/$(MAC2VENDOR_SOURCE) | \
+	  sed -e 's/^ *//' -e 's/\r$$//' $(MAC2VENDOR_DL_DIR)/$(MAC2VENDOR_SOURCE) | \
 	  grep "^[0-9A-F]\{5\}$$i " | \
 	  sed 's/ [^(]*.base 16.[^0-9a-zA-Z]*/~/' | \
 	  sed '/^......~$$/d' > $(@D)/oui-db/xxxxx$$i ; \

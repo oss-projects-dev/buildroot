@@ -6,10 +6,12 @@
 
 EX_VI_VERSION = 050325
 EX_VI_SOURCE = ex-$(EX_VI_VERSION).tar.bz2
-EX_VI_SITE = http://$(BR2_SOURCEFORGE_MIRROR).dl.sourceforge.net/ex-vi
+EX_VI_SITE = http://downloads.sourceforge.net/project/ex-vi/ex-vi/$(EX_VI_VERSION)
 EX_VI_CUSTOM_PATCH_DIR = astlinux
 
-EX_VI_DEPENDENCIES = ncurses
+EX_VI_MAKE = $(MAKE1)
+
+EX_VI_DEPENDENCIES = host-pkgconf host-ncurses ncurses
 
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 EX_VI_DEPENDENCIES += busybox

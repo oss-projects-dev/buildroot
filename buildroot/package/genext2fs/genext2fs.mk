@@ -10,6 +10,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 GENEXT2FS_VERSION=1.4.1
 GENEXT2FS_SOURCE=genext2fs-$(GENEXT2FS_VERSION).tar.gz
 GENEXT2FS_SITE:=http://$(BR2_SOURCEFORGE_MIRROR).dl.sourceforge.net/sourceforge/genext2fs
+GENEXT2FS_CUSTOM_PATCH_DIR = astlinux
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

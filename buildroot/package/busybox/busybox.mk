@@ -12,6 +12,8 @@ BUSYBOX_SITE = https://busybox.net/downloads
 BUSYBOX_CUSTOM_PATCH_DIR = astlinux
 BUSYBOX_SOURCE = busybox-$(BUSYBOX_VERSION).tar.bz2
 
+BUSYBOX_DEPENDENCIES = libxcrypt
+
 BUSYBOX_CFLAGS = \
 	$(TARGET_CFLAGS)
 
