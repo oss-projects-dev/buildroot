@@ -2142,11 +2142,11 @@ config BR2_PACKAGE_PYTHON_MELD3
 	  This package has been removed as it is unmaintained since
 	  April 2020.
 
-config BR2_PACKAGE_STRONGSWAN_EAP
-	bool "strongswan EAP plugins now individually selectable"
-	select BR2_LEGACY
-	help
-	  The various EAP plugins are now individually selectable.
+#config BR2_PACKAGE_STRONGSWAN_EAP
+#	bool "strongswan EAP plugins now individually selectable"
+#	select BR2_LEGACY
+#	help
+#	  The various EAP plugins are now individually selectable.
 
 config BR2_PACKAGE_GNURADIO_PAGER
 	bool "gnuradio gr-flex support removed"
