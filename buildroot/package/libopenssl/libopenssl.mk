@@ -1,4 +1,4 @@
-ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS1),y)
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
 ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 
 #############################################################
@@ -113,7 +113,7 @@ $(eval $(generic-package))
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
-else #BR2_BUILD_USE_CUSTOM_SCRIPTS1
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 ################################################################################
 #
@@ -302,4 +302,4 @@ endif
 $(eval $(generic-package))
 $(eval $(host-generic-package))
 
-endif #BR2_BUILD_USE_CUSTOM_SCRIPTS1
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS

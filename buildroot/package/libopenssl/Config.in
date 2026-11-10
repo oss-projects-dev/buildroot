@@ -91,6 +91,24 @@ config BR2_PACKAGE_LIBOPENSSL_ENGINES
 	help
 	  Install additional encryption engine libraries.
 
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
+if BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+config BR2_PACKAGE_LIBOPENSSL_OCF
+	bool "openssl ocf support"
+	help
+	  Enable openssl cryptodev (OCF) hardware acceleration support.
+	  This requires kernel patches from the ocf-linux project otherwise
+	  you'll just have a bigger openssl library that works as usual.
+	  Note:  This needs to be moved to a separate package to work
+	         as per upstream Buildroot using package "ocf-linux".
+
+	  http://ocf-linux.sourceforge.net/
+endif
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
+if !BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 config BR2_PACKAGE_LIBOPENSSL_ENABLE_CHACHA
 	bool "enable CHACHA"
 	default y
@@ -274,6 +292,8 @@ config BR2_PACKAGE_LIBOPENSSL_ENABLE_SSL_TRACE
 	help
 	  Build with SSL Trace support. Disabling this option may
 	  provide a small reduction in libssl binary size.
+
+endif #!BR2_BUILD_USE_CUSTOM_SCRIPTS
 
 endif # BR2_PACKAGE_LIBOPENSSL
 
