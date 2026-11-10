@@ -58,6 +58,10 @@ BFDETECT_STRIP_COMPONENTS = 0
 #TARGETS+=bfdetect
 #endif
 
+define BFDETECT_CONFIGURE_CMDS
+        @echo "No configure"
+endef
+
 define BFDETECT_BUILD_CMDS
 	$(SED) 's/^[[:space:]]*strip /#strip /' $(@D)/Makefile
 	$(TARGET_MAKE_ENV) $(MAKE) CC=$(TARGET_CC) CFLAGS='$(TARGET_CFLAGS)' $(TARGET_CONFIGURE_OPTS) -C $(@D)

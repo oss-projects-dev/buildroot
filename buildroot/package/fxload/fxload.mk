@@ -48,6 +48,10 @@ FXLOAD_CUSTOM_PATCH_DIR = astlinux
 #TARGETS+=fxload
 #endif
 
+define FXLOAD_CONFIGURE_CMDS
+        @echo "No configure"
+endef
+
 define FXLOAD_BUILD_CMDS
         $(TARGET_MAKE_ENV) $(MAKE) CC=$(TARGET_CC) $(TARGET_CONFIGURE_OPTS) -C $(@D)
 endef
