@@ -8,7 +8,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #############################################################
 SLANG_VERSION = 1.4.5
 SLANG_SOURCE = slang-$(SLANG_VERSION)-mini.tar.bz2
-SLANG_SITE = http://www.uclibc.org/
+SLANG_SITE = http://www.uclibc.org
 SLANG_CUSTOM_PATCH_DIR = astlinux
 SLANG_INSTALL_STAGING = YES
 
