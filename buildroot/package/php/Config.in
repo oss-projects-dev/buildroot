@@ -61,7 +61,7 @@ config BR2_PACKAGE_PHP_SAPI_CLI_FPM
 
 #endchoice
 
-source "package/php/Config.ext"
+source "package/php/astlinux/Config.ext"
 endif
 
 endif
