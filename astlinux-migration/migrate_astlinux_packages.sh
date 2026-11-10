@@ -54,8 +54,7 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
   cd $MERGE_FOLDER/$dir_name/$pkg_rename_name;
   if [[ "$pkg_name" != "$pkg_rename_name" ]]; then
     mv ${pkg_name}.mk ${pkg_rename_name}.mk
-	sed -e "s@${pkg_name_upper}_@${pkg_rename_name_upper}_@g" -i Config.in*
-	sed -e "s@${pkg_name_upper}_@${pkg_rename_name_upper}_@g" -i ${pkg_rename_name}.mk
+	sed -e "s@${pkg_name_upper}@${pkg_rename_name_upper}@g" -e "s@\"$pkg_name\"@\"$pkg_rename_name\"@g" -i *.in *.ext *.mk
   fi
   
   mkdir $custom_folder_name
@@ -63,6 +62,7 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
   #  mv *.patch custom/
   #fi  
   mv * $custom_folder_name/
+  touch $custom_folder_name/.gitkeep
 
   # below changes have to be done for all files before merging with buildroot files so both are separate
   # add custom-patch-dir
@@ -70,7 +70,7 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
       -e "/_SITE:=/a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
       -i $custom_folder_name/*.mk
   # change default package path for files to custom_folder_name  
-  sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" -i $custom_folder_name/*.mk
+  sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
 )
 
 if [ -d $BUILDROOTVER/$dir_name/$pkg_rename_name ]; then
@@ -244,6 +244,8 @@ process package busybox
 process package ca-certificates     
 process package chrony              
 process package clix                
+process package dahdi-linux         
+process package dahdi-tools         
 process package darkstat            
 process package ddclient            
 process package dhcpdump            
@@ -258,7 +260,7 @@ process package ethtool
 process package ex-vi               
 process package expat               
 process package fakeroot            
-process package fdisk            
+process package fdisk               
 process package flex                
 process package fossil              
 process package fping               
@@ -272,6 +274,7 @@ process package htpasswd
 process package iftop               
 process package iksemel             
 process package iperf               
+process package iperf3              
 process package iprange             
 process package iproute2            
 process package ipset               
@@ -292,6 +295,7 @@ process package libidn
 process package libmnl              
 process package libpcap             
 process package libpng              
+process package libpri              
 process package libqrencode         
 process package libretls            
 process package libsodium           
@@ -300,7 +304,7 @@ process package libtool
 process package liburiparser        
 process package libusb              
 process package libusb-compat       
-#process package libxcrypt           
+#process package libxcrypt          
 process package libxml2             
 process package lighttpd            
 process package linux-firmware      
@@ -330,6 +334,7 @@ process package ne
 process package neon                
 process package netcalc             
 process package netsnmp             
+process package newt                
 process package ngrep               
 process package nut                 
 process package openldap            
@@ -343,7 +348,8 @@ process package pcre2
 process package perl                
 process package phoneprov-tools     
 process package php                 
-#process package pkg-config          - replaced by pkgconf
+process package pjsip-ast20         
+#process package pkg-config         - replaced by pkgconf
 process package popt                
 process package pppd                
 process package prosody             
@@ -354,6 +360,7 @@ process package screen
 process package shellinabox         
 process package sipgrep             
 process package sipsak              
+process package slang               
 process package smartmontools       
 process package sngrep              
 process package spandsp             
@@ -365,6 +372,7 @@ process package strace
 process package strongswan          
 process package stunnel             
 process package sudo                
+process package system-vendor       
 process package tarsnap             
 process package tcpdump             
 process package tiff                
@@ -377,53 +385,13 @@ process package usbutils
 process package util-linux          
 process package vnstat              
 process package vsftpd              
+process package webinterface        
 process package whois               
 process package wide-dhcpv6         
 process package wireguard-tools     
 process package zabbix              
 process package zlib                libzlib
 process package zoneinfo            
-
-
-# disable packages
-
-# bug fixes
-# lua
-sed -e '6i\	select BR2_PACKAGE_HAS_LUAINTERPRETER' -i $MERGE_FOLDER/package/lua/Config.in
-# luasec
-sed -e 's@depends on BR2_PACKAGE_OPENSSL@select BR2_PACKAGE_OPENSSL@g' -i $MERGE_FOLDER/package/luasec/Config.in
-
-# neon
-sed -e 's@depends on BR2_PACKAGE_NEON@#depends on BR2_PACKAGE_NEON@g' \
-	-e '11i\if BR2_PACKAGE_NEON\n' \
-	-e '53i\endif\n' \
-	-i $MERGE_FOLDER/package/neon/Config.in
-sed -e '27,34s/^/#/' -e '53s/^/#/' -i $MERGE_FOLDER/package/neon/Config.in
-
-# prosody
-sed -e 's@select BR2_PACKAGE_LUA$@#select BR2_PACKAGE_LUA@g' -i $MERGE_FOLDER/package/prosody/Config.in
-
-# php
-sed -e '24,28s/^/#/' -e '62s/^/#/' -i $MERGE_FOLDER/package/php/Config.in
-
-# runnix - do not enable by default
-sed -e 's@default y@#default y@g' -i $MERGE_FOLDER/boot/runnix/Config.in
-
-# curl
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in
-
-# fix trailing slashes errors
-sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i $MERGE_FOLDER/package/dhcpdump/dhcpdump.mk
-sed -e 's@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p/@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p@g' -i $MERGE_FOLDER/package/popt/popt.mk
-sed -e 's@http://www.ibiblio.org/pub/Linux/system/serial/@http://www.ibiblio.org/pub/Linux/system/serial@g' -i $MERGE_FOLDER/package/statserial/statserial.mk
-
-
-# below are disabled packages
-# libopenssl - disable entire libopenssl package
-#sed -e '4,13s/^/#/' -e 's@if BR2_PACKAGE_OPENSSL$@if BR2_PACKAGE_LIBOPENSSL@g' -i $MERGE_FOLDER/package/libopenssl/Config.in
-sed -e '1,45s/^/#/' -e '280s/^/#/' -i $MERGE_FOLDER/package/libopenssl/Config.in
-sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERGE_FOLDER/package/libopenssl/libopenssl.mk
 
 # disable all packages where they are part of toolchain build
 # autoconf, automake, binutils, bison, gawk, gcc, glibc, gmp, isl, libtool, linux, m4, mpc, mpfr, patchef
@@ -439,6 +407,52 @@ sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERG
 #sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERGE_FOLDER/package/mpfr/mpfr.mk
 #sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERGE_FOLDER/package/patchelf/patchelf.mk
 
-# m4 - disable entire libopenssl package
-#sed -e '1,45s/^/#/' -e '280s/^/#/' -i $MERGE_FOLDER/package/libopenssl/Config.in
+# libopenssl - disable entire libopenssl package
+#sed -e '4,13s/^/#/' -e 's@if BR2_PACKAGE_OPENSSL$@if BR2_PACKAGE_LIBOPENSSL@g' -i $MERGE_FOLDER/package/libopenssl/Config.in
+sed -e '1,45s/^/#/' -e '280s/^/#/' -i $MERGE_FOLDER/package/libopenssl/Config.in
 #sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERGE_FOLDER/package/libopenssl/libopenssl.mk
+
+# below is bug fixes at package level
+
+# --- boot folder
+# runnix - do not enable by default
+sed -e 's@default y@#default y@g' -i $MERGE_FOLDER/boot/runnix/Config.in
+
+# --- package folder
+# dhcpdump - fix trailing slashes error
+sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i $MERGE_FOLDER/package/dhcpdump/dhcpdump.mk
+
+# libcurl
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in
+
+# lua
+sed -e '6i\	select BR2_PACKAGE_HAS_LUAINTERPRETER' -i $MERGE_FOLDER/package/lua/Config.in
+
+# luasec
+sed -e 's@depends on BR2_PACKAGE_OPENSSL@select BR2_PACKAGE_OPENSSL@g' -i $MERGE_FOLDER/package/luasec/Config.in
+
+# mac2vendor - change DL_DIR to MAC2VENDOR_DL_DIR
+sed -e 's@(DL_DIR)$@(MAC2VENDOR_DL_DIR)@g' -i $MERGE_FOLDER/package/mac2vendor/mac2vendor.mk
+
+# neon
+sed -e 's@depends on BR2_PACKAGE_NEON@#depends on BR2_PACKAGE_NEON@g' \
+	-e '11i\if BR2_PACKAGE_NEON\n' \
+	-e '53i\endif\n' \
+	-i $MERGE_FOLDER/package/neon/Config.in
+sed -e '27,34s/^/#/' -e '53s/^/#/' -i $MERGE_FOLDER/package/neon/Config.in
+
+# popt - fix trailing slashes error
+sed -e 's@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p/@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p@g' -i $MERGE_FOLDER/package/popt/popt.mk
+
+# prosody - circular dependency issue
+sed -e 's@select BR2_PACKAGE_LUA$@#select BR2_PACKAGE_LUA@g' -i $MERGE_FOLDER/package/prosody/Config.in
+
+# php
+sed -e '24,28s/^/#/' -e '62s/^/#/' -i $MERGE_FOLDER/package/php/Config.in
+
+# slang - fix trailing slashes error
+sed -e 's@http://www.uclibc.org/@http://www.uclibc.org@g' -i $MERGE_FOLDER/package/slang/slang.mk
+
+# statserial - fix trailing slashes error
+sed -e 's@http://www.ibiblio.org/pub/Linux/system/serial/@http://www.ibiblio.org/pub/Linux/system/serial@g' -i $MERGE_FOLDER/package/statserial/statserial.mk
