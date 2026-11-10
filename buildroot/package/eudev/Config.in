@@ -6,6 +6,7 @@ config BR2_PACKAGE_EUDEV
 	depends on BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
 	depends on BR2_USE_MMU # uses fork()
 	depends on BR2_USE_WCHAR # needs C99 compiler
+	select BR2_PACKAGE_HAS_UDEV
 	select BR2_PACKAGE_UTIL_LINUX
 	select BR2_PACKAGE_UTIL_LINUX_LIBBLKID
 	select BR2_PACKAGE_KMOD
@@ -16,6 +17,13 @@ config BR2_PACKAGE_EUDEV
 	  required by users and various distributions.
 
 	  https://github.com/eudev-project/eudev
+
+if BR2_PACKAGE_EUDEV
+
+config BR2_PACKAGE_PROVIDES_UDEV
+	default "eudev"
+
+endif
 
 comment "udev requires /dev mgmnt set to udev under System configuration"
 	depends on !BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
