@@ -1,8 +1,8 @@
 #if BR2_BUILD_USE_CUSTOM_SCRIPTS
 #if BR2_BUILD_USE_ASTLINUX_SCRIPTS
 #
-#config BR2_PACKAGE_OPENSSL
-#	bool "openssl"
+#config BR2_PACKAGE_LIBOPENSSL
+#	bool "libopenssl"
 #	select BR2_PACKAGE_ZLIB
 #	help
 #	  A collaborative effort to develop a robust, commercial-grade, fully
@@ -12,7 +12,7 @@
 #
 #	  https://www.openssl.org/
 #
-#if BR2_PACKAGE_OPENSSL
+#if BR2_PACKAGE_LIBOPENSSL
 #
 #config BR2_PACKAGE_LIBOPENSSL_BIN
 #	bool "openssl binary"

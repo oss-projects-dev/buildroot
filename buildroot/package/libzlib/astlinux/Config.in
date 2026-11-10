@@ -1,5 +1,5 @@
-config BR2_PACKAGE_ZLIB
-	bool "zlib"
+config BR2_PACKAGE_LIBZLIB
+	bool "libzlib"
 	help
 	  Standard (de)compression library.  Used by things like
 	  gzip and libpng.
