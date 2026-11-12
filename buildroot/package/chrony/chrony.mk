@@ -48,7 +48,7 @@ CHRONY_CONF_OPTS += --disable-pps
 endif
 
 define CHRONY_CONFIGURE_CMDS
-	cd $(@D) && $(TARGET_CONFIGURE_OPTS) ./configure $(CHRONY_CONF_OPT)
+	cd $(@D) && $(TARGET_CONFIGURE_OPTS) ./configure $(CHRONY_CONF_OPTS)
 endef
 
 define CHRONY_BUILD_CMDS
