@@ -17,7 +17,7 @@ LIBMAD_INSTALL_STAGING = YES
 LIBMAD_AUTORECONF = YES
 
 define LIBMAD_INSTALL_STAGING_PC
-	$(INSTALL) -D package/multimedia/libmad/mad.pc \
+	$(INSTALL) -D package/libmad/astlinux/mad.pc \
 		$(STAGING_DIR)/usr/lib/pkgconfig/mad.pc
 endef
 
