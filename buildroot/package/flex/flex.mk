@@ -6,10 +6,10 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 # flex
 #
 #############################################################
-FLEX_VERSION = 2.5.37
+FLEX_VERSION = 2.6.4
 FLEX_SOURCE = flex-$(FLEX_VERSION).tar.gz
-FLEX_SITE = http://download.sourceforge.net/project/flex
-FLEX_CUSTOM_PATCH_DIR = astlinux
+FLEX_SITE = https://github.com/westes/flex/files/981163
+FLEX_CUSTOM_PATCH_DIR = astlinux/2.6.4
 FLEX_INSTALL_STAGING=YES
 FLEX_DEPENDENCIES = host-m4
 HOST_FLEX_DEPENDENCIES = host-m4
