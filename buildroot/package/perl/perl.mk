@@ -22,9 +22,8 @@ PERL_MODULES = constant version base fields
 PERL_MODULES += Carp Errno Fcntl PathTools POSIX Digest Socket IO XSLoader Exporter B File-Find JSON-PP
 PERL_MODULES += Digest/MD5 Digest/SHA Getopt/Long Time/Local File/Glob Sys/Hostname
 
-PERL_CROSS_VERSION = 1.3.5
+PERL_CROSS_VERSION = 1.4.1
 PERL_CROSS_SITE = https://github.com/arsv/perl-cross/releases/download/$(PERL_CROSS_VERSION)
-PERL_CUSTOM_PATCH_DIR = astlinux
 PERL_CROSS_SOURCE = perl-cross-$(PERL_CROSS_VERSION).tar.gz
 PERL_EXTRA_DOWNLOADS = $(PERL_CROSS_SITE)/$(PERL_CROSS_SOURCE)
 
@@ -39,8 +38,9 @@ endef
 #PERL_POST_DOWNLOAD_HOOKS += PERL_CROSS_DOWNLOAD
 
 define PERL_CROSS_EXTRACT
-	$(INFLATE$(suffix $(PERL_CROSS_SOURCE))) $(DL_DIR)/$(PERL_CROSS_SOURCE) | \
-	$(TAR) $(TAR_STRIP_COMPONENTS)=1 -C $(@D) $(TAR_OPTIONS) -
+	$(call suitable-extractor,$(PERL_CROSS_SOURCE)) $(PERL_DL_DIR)/$(PERL_CROSS_SOURCE) | \
+	$(TAR) --strip-components=1 -C $(@D) $(TAR_OPTIONS) -
+	cp -a $(@D)/cnf/diffs/cperl-5.24.2 $(@D)/cnf/diffs/cperl-5.24.4
 endef
 PERL_POST_EXTRACT_HOOKS += PERL_CROSS_EXTRACT
 
@@ -80,7 +80,7 @@ endif
 
 define PERL_CONFIGURE_CMDS
 	(cd $(@D); $(TARGET_MAKE_ENV) HOSTCC='$(HOSTCC_NOCACHE)' \
-		./configure $(PERL_CONF_OPT))
+		./configure $(PERL_CONF_OPTS))
 	$(SED) 's/UNKNOWN-/Buildroot $(BR2_VERSION_FULL) /' $(@D)/patchlevel.h
 endef
 
