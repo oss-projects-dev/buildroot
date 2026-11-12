@@ -56,11 +56,11 @@ endef
 
 define DNSMASQ_BUILD_CMDS
 	$(DNSMASQ_FIX_PKGCONFIG)
-	$(DNSMASQ_MAKE_ENV) $(MAKE1) -C $(@D) $(DNSMASQ_MAKE_OPT)
+	$(DNSMASQ_MAKE_ENV) $(MAKE1) -C $(@D) $(DNSMASQ_MAKE_OPTS)
 endef
 
 define DNSMASQ_INSTALL_TARGET_CMDS
-	$(DNSMASQ_MAKE_ENV) $(MAKE) -C $(@D) $(DNSMASQ_MAKE_OPT) install
+	$(DNSMASQ_MAKE_ENV) $(MAKE) -C $(@D) $(DNSMASQ_MAKE_OPTS) install
 	$(INSTALL) -m 0755 -D package/dnsmasq/astlinux/dnsmasq.init $(TARGET_DIR)/etc/init.d/dnsmasq
 	$(INSTALL) -m 0644 -D package/dnsmasq/astlinux/dnsmasq.static $(TARGET_DIR)/stat/etc/dnsmasq.static
 	$(INSTALL) -m 0744 -D package/dnsmasq/astlinux/scripts/dnsmasq-lease.script.sh $(TARGET_DIR)/etc/dnsmasq-lease.script
