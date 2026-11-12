@@ -4,7 +4,7 @@
 #
 #############################################################
 
-SIPSAK_VERSION = 0.9.7
+SIPSAK_VERSION = 0.9.8.1
 SIPSAK_SOURCE = sipsak-$(SIPSAK_VERSION).tar.gz
 SIPSAK_SITE = https://github.com/nils-ohlmeier/sipsak/releases/download/$(SIPSAK_VERSION)
 SIPSAK_CUSTOM_PATCH_DIR = astlinux
