@@ -4,10 +4,10 @@
 #
 ##############################################################
 
-ZONEINFO_VERSION := 2026d
-ZONEINFO_DATA := tzdata$(ZONEINFO_VERSION).tar.gz
-ZONEINFO_SOURCE := tzcode$(ZONEINFO_VERSION).tar.gz
-ZONEINFO_SITE := https://www.iana.org/time-zones/repository/releases
+ZONEINFO_VERSION = 2026d
+#ZONEINFO_DATA := tzdata$(ZONEINFO_VERSION).tar.gz
+ZONEINFO_SOURCE = tzdb-$(ZONEINFO_VERSION).tar.lz
+ZONEINFO_SITE = https://www.iana.org/time-zones/repository/releases
 ZONEINFO_CUSTOM_PATCH_DIR = astlinux
 #ZONEINFO_DIR := $(BUILD_DIR)/zoneinfo
 #ZONEINFO_BINARY := usr/share/zoneinfo/.tzversion
