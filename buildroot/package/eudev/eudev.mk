@@ -27,9 +27,9 @@ EUDEV_CONF_OPTS = \
 EUDEV_DEPENDENCIES = host-gperf host-pkgconf util-linux kmod
 
 define EUDEV_INSTALL_USBTTY
-	$(INSTALL) -m 0644 -D package/udev/usbtty/usbtty.rules $(TARGET_DIR)/etc/udev/rules.d/usbtty.rules
-	$(INSTALL) -m 0755 -D package/udev/usbtty/usb-getty $(TARGET_DIR)/usr/share/usbtty/usb-getty
-	$(INSTALL) -m 0755 -D package/udev/usbtty/usb-getty-background $(TARGET_DIR)/usr/share/usbtty/usb-getty-background
+	$(INSTALL) -m 0644 -D package/eudev/astlinux/usbtty/usbtty.rules $(TARGET_DIR)/etc/udev/rules.d/usbtty.rules
+	$(INSTALL) -m 0755 -D package/eudev/astlinux/usbtty/usb-getty $(TARGET_DIR)/usr/share/usbtty/usb-getty
+	$(INSTALL) -m 0755 -D package/eudev/astlinux/usbtty/usb-getty-background $(TARGET_DIR)/usr/share/usbtty/usb-getty-background
 endef
 EUDEV_POST_INSTALL_TARGET_HOOKS += EUDEV_INSTALL_USBTTY
 
