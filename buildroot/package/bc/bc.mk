@@ -7,10 +7,10 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #
 #############################################################
 
-BC_VERSION = 1.06.95
-BC_SOURCE = bc-$(BC_VERSION).tar.bz2
-BC_SITE = http://alpha.gnu.org/gnu/bc
-BC_CUSTOM_PATCH_DIR = astlinux
+BC_VERSION = 1.08.2
+BC_SOURCE = bc-$(BC_VERSION).tar.gz
+BC_SITE = $(BR2_GNU_MIRROR)/bc
+BC_CUSTOM_PATCH_DIR = astlinux/$(BC_VERSION)
 BC_DEPENDENCIES = host-bison host-flex
 
 ifeq ($(BR2_PACKAGE_LIBEDIT),y)
