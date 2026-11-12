@@ -66,11 +66,21 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
 
   # below changes have to be done for all files before merging with buildroot files so both are separate
   # add custom-patch-dir
-  sed -e "/_SITE /a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
-      -e "/_SITE:=/a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
+  sed -e "/${pkg_rename_name_upper}_SITE /a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
+      -e "/${pkg_rename_name_upper}_SITE:=/a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
       -i $custom_folder_name/*.mk
   # change default package path for files to custom_folder_name  
-  sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+  if [[ "$pkg_src_dir" != "$pkg_name" ]]; then
+    sed -e "s@$dir_name/$pkg_src_dir@$dir_name/$pkg_name@g" \
+	    -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+  fi
+  if [[ "$pkg_name" != "$pkg_rename_name" ]]; then
+    sed -e "s@$dir_name/$pkg_name@$dir_name/$pkg_rename_name@g" \
+	    -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+  fi
+    
+  sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" \
+	  -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
 )
 
 if [ -d $BUILDROOTVER/$dir_name/$pkg_rename_name ]; then
@@ -171,7 +181,13 @@ fi
   sed -e 's@BR2_PREFER_STATIC_LIB@BR2_STATIC_LIBS@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename _OPT to _OPTS - there will be false positives?
-  sed -e 's@_OPT @_OPTS @g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@_OPT @_OPTS @g' -e 's@_OPT)@_OPTS)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+
+  # rename LINUX_VERSION_PROBED to LINUX_VERSION - looks like this is supported?
+  #sed -e 's@LINUX_VERSION_PROBED@LINUX_VERSION@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+
+  # rename KERNEL_ARCH to NORMALIZED_ARCH
+  sed -e 's@KERNEL_ARCH@NORMALIZED_ARCH@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) to $(TARGET_NLS_DEPENDENCIES) 
   sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext)@$(TARGET_NLS_DEPENDENCIES)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
@@ -419,12 +435,20 @@ sed -e '1,45s/^/#/' -e '280s/^/#/' -i $MERGE_FOLDER/package/libopenssl/Config.in
 sed -e 's@default y@#default y@g' -i $MERGE_FOLDER/boot/runnix/Config.in
 
 # --- package folder
+# ddclient
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
+
 # dhcpdump - fix trailing slashes error
 sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i $MERGE_FOLDER/package/dhcpdump/dhcpdump.mk
 
+# iptables - change IPTABLES_TARGET_INSTALL to IPTABLES_TARGET_INSTALL_INIT as it is giving issue in buildroot.
+sed -e 's@IPTABLES_TARGET_INSTALL@IPTABLES_TARGET_INSTALL_INIT@g' -i $MERGE_FOLDER/package/iptables/iptables.mk
+
 # libcurl
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
 sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in
+
+# libusb
+sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV@BR2_PACKAGE_HAS_UDEV@g' -i $MERGE_FOLDER/package/libusb/libusb.mk
 
 # lua
 sed -e '6i\	select BR2_PACKAGE_HAS_LUAINTERPRETER' -i $MERGE_FOLDER/package/lua/Config.in
@@ -433,7 +457,7 @@ sed -e '6i\	select BR2_PACKAGE_HAS_LUAINTERPRETER' -i $MERGE_FOLDER/package/lua/
 sed -e 's@depends on BR2_PACKAGE_OPENSSL@select BR2_PACKAGE_OPENSSL@g' -i $MERGE_FOLDER/package/luasec/Config.in
 
 # mac2vendor - change DL_DIR to MAC2VENDOR_DL_DIR
-sed -e 's@(DL_DIR)$@(MAC2VENDOR_DL_DIR)@g' -i $MERGE_FOLDER/package/mac2vendor/mac2vendor.mk
+sed -e 's@(DL_DIR)@(MAC2VENDOR_DL_DIR)@g' -i $MERGE_FOLDER/package/mac2vendor/mac2vendor.mk
 
 # neon
 sed -e 's@depends on BR2_PACKAGE_NEON@#depends on BR2_PACKAGE_NEON@g' \
