@@ -1327,23 +1327,27 @@ check-package-external:
 CP := $(shell which cp || type -p cp) -av
 
 .PHONY: saveconfig
+DEFCONFIG_FILENAME := $(notdir $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig))
+DEFCONFIG_BACKUP_DIR := $(TOPDIR)/configs-backup
 saveconfig: savedefconfig
-	@if [ ! -f $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig ]; then \
-		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; \
-	elif cmp -s $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; then \
-		echo "No change in Configuration : $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig"; \
+	@mkdir -p $(DEFCONFIG_BACKUP_DIR)
+	@if [ ! -f $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig ]; then \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig; \
+	elif cmp -s $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig; then \
+		echo "No change in Configuration : $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig"; \
 	else \
-		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig.$(shell date +%Y%m%d%H%M%S); \
-		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).defconfig; \
+		cp -av $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig.$(shell date +%Y%m%d%H%M%S); \
+		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).defconfig; \
 	fi
-	@if [ ! -f $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config ]; then \
-		cp -av $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; \
-	elif cmp -s $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; then \
-		echo "No change in Configuration : $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config"; \
+	@if [ ! -f $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config ]; then \
+		cp -av $(BR2_CONFIG) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config; \
+	elif cmp -s $(BR2_CONFIG) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config; then \
+		echo "No change in Configuration : $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config"; \
 	else \
-		cp -av $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config.$(shell date +%Y%m%d%H%M%S); \
-		cp -av $(BR2_CONFIG) $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig).config; \
+		cp -av $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config.$(shell date +%Y%m%d%H%M%S); \
+		cp -av $(BR2_CONFIG) $(DEFCONFIG_BACKUP_DIR)/$(DEFCONFIG_FILENAME).config; \
 	fi
+
 
 include docs/manual/manual.mk
 -include $(foreach dir,$(BR2_EXTERNAL_DIRS),$(sort $(wildcard $(dir)/docs/*/*.mk)))
