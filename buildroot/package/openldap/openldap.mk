@@ -34,7 +34,8 @@ OPENLDAP_CONF_OPTS = \
 	--disable-bdb \
 	--disable-hdb \
 	--disable-monitor \
-	--disable-relay
+	--disable-relay \
+	-enable-dynamic=$(if $(BR2_STATIC_LIBS),no,yes)
 
 ifeq ($(BR2_PACKAGE_OPENLDAP_SERVER),y)
 define OPENLDAP_INSTALL_TARGET_SERVER
