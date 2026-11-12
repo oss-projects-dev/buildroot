@@ -6,9 +6,9 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 # dialog
 #
 #############################################################
-DIALOG_VERSION = 1.3-20210117
+DIALOG_VERSION = 1.3-20170509
 DIALOG_SOURCE = dialog-$(DIALOG_VERSION).tgz
-DIALOG_SITE = https://invisible-mirror.net/archives/dialog
+DIALOG_SITE = ftp://ftp.invisible-island.net/dialog
 DIALOG_CUSTOM_PATCH_DIR = astlinux
 DIALOG_DEPENDENCIES = host-pkgconf ncurses
 
