@@ -45,7 +45,7 @@ define SQLITE_CONFIGURE_CMDS
 		--host="$(GNU_TARGET_NAME)" \
 		--build="$(GNU_HOST_NAME)" \
 		--sysroot="$(STAGING_DIR)" \
-		$(SQLITE_CONF_OPT) \
+		$(SQLITE_CONF_OPTS) \
 	)
 endef
 
