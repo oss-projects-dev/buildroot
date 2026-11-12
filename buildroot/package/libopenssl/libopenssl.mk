@@ -8,6 +8,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #############################################################
 
 LIBOPENSSL_VERSION = 1.1.1w
+LIBOPENSSL_SOURCE = openssl-$(LIBOPENSSL_VERSION).tar.gz
 LIBOPENSSL_SITE = https://www.openssl.org/source
 LIBOPENSSL_CUSTOM_PATCH_DIR = astlinux
 LIBOPENSSL_INSTALL_STAGING = YES
