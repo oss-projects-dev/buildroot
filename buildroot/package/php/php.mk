@@ -30,8 +30,8 @@ endef
 
 define PHP_TIMEZONEDB_EXTRACT
 	mkdir -p $(@D)/timezonedb
-	$(INFLATE$(suffix $(PHP_TIMEZONEDB_SOURCE))) $(DL_DIR)/$(PHP_TIMEZONEDB_SOURCE) | \
-	$(TAR) $(TAR_STRIP_COMPONENTS)=1 -C $(@D)/timezonedb $(TAR_OPTIONS) -
+	$(call suitable-extractor,$(PHP_TIMEZONEDB_SOURCE)) $(PHP_DL_DIR)/$(PHP_TIMEZONEDB_SOURCE) | \
+	$(TAR) --strip-components=1 -C $(@D)/timezonedb $(TAR_OPTIONS) -
 	cp $(@D)/timezonedb/timezonedb.h $(@D)/ext/date/lib/timezonedb.h
 endef
 PHP_POST_EXTRACT_HOOKS += PHP_TIMEZONEDB_EXTRACT
@@ -103,7 +103,7 @@ PHP_DEPENDENCIES += openssl
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_CURL),y)
-PHP_CONF_OPTS += --with-curl=$(STAGING_DIR)/usr
+PHP_CONF_OPTS += --with-curl
 PHP_DEPENDENCIES += libcurl
 endif
 
