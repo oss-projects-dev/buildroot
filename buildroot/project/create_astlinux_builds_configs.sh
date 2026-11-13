@@ -47,6 +47,7 @@ sed -e "s@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g" -i ${build_dir}/.config #
 sed -e "s@BR2_ENABLE_LOCALE_WHITELIST=\"\"@BR2_ENABLE_LOCALE_WHITELIST=\"C en_US\"@g" -i ${build_dir}/.config
 if grep -Fq "BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=" ${build_dir}/.config; then
   sed -e '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=/s/.*/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https:\/\/www.kernel.org\/pub\/linux\/kernel\/projects\/cip\/6.12\/linux-cip-6.12.114-cip34.tar.xz"/' -i ${build_dir}/.config
+  sed -s '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION/a BR2_LINUX_KERNEL_NEEDS_HOST_LIBELF=y' -i ${build_dir}/.config #libelf is required in linux-6.12
 fi
 if [[ $build_name == astlinux* ]]; then
   sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV=y@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y@g' -i ${build_dir}/.config
