@@ -73,14 +73,22 @@ gen_changelog()
 }
 
 target="$1"
+target_output_dir="$(dirname $target)"
+target_output_base_dir="$(dirname $target_output_dir)"
 
-base="${target%/output/target}"
+base="$2"
 
-if [ ! -f "$base/astlinux.board" ]; then
-  echo "genx86_64" > "$base/astlinux.board"
+echo "target                 : $target"
+echo "target_output_dir      : $target_output_dir"
+echo "target_output_base_dir : $target_output_base_dir"
+
+echo "base                   : $base"
+
+if [ ! -f "$target_output_base_dir/astlinux.board" ]; then
+  echo "genx86_64" > "$target_output_base_dir/astlinux.board"
 fi
 
-board="$(cat "$base/astlinux.board")"
+board="$(cat "$target_output_base_dir/astlinux.board")"
 
 if [ -z "$board" ] || [ ! -d "$base/project/astlinux/board/$board" ]; then
   exit_error "Unknown Board type."
@@ -95,7 +103,13 @@ echo ${ASTVER} > "$target/etc/astlinux-release"
 gen_os_release "$ASTVER" "$board" > "$target/etc/os-release"
 
 mkdir -p "$target/stat/etc/docs"
-gen_changelog "$ASTVER" "$base/docs/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
+gen_changelog "$ASTVER" "$base/project/astlinux/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
+
+
+# cleanup
+rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
+rmdir --ignore-fail-on-non-empty $target/usr/share/bash-completion/completions
+rmdir --ignore-fail-on-non-empty $target/usr/share/bash-completion
 
 exit 0
 
