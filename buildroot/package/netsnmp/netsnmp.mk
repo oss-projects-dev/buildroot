@@ -64,7 +64,7 @@ ifeq ($(BR2_PACKAGE_PCIUTILS),y)
 endif
 
 # Remove IPv6 MIBs if there's no IPv6
-ifneq ($(BR2_INET_IPV6),y)
+ifneq ($(BR2_TOOLCHAIN_EXTERNAL_CUSTOM),y) #BR2_INET_IPV6
 define NETSNMP_REMOVE_MIBS_IPV6
 	rm -f $(TARGET_DIR)/usr/share/snmp/mibs/IPV6*
 endef
