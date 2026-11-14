@@ -1,0 +1,32 @@
+From d932d9fbc8b3559829a76fffcedceb78d1fc1887 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Urs=20F=C3=A4ssler?= <urs.fassler@iqilio.ch>
+Date: Tue, 6 Aug 2024 09:48:49 +0200
+Subject: [PATCH] fix missing spantype file from dahdi-tools
+
+---
+ drivers/dahdi/dahdi-sysfs.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dahdi/dahdi-sysfs.c b/drivers/dahdi/dahdi-sysfs.c
+index afcd3dca..7477ebc9 100644
+--- a/drivers/dahdi/dahdi-sysfs.c
++++ b/drivers/dahdi/dahdi-sysfs.c
+@@ -704,8 +704,16 @@ static DEVICE_ATTR_RO(location);
+ static DEVICE_ATTR_WO(auto_assign);
+ static DEVICE_ATTR_WO(assign_span);
+ static DEVICE_ATTR_WO(unassign_span);
+-static DEVICE_ATTR_RW(dahdi_spantype);
+-static DEVICE_ATTR_RO(dahdi_registration_time);
++static struct device_attribute dev_attr_dahdi_spantype = {
++	.attr   = { .name = "spantype", .mode = 0644 },
++	.show   = dahdi_spantype_show,
++	.store  = dahdi_spantype_store,
++};
++static struct device_attribute dev_attr_dahdi_registration_time = {
++	.attr   = { .name = "registration_time", .mode = 0444 },
++	.show   = dahdi_registration_time_show,
++	.store  = NULL,
++};
+ static struct attribute *dahdi_device_attrs[] = {
+ 	&dev_attr_manufacturer.attr,
+ 	&dev_attr_type.attr,

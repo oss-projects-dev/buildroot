@@ -7,7 +7,7 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #
 ################################################################################
 
-DAHDI_TOOLS_VERSION = 3.2.0
+DAHDI_TOOLS_VERSION = 3.4.0
 DAHDI_TOOLS_SITE = http://downloads.asterisk.org/pub/telephony/dahdi-tools/releases
 DAHDI_TOOLS_CUSTOM_PATCH_DIR = astlinux
 
