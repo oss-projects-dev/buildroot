@@ -24,7 +24,7 @@ FLEX_POST_PATCH_HOOKS += FLEX_DISABLE_PROGRAM
 
 # flex++ symlink is broken when flex binary is not installed
 define FLEX_REMOVE_BROKEN_SYMLINK
-	rm -f $(TARGET_DIR)/usr/bin/flex++
+	rm -f $(TARGET_DIR)/usr/bin/flex++ $(TARGET_DIR)/usr/bin/flex
 endef
 FLEX_POST_INSTALL_TARGET_HOOKS += FLEX_REMOVE_BROKEN_SYMLINK
 
