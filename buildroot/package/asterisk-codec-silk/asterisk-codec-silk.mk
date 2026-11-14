@@ -14,36 +14,49 @@ ASTERISK_CODEC_SILK_SITE := https://downloads.digium.com/pub/telephony/codec_sil
 ASTERISK_CODEC_SILK_CUSTOM_PATCH_DIR = astlinux
 endif
 ASTERISK_CODEC_SILK_SOURCE := codec_silk-$(ASTERISK_CODEC_SILK_VERSION).tar.gz
-ASTERISK_CODEC_SILK_DIR := $(BUILD_DIR)/codec_silk-$(ASTERISK_CODEC_SILK_VERSION)
+ASTERISK_CODEC_SILK_DIR := $(@D)
 ASTERISK_CODEC_SILK_BINARY := usr/lib/asterisk/modules/codec_silk.so
 
-$(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE):
-ifeq ($(ASTERISK_CODEC_SILK_VERSION),)
-	@echo "Asterisk SILK CODEC not supported with the selected version of Asterisk"
-	@exit 1
-endif
-	$(WGET) -P $(DL_DIR) $(ASTERISK_CODEC_SILK_SITE)/$(ASTERISK_CODEC_SILK_SOURCE)
+#$(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE):
+#ifeq ($(ASTERISK_CODEC_SILK_VERSION),)
+#	@echo "Asterisk SILK CODEC not supported with the selected version of Asterisk"
+#	@exit 1
+#endif
+#	$(WGET) -P $(DL_DIR) $(ASTERISK_CODEC_SILK_SITE)/$(ASTERISK_CODEC_SILK_SOURCE)
 
-$(ASTERISK_CODEC_SILK_DIR)/.source: $(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE)
-	zcat $(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
-	touch $@
+#$(ASTERISK_CODEC_SILK_DIR)/.source: $(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE)
+#	zcat $(DL_DIR)/$(ASTERISK_CODEC_SILK_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
+#	touch $@
 
-$(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY): $(ASTERISK_CODEC_SILK_DIR)/.source | asterisk
+ASTERISK_CODEC_SILK_DEPENDENCIES += asterisk
+
+define ASTERISK_CODEC_SILK_CONFIGURE_CMDS
+	echo "No configure"
+endef
+
+define ASTERISK_CODEC_SILK_BUILD_CMDS
+	echo "No build"
+endef
+
+define ASTERISK_CODEC_SILK_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(ASTERISK_CODEC_SILK_DIR)/codec_silk.so $(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY)
+endef
 
-asterisk-codec-silk: $(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY)
+#asterisk-codec-silk: $(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY)
 
-asterisk-codec-silk-clean:
-	rm -f $(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY)
+#asterisk-codec-silk-clean:
+#	rm -f $(TARGET_DIR)/$(ASTERISK_CODEC_SILK_BINARY)
 
-asterisk-codec-silk-dirclean:
-	rm -rf $(ASTERISK_CODEC_SILK_DIR)
+#asterisk-codec-silk-dirclean:
+#	rm -rf $(ASTERISK_CODEC_SILK_DIR)
 
 #############################################################
 #
 # Toplevel Makefile options
 #
 #############################################################
-ifeq ($(strip $(BR2_PACKAGE_ASTERISK_CODEC_SILK)),y)
-TARGETS+=asterisk-codec-silk
-endif
+#ifeq ($(strip $(BR2_PACKAGE_ASTERISK_CODEC_SILK)),y)
+#TARGETS+=asterisk-codec-silk
+#endif
+
+$(eval $(generic-package))
