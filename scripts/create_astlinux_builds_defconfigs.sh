@@ -29,7 +29,7 @@ script_dir=$(get_script_dir)
 script_base_dir=$(dirname $script_dir)
 
 BUILDROOT_DIR=$script_base_dir
-BUILDS_DIR=$HOME/astlinux-builds-defconfigs
+BUILDS_DIR=$BUILDROOT_DIR/output-builds/astlinux-builds-defconfigs
 
 rm -rf $BUILDS_DIR
 

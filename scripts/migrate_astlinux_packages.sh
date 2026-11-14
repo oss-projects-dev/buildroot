@@ -29,6 +29,8 @@ script_base_dir=$(dirname $script_dir)
 
 BUILDROOT_DIR=$script_base_dir
 
+mkdir -p $BUILDROOT_DIR/output-files
+
 cd $BUILDROOT_DIR/output-files
 
 # notes AstLinux pulled on 2026-11-07
@@ -441,6 +443,16 @@ process package wireguard-tools
 process package zabbix              
 process package zlib                libzlib
 process package zoneinfo            
+
+mkdir -p $MERGE_FOLDER/docs
+cp -a $ASTVER/docs/ChangeLog.txt $MERGE_FOLDER/docs/
+
+mkdir -p $MERGE_FOLDER/project/configs-astlinux
+cp -a $ASTVER/runnix* $MERGE_FOLDER/
+cp -a $ASTVER/x86_64-configs $MERGE_FOLDER/
+cp -a $ASTVER/runnix* $MERGE_FOLDER/project/configs-astlinux/
+cp -a $ASTVER/x86_64-configs $MERGE_FOLDER/project/configs-astlinux/
+
 
 # disable all packages where they are part of toolchain build
 # autoconf, automake, binutils, bison, gawk, gcc, glibc, gmp, isl, libtool, linux, m4, mpc, mpfr, patchef
