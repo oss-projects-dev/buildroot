@@ -58,7 +58,7 @@ LIBCURL_CONF_ENV += \
 
 define LIBCURL_TARGET_CLEANUP
 	rm -rf $(TARGET_DIR)/usr/bin/curl-config \
-	       $(if $(BR2_PACKAGE_CURL),,$(TARGET_DIR)/usr/bin/curl)
+	       $(if $(BR2_PACKAGE_LIBCURL_CURL),,$(TARGET_DIR)/usr/bin/curl)
 endef
 LIBCURL_POST_INSTALL_TARGET_HOOKS += LIBCURL_TARGET_CLEANUP
 
