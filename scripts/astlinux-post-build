@@ -103,7 +103,7 @@ echo ${ASTVER} > "$target/etc/astlinux-release"
 gen_os_release "$ASTVER" "$board" > "$target/etc/os-release"
 
 mkdir -p "$target/stat/etc/docs"
-gen_changelog "$ASTVER" "$base/project/astlinux/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
+gen_changelog "$ASTVER" "$base/docs/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
 
 
 # cleanup
