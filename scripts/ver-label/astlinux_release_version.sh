@@ -22,3 +22,5 @@ astlinux_release_version()
   fi
 }
 
+astlinux_release_version
+echo $ASTVER
