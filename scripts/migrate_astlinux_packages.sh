@@ -229,6 +229,9 @@ fi
   # rename BR2_NEEDS_GETTEXT_IF_LOCALE to $(TARGET_NLS_DEPENDENCIES) 
   sed -e 's@BR2_NEEDS_GETTEXT@BR2_NEEDS_GETTEXT_IF_LOCALE@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
+  # rename BR2_INET_IPV6 to BR2_TOOLCHAIN
+  sed -e 's@BR2_INET_IPV6@BR2_TOOLCHAIN@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  
   # removal of BR2_LARGFILE
   sed -e 's@depends on !(BR2_LARGEFILE && BR2_USE_WCHAR)@depends on !BR2_USE_WCHAR@g' \
 	  -e 's@depends on !BR2_LARGEFILE || !BR2_USE_WCHAR@depends on !BR2_USE_WCHAR@g' \
@@ -490,7 +493,7 @@ sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i
 sed -e 's@IPTABLES_TARGET_INSTALL@IPTABLES_TARGET_INSTALL_INIT@g' -i $MERGE_FOLDER/package/iptables/iptables.mk
 
 # libcurl
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in $MERGE_FOLDER/package/libcurl/libcurl.mk
 
 # libusb
 sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV@BR2_PACKAGE_HAS_UDEV@g' -i $MERGE_FOLDER/package/libusb/libusb.mk
