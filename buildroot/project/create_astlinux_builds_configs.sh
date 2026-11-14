@@ -40,14 +40,17 @@ build_name=${build_name//.config/}
 local build_dir=$BUILDS_DIR/output-${build_name}
 mkdir -p $build_dir
 make -C $BUILDROOT_DIR O=$build_dir pc_x86_64_bios_defconfig
-cp -av $build_file ${build_dir}/.config
+cp -av $build_file ${build_dir}/.config.orig
+( cd $build_dir && cp -a .config.orig .config && make olddefconfig && cp -a .config .config.orig.generated && cp -a .config.orig .config )
 echo "BR2_BUILD_USE_CUSTOM_SCRIPTS=y" >> ${build_dir}/.config                  # add Custom Scripts Use before itself so existing parameters are not lost
 echo "BR2_BUILD_USE_ASTLINUX_SCRIPTS=y" >> ${build_dir}/.config                # add Custom Scripts Use before itself so existing parameters are not lost
 sed -e "s@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g" -i ${build_dir}/.config # BR2_PACKAGE_CURL is renamed to BR2_PACKAGE_LIBCURL_CURL
 sed -e "s@BR2_ENABLE_LOCALE_WHITELIST=\"\"@BR2_ENABLE_LOCALE_WHITELIST=\"C en_US\"@g" -i ${build_dir}/.config
+sed -e "s@astlinux/x-tools-1.25.0-5.10-2.31/x86_64-unknown-linux-gnu@x86_64-buildroot-linux-gnu_sdk-buildroot-13.5.0@g" -i ${build_dir}/.config # change the toolchain
+sed -e "s@x86_64-unknown-linux-gnu@x86_64-buildroot-linux-gnu@g"                                                        -i ${build_dir}/.config # change the toolchain
 if grep -Fq "BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=" ${build_dir}/.config; then
   sed -e '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=/s/.*/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https:\/\/www.kernel.org\/pub\/linux\/kernel\/projects\/cip\/6.12\/linux-cip-6.12.114-cip34.tar.xz"/' -i ${build_dir}/.config
-  sed -s '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION/a BR2_LINUX_KERNEL_NEEDS_HOST_LIBELF=y' -i ${build_dir}/.config #libelf is required in linux-6.12
+  sed -e '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION/a BR2_LINUX_KERNEL_NEEDS_HOST_LIBELF=y' -i ${build_dir}/.config #libelf is required in linux-6.12
 fi
 if [[ $build_name == astlinux* ]]; then
   sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV=y@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y@g' -i ${build_dir}/.config
@@ -66,13 +69,15 @@ echo "# BR2_PACKAGE_URANDOM_SCRIPTS is not set" >> ${build_dir}/.config
 (
   cd $build_dir
   make olddefconfig
+  if [[ $build_name == astlinux* ]]; then
+    sed -e "s@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\"@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\$(TOPDIR)\"@g" -i .config
+    sed -e "s@BR2_TARGET_ROOTFS_EXT2_SIZE=\"60M\"@BR2_TARGET_ROOTFS_EXT2_SIZE=\"185M\"@g" -i .config
+  fi
   cp -av .config .config-before-script-changes
   make savedefconfig
   sed -e "/^BR2_WGET=/d"                                                                                                  -i defconfig # remove the existing WGET parameters
   sed -e "/^BR2_SVN=/d"                                                                                                   -i defconfig # remove the existing SVN parameters
   sed -e "/^BR2_GNU_MIRROR=/d"                                                                                            -i defconfig # remove the existing BR2_GNU_MIRROR parameters
-  sed -e "s@astlinux/x-tools-1.25.0-5.10-2.31/x86_64-unknown-linux-gnu@x86_64-buildroot-linux-gnu_sdk-buildroot-13.5.0@g" -i defconfig # change the toolchain
-  sed -e "s@x86_64-unknown-linux-gnu@x86_64-buildroot-linux-gnu@g"                                                        -i defconfig # change the toolchain
   sed -e '/BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX/a BR2_TOOLCHAIN_EXTERNAL_GCC_13=y\nBR2_TOOLCHAIN_EXTERNAL_HEADERS_6_12=y' -i defconfig
   sed -e '/BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC/a # BR2_TOOLCHAIN_EXTERNAL_INET_RPC is not set'                            -i defconfig
   sed -e '/BR2_TOOLCHAIN_EXTERNAL_CXX/a BR2_TOOLCHAIN_EXTERNAL_FORTRAN=y\nBR2_TOOLCHAIN_EXTERNAL_OPENMP=y'                -i defconfig
@@ -82,6 +87,7 @@ echo "# BR2_PACKAGE_URANDOM_SCRIPTS is not set" >> ${build_dir}/.config
   make saveconfig
 )
 echo "( cd ${build_dir} && make saveconfig )" >> $BUILDS_DIR/backup_configs.sh
+echo "( cd ${build_dir} && make clean )" >> $BUILDS_DIR/clean_builds.sh
 }
 
 create_build $BUILDROOT_DIR/project/configs-astlinux/runnix.config
@@ -90,4 +96,4 @@ create_build $BUILDROOT_DIR/project/configs-astlinux/x86_64-configs/initrd.confi
 create_build $BUILDROOT_DIR/project/configs-astlinux/x86_64-configs/astlinux-ast18se.config
 create_build $BUILDROOT_DIR/project/configs-astlinux/x86_64-configs/astlinux-ast20.config
 
-chmod +x $BUILDS_DIR/backup_configs.sh
+chmod +x $BUILDS_DIR/*.sh
