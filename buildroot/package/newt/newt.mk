@@ -7,20 +7,20 @@ ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
 #
 #############################################################
 NEWT_SOURCE=newt-0.51.0.tar.bz2
-NEWT_CAT:=$(BZCAT)
-NEWT_SITE=http://www.uclibc.org/
-NEWT_DIR=$(BUILD_DIR)/newt-0.51.0
+#NEWT_CAT:=$(BZCAT)
+NEWT_SITE=http://www.uclibc.org
+NEWT_DIR=$(@D)
 NEWT_VERSION=0.51.0
 NEWT_CFLAGS=-Os -g -fPIC
 
-$(DL_DIR)/$(NEWT_SOURCE):
-	$(call DOWNLOAD,$(NEWT_SITE),$(NEWT_SOURCE))
+#$(DL_DIR)/$(NEWT_SOURCE):
+#	$(call DOWNLOAD,$(NEWT_SITE),$(NEWT_SOURCE))
 
-$(NEWT_DIR)/.source: $(DL_DIR)/$(NEWT_SOURCE)
-	$(NEWT_CAT) $(DL_DIR)/$(NEWT_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
-	touch $(NEWT_DIR)/.source
+#$(NEWT_DIR)/.source: $(DL_DIR)/$(NEWT_SOURCE)
+#	$(NEWT_CAT) $(DL_DIR)/$(NEWT_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
+#	touch $(NEWT_DIR)/.source
 
-$(NEWT_DIR)/.configured: $(NEWT_DIR)/.source
+define NEWT_CONFIGURE_CMDS
 	(cd $(NEWT_DIR); rm -rf config.cache; \
 		$(TARGET_CONFIGURE_OPTS) \
 		$(TARGET_CONFIGURE_ARGS) \
@@ -42,44 +42,47 @@ $(NEWT_DIR)/.configured: $(NEWT_DIR)/.source
 		--infodir=/usr/info \
 		$(DISABLE_NLS) \
 	)
-	touch $(NEWT_DIR)/.configured
+endef
 
-$(NEWT_DIR)/libnewt.so.$(NEWT_VERSION): $(NEWT_DIR)/.configured
+define NEWT_BUILD_CMDS
 	$(MAKE) CFLAGS="$(TARGET_CFLAGS) $(NEWT_CFLAGS)" CC="$(TARGET_CC)" -C $(NEWT_DIR)
-	touch -c $@
+endef
 
-$(STAGING_DIR)/usr/lib/libnewt.a: $(NEWT_DIR)/libnewt.so.$(NEWT_VERSION)
+define NEWT_INSTALL_STAGING_CMDS
 	cp -a $(NEWT_DIR)/libnewt.a $(STAGING_DIR)/usr/lib/
 	cp -a $(NEWT_DIR)/newt.h $(STAGING_DIR)/usr/include/
 	cp -a $(NEWT_DIR)/libnewt.so* $(STAGING_DIR)/usr/lib/
 	(cd $(STAGING_DIR)/usr/lib; ln -fs libnewt.so.$(NEWT_VERSION) libnewt.so)
 	(cd $(STAGING_DIR)/usr/lib; ln -fs libnewt.so.$(NEWT_VERSION) libnewt.so.0.51)
-	touch -c $@
+endef
 
-$(TARGET_DIR)/usr/lib/libnewt.so.$(NEWT_VERSION): $(STAGING_DIR)/usr/lib/libnewt.a
+define NEWT_INSTALL_TARGET_CMDS
+	$(NEWT_INSTALL_STAGING_CMDS)
 	cp -a $(STAGING_DIR)/usr/lib/libnewt.so* $(TARGET_DIR)/usr/lib/
 	-$(STRIPCMD) $(STRIP_STRIP_UNNEEDED) $(TARGET_DIR)/usr/lib/libnewt.so*
-	touch -c $@
+endef
 
-newt: slang $(TARGET_DIR)/usr/lib/libnewt.so.$(NEWT_VERSION)
+NEWT_DEPENDENCIES += slang
 
-newt-source: $(DL_DIR)/$(NEWT_SOURCE)
+#newt-source: $(DL_DIR)/$(NEWT_SOURCE)
 
-newt-clean:
-	rm -f $(TARGET_DIR)/usr/lib/libnewt.so*
-	-$(MAKE) -C $(NEWT_DIR) clean
+#newt-clean:
+#	rm -f $(TARGET_DIR)/usr/lib/libnewt.so*
+#	-$(MAKE) -C $(NEWT_DIR) clean
 
-newt-dirclean: slang-dirclean
-	rm -rf $(NEWT_DIR)
+#newt-dirclean: slang-dirclean
+#	rm -rf $(NEWT_DIR)
 
 #############################################################
 #
 # Toplevel Makefile options
 #
 #############################################################
-ifeq ($(BR2_PACKAGE_NEWT),y)
-TARGETS+=newt
-endif
+#ifeq ($(BR2_PACKAGE_NEWT),y)
+#TARGETS+=newt
+#endif
+
+$(eval $(generic-package))
 
 endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
