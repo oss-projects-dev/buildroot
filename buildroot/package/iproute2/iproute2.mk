@@ -53,6 +53,13 @@ define IPROUTE2_INSTALL_TARGET_CMDS
 	rm -f $(TARGET_DIR)/sbin/routel
 endef
 
+define IPROUTE2_REMOVE_BASH_COMPLETION_SCRIPTS
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/devlink
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/tc
+endef
+
+IPROUTE2_POST_INSTALL_TARGET_HOOKS += IPROUTE2_REMOVE_BASH_COMPLETION_SCRIPTS
+
 define IPROUTE2_UNINSTALL_TARGET_CMDS
 	rm -rf $(TARGET_DIR)/usr/lib/tc
 	rm -rf $(TARGET_DIR)/etc/iproute2
