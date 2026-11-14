@@ -60,6 +60,15 @@ endef
 
 HOST_KMOD_POST_INSTALL_HOOKS += HOST_KMOD_INSTALL_TOOLS
 
+define KMOD_REMOVE_BASH_COMPLETION_SCRIPTS
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/insmod
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/kmod
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/lsmod
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/rmmod
+endef
+
+KMOD_POST_INSTALL_TARGET_HOOKS += KMOD_REMOVE_BASH_COMPLETION_SCRIPTS
+
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 
