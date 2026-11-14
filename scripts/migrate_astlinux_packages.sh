@@ -29,13 +29,15 @@ script_base_dir=$(dirname $script_dir)
 
 BUILDROOT_DIR=$script_base_dir
 
-mkdir -p $BUILDROOT_DIR/output-files
-
-cd $BUILDROOT_DIR/output-files
+BUILDROOT_FILES_DIR=$BUILDROOT_DIR/output-files
+BUILDROOT_FILES_EXTRACT_DIR=$HOME/output-files
 
 # notes AstLinux pulled on 2026-11-07
 ASTVER=astlinux-338e17c4efd61b63fbecb66d3132a32e68440d83
 BUILDROOTVER=buildroot-2025.02.19
+
+MERGE_FOLDER=m-buildroot-merge-${BUILDROOTVER//buildroot-/}-${ASTVER//astlinux-/}
+BASE_BUILDROOT_FOLDER=m-buildroot-orig-${BUILDROOTVER//buildroot-/}-${ASTVER//astlinux-/}
 
 # --- start of check_and_download_file function
 
@@ -82,45 +84,39 @@ pkg_rename_name_upper=${pkg_rename_name_upper//-/_}
 
 mkdir -p $MERGE_FOLDER/$dir_name/$pkg_rename_name
 
-echo "copying $ASTVER/$dir_name/$pkg_src_dir to $MERGE_FOLDER/$dir_name/$pkg_rename_name"
-cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
+echo "copying $ASTVER/$dir_name/$pkg_src_dir to $MERGE_FOLDER/$dir_name/$pkg_rename_name/$custom_folder_name"
+mkdir -p $MERGE_FOLDER/$dir_name/$pkg_rename_name/$custom_folder_name
+cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/$custom_folder_name/
 
 ( 
-  cd $MERGE_FOLDER/$dir_name/$pkg_rename_name;
+  cd $MERGE_FOLDER/$dir_name/$pkg_rename_name/$custom_folder_name;
   if [[ "$pkg_name" != "$pkg_rename_name" ]]; then
     mv ${pkg_name}.mk ${pkg_rename_name}.mk
-	sed -e "s@${pkg_name_upper}@${pkg_rename_name_upper}@g" -e "s@\"$pkg_name\"@\"$pkg_rename_name\"@g" -i *.in *.ext *.mk
+    sed -e "s@${pkg_name_upper}@${pkg_rename_name_upper}@g" -e "s@\"$pkg_name\"@\"$pkg_rename_name\"@g" -i *.in *.ext *.mk
   fi
   
-  mkdir $custom_folder_name
-  #if compgen -G "*.patch" > /dev/null; then
-  #  mv *.patch custom/
-  #fi  
-  mv * $custom_folder_name/
-  touch $custom_folder_name/.gitkeep
+  touch .gitkeep
 
   # below changes have to be done for all files before merging with buildroot files so both are separate
   # add custom-patch-dir
   sed -e "/${pkg_rename_name_upper}_SITE /a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
       -e "/${pkg_rename_name_upper}_SITE:=/a ${pkg_rename_name_upper}_CUSTOM_PATCH_DIR = $custom_folder_name" \
-      -i $custom_folder_name/*.mk
+      -i *.mk
   # change default package path for files to custom_folder_name  
   if [[ "$pkg_src_dir" != "$pkg_name" ]]; then
     sed -e "s@$dir_name/$pkg_src_dir@$dir_name/$pkg_name@g" \
-	    -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+	    -i *.in *.ext *.mk
   fi
   if [[ "$pkg_name" != "$pkg_rename_name" ]]; then
     sed -e "s@$dir_name/$pkg_name@$dir_name/$pkg_rename_name@g" \
-	    -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+	    -i *.in *.ext *.mk
   fi
     
   sed -e "s@$dir_name/$pkg_rename_name@$dir_name/$pkg_rename_name/$custom_folder_name@g" \
-	  -i $custom_folder_name/*.in $custom_folder_name/*.ext $custom_folder_name/*.mk
+	  -i *.in *.ext *.mk
 )
 
 if [ -d $BUILDROOTVER/$dir_name/$pkg_rename_name ]; then
-  cp -a $BUILDROOTVER/$dir_name/$pkg_rename_name/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
-
   if [ -f $MERGE_FOLDER/$dir_name/$pkg_rename_name/Config.in ]; then
 cat << 'EOF' > $MERGE_FOLDER/$dir_name/$pkg_rename_name/Config.in.temp
 if BR2_BUILD_USE_CUSTOM_SCRIPTS
@@ -242,21 +238,23 @@ fi
 
 # ---- end of process function
 
-check_and_download_file https://github.com/astlinux-project/astlinux/archive/${ASTVER//astlinux-/}.tar.gz ${ASTVER}.tar.gz
+mkdir -p $BUILDROOT_FILES_DIR
+check_and_download_file https://github.com/astlinux-project/astlinux/archive/${ASTVER//astlinux-/}.tar.gz $BUILDROOT_FILES_DIR/${ASTVER}.tar.gz
+check_and_download_file https://buildroot.org/downloads/${BUILDROOTVER}.tar.gz $BUILDROOT_FILES_DIR/${BUILDROOTVER}.tar.gz
 
-check_and_download_file https://buildroot.org/downloads/${BUILDROOTVER}.tar.gz ${BUILDROOTVER}.tar.gz
+mkdir -p $BUILDROOT_FILES_EXTRACT_DIR
+cd $BUILDROOT_FILES_EXTRACT_DIR
+
+echo "Extract Dir : $BUILDROOT_FILES_EXTRACT_DIR"
 
 if [ ! -d ${ASTVER} ]; then
-  echo "extracting ${ASTVER}.tar.gz ..."
-  tar -xf ${ASTVER}.tar.gz || exit 1
+  echo "extracting $BUILDROOT_FILES_DIR/${ASTVER}.tar.gz ..."
+  tar -xf $BUILDROOT_FILES_DIR/${ASTVER}.tar.gz || exit 1
 fi
 if [ ! -d ${BUILDROOTVER} ]; then
-  echo "extracting ${BUILDROOTVER}.tar.gz ..."
-  tar -xf ${BUILDROOTVER}.tar.gz || exit 1
+  echo "extracting $BUILDROOT_FILES_DIR/${BUILDROOTVER}.tar.gz ..."
+  tar -xf $BUILDROOT_FILES_DIR/${BUILDROOTVER}.tar.gz || exit 1
 fi
-
-MERGE_FOLDER=m-buildroot-merge-${ASTVER//astlinux-/}-${BUILDROOTVER//buildroot-/}
-BASE_BUILDROOT_FOLDER=m-buildroot-orig-${ASTVER//astlinux-/}-${BUILDROOTVER//buildroot-/}
 
 #rm -rf $ASTVER
 #rm -rf $BUILDROOTVER
@@ -266,7 +264,9 @@ rm -rf $MERGE_FOLDER $BASE_BUILDROOT_FOLDER
 
 custom_folder_name=astlinux
 
-mkdir -p $MERGE_FOLDER
+# use buildroot as baseline folder
+cp -a $BUILDROOTVER $MERGE_FOLDER
+cp -a $BUILDROOTVER $BASE_BUILDROOT_FOLDER
 
 cp -a ${ASTVER}/project $MERGE_FOLDER/
 cp -a ${ASTVER}/scripts $MERGE_FOLDER/
