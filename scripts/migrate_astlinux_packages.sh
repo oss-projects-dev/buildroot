@@ -188,55 +188,69 @@ fi
   cp -a $MERGE_FOLDER/$dir_name/$pkg_rename_name/* $BASE_BUILDROOT_FOLDER/$dir_name/$pkg_rename_name/
 
   # rename (HOST_DIR)/usr to (HOST_DIR)
-  sed -e 's@(HOST_DIR)/usr@(HOST_DIR)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@(HOST_DIR)/usr@(HOST_DIR)@g'                                          -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename GENTARGETS to generic-package
-  sed -e '/GENTARGETS,boot,.*,host)).*$/c\$(eval $(host-generic-package))'     -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
-  sed -e '/GENTARGETS,package,.*,host)).*$/c\$(eval $(host-generic-package))'  -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/GENTARGETS,boot,.*,host)).*$/c\$(eval $(host-generic-package))'        -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/GENTARGETS,package,.*,host)).*$/c\$(eval $(host-generic-package))'     -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
-  sed -e '/GENTARGETS,boot/c\$(eval $(generic-package))'     -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
-  sed -e '/GENTARGETS,package/c\$(eval $(generic-package))'  -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/GENTARGETS,boot/c\$(eval $(generic-package))'                          -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/GENTARGETS,package/c\$(eval $(generic-package))'                       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename AUTOTARGETS to autotools-package
   sed -e '/AUTOTARGETS,boot,.*,host)).*$/c\$(eval $(host-autotools-package))'     -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
   sed -e '/AUTOTARGETS,package,.*,host)).*$/c\$(eval $(host-autotools-package))'  -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
-  sed -e '/AUTOTARGETS,boot/c\$(eval $(autotools-package))'     -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
-  sed -e '/AUTOTARGETS,package/c\$(eval $(autotools-package))'  -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/AUTOTARGETS,boot/c\$(eval $(autotools-package))'                       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e '/AUTOTARGETS,package/c\$(eval $(autotools-package))'                    -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename host-pkg-config to host-pkgconf
-  sed -e 's@host-pkg-config@host-pkgconf@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@host-pkg-config@host-pkgconf@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename BR2_PREFER_STATIC_LIB to BR2_STATIC_LIBS
-  sed -e 's@BR2_PREFER_STATIC_LIB@BR2_STATIC_LIBS@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in
-  sed -e 's@BR2_PREFER_STATIC_LIB@BR2_STATIC_LIBS@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@BR2_PREFER_STATIC_LIB@BR2_STATIC_LIBS@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename _OPT to _OPTS - there will be false positives?
-  sed -e 's@_OPT @_OPTS @g' -e 's@_OPT)@_OPTS)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@_OPT @_OPTS @g' -e 's@_OPT)@_OPTS)@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename LINUX_VERSION_PROBED to LINUX_VERSION - looks like this is supported?
   #sed -e 's@LINUX_VERSION_PROBED@LINUX_VERSION@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename KERNEL_ARCH to NORMALIZED_ARCH
-  sed -e 's@KERNEL_ARCH@NORMALIZED_ARCH@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@KERNEL_ARCH@NORMALIZED_ARCH@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) to $(TARGET_NLS_DEPENDENCIES) 
-  sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext)@$(TARGET_NLS_DEPENDENCIES)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext)@$(TARGET_NLS_DEPENDENCIES)@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl) to LIBS=$(TARGET_NLS_LIBS) 
-  sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)@LIBS=$(TARGET_NLS_LIBS)@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)@LIBS=$(TARGET_NLS_LIBS)@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename BR2_NEEDS_GETTEXT_IF_LOCALE to $(TARGET_NLS_DEPENDENCIES) 
-  sed -e 's@BR2_NEEDS_GETTEXT@BR2_NEEDS_GETTEXT_IF_LOCALE@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@BR2_NEEDS_GETTEXT$@BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
+      -e 's@BR2_NEEDS_GETTEXT @BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename BR2_INET_IPV6 to BR2_TOOLCHAIN
-  sed -e 's@BR2_INET_IPV6@BR2_TOOLCHAIN@g' -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+  sed -e 's@BR2_INET_IPV6@BR2_TOOLCHAIN@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+
+  # rename BR2_PACKAGE_PYTHON to BR2_PACKAGE_PYTHON3
+  sed -e 's@BR2_PACKAGE_PYTHON$@BR2_PACKAGE_PYTHON3@g' \
+      -e 's@BR2_PACKAGE_PYTHON @BR2_PACKAGE_PYTHON3 @g' \
+      -e 's@BR2_PACKAGE_PYTHON)@BR2_PACKAGE_PYTHON3)@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
   
   # removal of BR2_LARGFILE
   sed -e 's@depends on !(BR2_LARGEFILE && BR2_USE_WCHAR)@depends on !BR2_USE_WCHAR@g' \
-	  -e 's@depends on !BR2_LARGEFILE || !BR2_USE_WCHAR@depends on !BR2_USE_WCHAR@g' \
-	  -e '/BR2_LARGEFILE/d' \
-	  -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in
+      -e 's@depends on !BR2_LARGEFILE || !BR2_USE_WCHAR@depends on !BR2_USE_WCHAR@g' \
+      -e '/BR2_LARGEFILE/d' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 }
 
 # ---- end of process function
@@ -342,8 +356,11 @@ process package kmod
 process package libcap              
 process package libcurl             
 process package libdaemon           
+process package libdnet             
 process package libedit             
+process package libffi              
 process package libfuse             
+process package libglib2            
 process package libical             
 process package libidn              
 process package libmnl              
@@ -394,6 +411,7 @@ process package nut
 process package openldap            
 process package openssh             
 process package openssl             libopenssl
+process package openvmtools         
 process package openvpn             
 process package p910nd              
 process package pciutils            
@@ -402,11 +420,13 @@ process package pcre2
 process package perl                
 process package phoneprov-tools     
 process package php                 
+process package pjsip               
 process package pjsip-ast20         
 #process package pkg-config         - replaced by pkgconf
 process package popt                
 process package pppd                
 process package prosody             
+process package qemu-guest-agent    
 process package r8125               
 process package rsync               
 process package s3fs                
@@ -443,6 +463,7 @@ process package webinterface
 process package whois               
 process package wide-dhcpv6         
 process package wireguard-tools     
+process package xorriso             
 process package zabbix              
 process package zlib                libzlib
 process package zoneinfo            
