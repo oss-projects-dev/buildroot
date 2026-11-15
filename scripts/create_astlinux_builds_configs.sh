@@ -80,7 +80,7 @@ echo "# BR2_PACKAGE_URANDOM_SCRIPTS is not set" >> ${build_dir}/.config
   sed -e "/^BR2_GNU_MIRROR=/d"                                                                                            -i defconfig # remove the existing BR2_GNU_MIRROR parameters
   sed -e '/BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX/a BR2_TOOLCHAIN_EXTERNAL_GCC_13=y\nBR2_TOOLCHAIN_EXTERNAL_HEADERS_6_12=y' -i defconfig
   sed -e '/BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC/a # BR2_TOOLCHAIN_EXTERNAL_INET_RPC is not set'                            -i defconfig
-  sed -e '/BR2_TOOLCHAIN_EXTERNAL_CXX/a BR2_TOOLCHAIN_EXTERNAL_FORTRAN=y\nBR2_TOOLCHAIN_EXTERNAL_OPENMP=y'                -i defconfig
+  sed -e '/BR2_TOOLCHAIN_EXTERNAL_CXX/a BR2_TOOLCHAIN_EXTERNAL_OPENMP=y'                -i defconfig
   cp -av defconfig .config
   make olddefconfig
   sed -e "s#(CONFIG_DIR)/defconfig#(TOPDIR)/configs/pc_x86_64_astlinux_${build_name//-/_}_defconfig#" -i .config
