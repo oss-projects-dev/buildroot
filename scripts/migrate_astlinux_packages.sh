@@ -375,7 +375,6 @@ process package libtool
 process package liburiparser        
 process package libusb              
 process package libusb-compat       
-#process package libxcrypt          
 process package libxml2             
 process package lighttpd            
 process package linux-firmware      
