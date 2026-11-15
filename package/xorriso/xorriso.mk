@@ -1,3 +1,38 @@
+ifeq ($(BR2_BUILD_USE_CUSTOM_SCRIPTS),y)
+ifeq ($(BR2_BUILD_USE_ASTLINUX_SCRIPTS),y)
+
+#############################################################
+#
+# xorriso - HOST-Only
+#
+# Used by: ./scripts/build-runnix-iso
+#
+#############################################################
+
+XORRISO_VERSION = 1.5.4.pl02
+XORRISO_SOURCE = xorriso-$(XORRISO_VERSION).tar.gz
+XORRISO_SITE = https://www.gnu.org/software/xorriso
+XORRISO_CUSTOM_PATCH_DIR = astlinux
+
+# Disable everything until we actually need those features, and add the correct
+# host libraries
+HOST_XORRISO_CONF_OPTS = \
+	--enable-zlib \
+	--disable-xattr-h-pref-attr \
+	--disable-libbz2 \
+	--disable-libcdio \
+	--disable-libreadline \
+	--disable-libedit \
+	--disable-libacl
+
+HOST_XORRISO_DEPENDENCIES = host-zlib
+
+$(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_ASTLINUX_SCRIPTS
+
+else #BR2_BUILD_USE_CUSTOM_SCRIPTS
+
 ################################################################################
 #
 # xorriso
@@ -77,3 +112,5 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+endif #BR2_BUILD_USE_CUSTOM_SCRIPTS
