@@ -12,7 +12,7 @@ OPENLDAP_SOURCE = openldap-$(OPENLDAP_VERSION).tgz
 OPENLDAP_SITE = http://www.openldap.org/software/download/OpenLDAP/openldap-release
 OPENLDAP_CUSTOM_PATCH_DIR = astlinux
 OPENLDAP_INSTALL_STAGING = YES
-OPENLDAP_DEPENDENCIES += openssl
+OPENLDAP_DEPENDENCIES += openssl libxcrypt
 
 OPENLDAP_UNINSTALL_STAGING_OPTS = --version
 
