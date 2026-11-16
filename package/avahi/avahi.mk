@@ -125,17 +125,18 @@ else
 AVAHI_CONF_OPTS += --disable-glib --disable-gobject
 endif
 
-ifeq ($(BR2_PACKAGE_PYTHON),y)
+ifeq ($(BR2_PACKAGE_PYTHON3),y)
+PYTHON3_TARGET_BINARY:usr/bin/python3
 AVAHI_CONF_ENV += \
-	am_cv_pathless_PYTHON=python \
-	am_cv_path_PYTHON=$(PYTHON_TARGET_BINARY) \
-	am_cv_python_version=$(PYTHON_VERSION) \
-	am_cv_python_platform=linux2 \
-	am_cv_python_pythondir=/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages \
-	am_cv_python_pyexecdir=/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages \
+	am_cv_pathless_PYTHON=python3 \
+	am_cv_path_PYTHON=$(PYTHON3_TARGET_BINARY) \
+	am_cv_python_version=$(PYTHON3_VERSION) \
+	am_cv_python_platform=linux5 \
+	am_cv_python_pythondir=/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages \
+	am_cv_python_pyexecdir=/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages \
 	py_cv_mod_socket_=yes
 
-AVAHI_DEPENDENCIES += python
+AVAHI_DEPENDENCIES += python3
 AVAHI_CONF_OPTS += --enable-python
 else
 AVAHI_CONF_OPTS += --disable-python
