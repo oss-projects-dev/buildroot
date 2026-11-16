@@ -4,8 +4,20 @@
 #
 
 target="$1"
+target_output_dir="$(dirname $target)"
+target_output_base_dir="$(dirname $target_output_dir)"
 
-base="${target%/output/target}"
+base="$2"
+
+if [[ "$base" == "" ]]; then
+  base="$target_output_base_dir"
+fi
+
+echo "target                 : $target"
+echo "target_output_dir      : $target_output_dir"
+echo "target_output_base_dir : $target_output_base_dir"
+
+echo "base                   : $base"
 
 ## Our target skeleton copying does not include dot-files
 ## Do it here:
@@ -14,6 +26,9 @@ ln -snf "/tmp/.ssh" "$target/.ssh"
 . "$base/scripts/ver-label/runnix_release_version.sh"
 runnix_release_version
 echo ${RUNVER} > "$target/etc/runnix-release"
+
+# cleanup
+rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
 
 echo "
 ##

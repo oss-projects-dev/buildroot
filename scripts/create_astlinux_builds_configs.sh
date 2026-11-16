@@ -52,6 +52,11 @@ if grep -Fq "BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=" ${build_dir}/.config; th
   sed -e '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=/s/.*/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https:\/\/www.kernel.org\/pub\/linux\/kernel\/projects\/cip\/6.12\/linux-cip-6.12.114-cip34.tar.xz"/' -i ${build_dir}/.config
   sed -e '/BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION/a BR2_LINUX_KERNEL_NEEDS_HOST_LIBELF=y' -i ${build_dir}/.config #libelf is required in linux-6.12
 fi
+if [[ $build_name == initrd* ]]; then
+  sed -e "s@BR2_ROOTFS_POST_BUILD_SCRIPT=\"\"@BR2_ROOTFS_POST_BUILD_SCRIPT=\"scripts/initrd-post-build\"@g" -i ${build_dir}/.config
+  echo "BR2_ROOTFS_POST_SCRIPT_ARGS=\"\$(TOPDIR)\"" >> ${build_dir}/.config
+  echo "BR2_ROOTFS_POST_BUILD_SCRIPT_ARGS=\"\""     >> ${build_dir}/.config
+fi
 if [[ $build_name == astlinux* ]]; then
   sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV=y@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y@g' -i ${build_dir}/.config
   sed -e 's@BR2_PACKAGE_CURL=y@BR2_PACKAGE_LIBCURL_CURL=y@g'                                        -i ${build_dir}/.config

@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Use BuildRoot "post-build" script to overlay board specific files
+#
+
+target="$1"
+target_output_dir="$(dirname $target)"
+target_output_base_dir="$(dirname $target_output_dir)"
+
+base="$2"
+
+if [[ "$base" == "" ]]; then
+  base="$target_output_base_dir"
+fi
+
+echo "target                 : $target"
+echo "target_output_dir      : $target_output_dir"
+echo "target_output_base_dir : $target_output_base_dir"
+
+echo "base                   : $base"
+
+# cleanup
+rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
+
+exit 0
+

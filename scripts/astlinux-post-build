@@ -78,6 +78,10 @@ target_output_base_dir="$(dirname $target_output_dir)"
 
 base="$2"
 
+if [[ "$base" == "" ]]; then
+  base="$target_output_base_dir"
+fi
+
 echo "target                 : $target"
 echo "target_output_dir      : $target_output_dir"
 echo "target_output_base_dir : $target_output_base_dir"
