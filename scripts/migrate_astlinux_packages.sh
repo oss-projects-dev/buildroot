@@ -223,17 +223,18 @@ fi
   sed -e 's@KERNEL_ARCH@NORMALIZED_ARCH@g' \
       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
+  # rename BR2_NEEDS_GETTEXT_IF_LOCALE to $(TARGET_NLS_DEPENDENCIES) 
+  sed -e 's@BR2_NEEDS_GETTEXT$@BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
+      -e 's@BR2_NEEDS_GETTEXT @BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
+      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
+
   # rename $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) to $(TARGET_NLS_DEPENDENCIES) 
   sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext)@$(TARGET_NLS_DEPENDENCIES)@g' \
+      -e 's@$(if $(BR2_NEEDS_GETTEXT),gettext)@$(TARGET_NLS_DEPENDENCIES)@g' \
       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl) to LIBS=$(TARGET_NLS_LIBS) 
   sed -e 's@$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)@LIBS=$(TARGET_NLS_LIBS)@g' \
-      -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
-
-  # rename BR2_NEEDS_GETTEXT_IF_LOCALE to $(TARGET_NLS_DEPENDENCIES) 
-  sed -e 's@BR2_NEEDS_GETTEXT$@BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
-      -e 's@BR2_NEEDS_GETTEXT @BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 
   # rename BR2_INET_IPV6 to BR2_TOOLCHAIN
@@ -249,7 +250,6 @@ fi
   # removal of BR2_LARGFILE
   sed -e 's@depends on !(BR2_LARGEFILE && BR2_USE_WCHAR)@depends on !BR2_USE_WCHAR@g' \
       -e 's@depends on !BR2_LARGEFILE || !BR2_USE_WCHAR@depends on !BR2_USE_WCHAR@g' \
-      -e '/BR2_LARGEFILE/d' \
       -i $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.in $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.ext $MERGE_FOLDER/$dir_name/$pkg_rename_name/*.mk
 }
 
