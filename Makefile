@@ -118,7 +118,7 @@ BR2_LOCALVERSION := $(shell $(TOPDIR)/support/scripts/setlocalversion)
 ifeq ($(BR2_LOCALVERSION),)
 export BR2_VERSION_FULL := $(BR2_VERSION)
 else
-export BR2_VERSION_FULL := $(BR2_LOCALVERSION)
+export BR2_VERSION_FULL := $(basename $(BR2_VERSION))$(BR2_LOCALVERSION)
 endif
 
 # List of targets and target patterns for which .config doesn't need to be read in
