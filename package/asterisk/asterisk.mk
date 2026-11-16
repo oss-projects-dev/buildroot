@@ -155,10 +155,10 @@ ASTERISK_CONFIGURE_ARGS+= \
                         --with-sqlite3="$(STAGING_DIR)/usr"
 endif
 
-ifeq ($(strip $(BR2_PACKAGE_CURL)),y)
+ifeq ($(strip $(BR2_PACKAGE_LIBCURL)),y)
 ASTERISK_EXTRAS+=libcurl
 ASTERISK_CONFIGURE_ARGS+= \
-			--with-libcurl="$(STAGING_DIR)"
+			--with-libcurl="$(STAGING_DIR)/usr"
 ASTERISK_CONFIGURE_ENV+= \
 			LIBCURL="-lcurl -lz -lssl" \
 			_libcurl_config="$(STAGING_DIR)/usr/bin/curl-config"

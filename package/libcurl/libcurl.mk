@@ -66,7 +66,8 @@ define LIBCURL_STAGING_FIXUP_CURL_CONFIG
 	$(SED) "s,^prefix=.*,prefix='$(STAGING_DIR)/usr',g" $(STAGING_DIR)/usr/bin/curl-config
 	$(SED) "s,^exec_prefix=.*,exec_prefix='$(STAGING_DIR)/usr',g" $(STAGING_DIR)/usr/bin/curl-config
 endef
-LIBCURL_POST_INSTALL_STAGING_HOOKS += LIBCURL_STAGING_FIXUP_CURL_CONFIG
+#LIBCURL_POST_INSTALL_STAGING_HOOKS += LIBCURL_STAGING_FIXUP_CURL_CONFIG
+LIBCURL_CONFIG_SCRIPTS = curl-config
 
 $(eval $(autotools-package))
 
