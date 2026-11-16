@@ -11,7 +11,7 @@ EX_VI_CUSTOM_PATCH_DIR = astlinux
 
 EX_VI_MAKE = $(MAKE1)
 
-EX_VI_DEPENDENCIES = host-pkgconf host-ncurses ncurses
+EX_VI_DEPENDENCIES = ncurses
 
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 EX_VI_DEPENDENCIES += busybox
