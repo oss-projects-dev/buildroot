@@ -56,6 +56,8 @@ endef
 define IPROUTE2_REMOVE_BASH_COMPLETION_SCRIPTS
 	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/devlink
 	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/tc
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion/completions
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion
 endef
 
 IPROUTE2_POST_INSTALL_TARGET_HOOKS += IPROUTE2_REMOVE_BASH_COMPLETION_SCRIPTS

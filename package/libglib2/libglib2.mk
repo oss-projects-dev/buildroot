@@ -129,6 +129,17 @@ ifneq ($(BR2_PACKAGE_GDB),y)
 LIBGLIB2_POST_INSTALL_TARGET_HOOKS += LIBGLIB2_REMOVE_GDB_FILES
 endif
 
+define LIBGLIB2_REMOVE_BASH_COMPLETION_SCRIPTS
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/gapplication
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/gdbus
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/gsettings
+	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/gresource
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion/completions
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion
+endef
+
+LIBGLIB2_POST_INSTALL_TARGET_HOOKS += LIBGLIB2_REMOVE_BASH_COMPLETION_SCRIPTS
+
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 

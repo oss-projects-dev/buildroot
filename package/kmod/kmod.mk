@@ -65,6 +65,8 @@ define KMOD_REMOVE_BASH_COMPLETION_SCRIPTS
 	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/kmod
 	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/lsmod
 	rm -f $(TARGET_DIR)/usr/share/bash-completion/completions/rmmod
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion/completions
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/bash-completion
 endef
 
 KMOD_POST_INSTALL_TARGET_HOOKS += KMOD_REMOVE_BASH_COMPLETION_SCRIPTS
