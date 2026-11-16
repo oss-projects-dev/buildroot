@@ -108,8 +108,6 @@ gen_changelog "$ASTVER" "$base/docs/ChangeLog.txt" > "$target/stat/etc/docs/Chan
 
 # cleanup
 rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
-rmdir --ignore-fail-on-non-empty $target/usr/share/bash-completion/completions
-rmdir --ignore-fail-on-non-empty $target/usr/share/bash-completion
 
 exit 0
 
