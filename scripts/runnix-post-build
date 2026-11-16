@@ -29,6 +29,7 @@ echo ${RUNVER} > "$target/etc/runnix-release"
 
 # cleanup
 rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
+rm -f $target/etc/os-release $target/usr/lib/os-release
 
 echo "
 ##
