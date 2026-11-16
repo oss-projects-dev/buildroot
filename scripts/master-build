@@ -70,6 +70,9 @@ set_openvmtools_package()
 {
   # enable BR2_PACKAGE_OPENVMTOOLS
   sed -i 's:^# BR2_PACKAGE_OPENVMTOOLS .*$:BR2_PACKAGE_OPENVMTOOLS=y:' .config
+  sed -i 's:^# BR2_PACKAGE_LIBTIRPC .*$:BR2_PACKAGE_LIBTIRPC=y:' .config
+  echo "# BR2_PACKAGE_LIBTIRPC_GSS is not set" >> .config
+  echo "# BR2_PACKAGE_LIBTIRPC_RPCDB is not set" >> .config
 }
 
 set_qemu_guest_agent_package()
