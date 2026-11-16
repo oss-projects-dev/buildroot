@@ -23,7 +23,7 @@ ZABBIX_CONF_OPTS += \
 	--enable-proxy \
 	--with-sqlite3="$(STAGING_DIR)/usr"
 
- ifeq ($(BR2_PACKAGE_CURL),y)
+ ifeq ($(BR2_PACKAGE_LIBCURL),y)
 ZABBIX_DEPENDENCIES += libcurl
 ZABBIX_CONF_OPTS += \
 	--with-libcurl="$(STAGING_DIR)/usr/bin/curl-config"
