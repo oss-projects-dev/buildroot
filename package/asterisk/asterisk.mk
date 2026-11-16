@@ -26,13 +26,13 @@ ASTERISK_CONFIGURE_ARGS :=
 ASTERISK_MODULE_DIR := usr/lib/asterisk/modules
 
 # $(call ndots start,end,dotted-string)
-dot:=.
-empty:=
-space:=$(empty) $(empty)
-ndots = $(subst $(space),$(dot),$(wordlist $(1),$(2),$(subst $(dot),$(space),$3)))
+#dot:=.
+#empty:=
+#space:=$(empty) $(empty)
+#ndots = $(subst $(space),$(dot),$(wordlist $(1),$(2),$(subst $(dot),$(space),$3)))
 ##
-ASTERISK_VERSION_SINGLE := $(call ndots,1,1,$(ASTERISK_VERSION))
-ASTERISK_VERSION_TUPLE := $(call ndots,1,2,$(ASTERISK_VERSION))
+ASTERISK_VERSION_SINGLE := $(shell echo $(ASTERISK_VERSION) | cut -d'.' -f1)
+ASTERISK_VERSION_TUPLE := $(shell echo $(ASTERISK_VERSION) | rev | cut -d'.' -f2- | rev )
 
 ASTERISK_GLOBAL_MAKEOPTS :=
 

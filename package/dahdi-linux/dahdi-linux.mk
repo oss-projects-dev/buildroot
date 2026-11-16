@@ -45,13 +45,13 @@ DAHDI_LINUX_EXTRA_DOWNLOADS = \
 	$(patsubst %,$(DAHDI_LINUX_FW_SITE)/%,$(DAHDI_LINUX_FW_FILES))
 
 # $(call ndots start,end,dotted-string)
-dot:=.
-empty:=
-space:=$(empty) $(empty)
-ndots = $(subst $(space),$(dot),$(wordlist $(1),$(2),$(subst $(dot),$(space),$3)))
+#dot:=.
+#empty:=
+#space:=$(empty) $(empty)
+#ndots = $(subst $(space),$(dot),$(wordlist $(strip $(1)),$(strip $(2)),$(subst $(dot),$(space),$(strip $(3)))))
 ##
-DAHDI_LINUX_VERSION_SINGLE := $(call ndots,1,1,$(DAHDI_LINUX_VERSION))
-DAHDI_LINUX_VERSION_TUPLE := $(call ndots,1,2,$(DAHDI_LINUX_VERSION))
+DAHDI_LINUX_VERSION_SINGLE := $(shell echo $(DAHDI_LINUX_VERSION) | cut -d'.' -f1)
+DAHDI_LINUX_VERSION_TUPLE := $(shell echo $(DAHDI_LINUX_VERSION) | rev | cut -d'.' -f2- | rev )
 
 #$(DL_DIR)/$(DAHDI_LINUX_SOURCE):
 #	$(WGET) -P $(DL_DIR) $(DAHDI_LINUX_SITE)/$(DAHDI_LINUX_SOURCE)
