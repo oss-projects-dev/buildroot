@@ -8,6 +8,7 @@
 #   git describe --match 'glibc-*' --abbrev=40 origin/release/MAJOR.MINOR/master | cut -d '-' -f 2-
 # When updating the version, please also update localedef
 GLIBC_VERSION = 2.40-235-gfe1b389aab330e8c5ec4d08db3be6d5d0d3cde23
+GLIBC_CUSTOM_PATCH_DIR = custom
 GLIBC_SITE = https://gitlab.com/gnutools/glibc.git
 GLIBC_SITE_METHOD = git
 
