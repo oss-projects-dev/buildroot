@@ -496,24 +496,69 @@ sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERG
 sed -e '1,45s/^/#/' -e '280s/^/#/' -i $MERGE_FOLDER/package/libopenssl/Config.in
 #sed -e 's@BR2_BUILD_USE_CUSTOM_SCRIPTS@BR2_BUILD_USE_CUSTOM_SCRIPTS1@g' -i $MERGE_FOLDER/package/libopenssl/libopenssl.mk
 
-# below is bug fixes at package level
 
+# BR2_LARGEFILE removed
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' \
+    -e 's@comment "dosfstools requires a toolchain with LARGEFILE and WCHAR support"@comment "dosfstools requires a toolchain with WCHAR support"@g' \
+    -i $MERGE_FOLDER/package/dosfstools/Config.in
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' -i $MERGE_FOLDER/package/e2fsprogs/Config.in
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' \
+    -e 's@comment "ipset requires a toolchain with LARGEFILE support"@#comment "ipset requires a toolchain with LARGEFILE support"@g' \
+    -e 's@depends on !BR2_LARGEFILE@#depends on !BR2_LARGEFILE@g' -i $MERGE_FOLDER/package/ipset/Config.in
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' \
+    -e 's@comment "libmnl requires a toolchain with LARGEFILE support"@#comment "libmnl requires a toolchain with LARGEFILE support"@g' \
+    -e 's@depends on !BR2_LARGEFILE@#depends on !BR2_LARGEFILE@g' -i $MERGE_FOLDER/package/libmnl/Config.in
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' \
+    -e 's@comment "squashfs requires a toolchain with LARGEFILE support"@#comment "squashfs requires a toolchain with LARGEFILE support"@g' \
+    -e 's@depends on !BR2_LARGEFILE@#depends on !BR2_LARGEFILE@g' -i $MERGE_FOLDER/package/squashfs/Config.in
+sed -e 's@depends on BR2_LARGEFILE@#depends on BR2_LARGEFILE@g' -i $MERGE_FOLDER/package/util-linux/Config.in
+
+# fix trailing slashes error
+sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i $MERGE_FOLDER/package/dhcpdump/dhcpdump.mk
+sed -e 's@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p/@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p@g' -i $MERGE_FOLDER/package/popt/popt.mk
+sed -e 's@http://www.uclibc.org/@http://www.uclibc.org@g' -i $MERGE_FOLDER/package/slang/slang.mk
+sed -e 's@http://www.ibiblio.org/pub/Linux/system/serial/@http://www.ibiblio.org/pub/Linux/system/serial@g' -i $MERGE_FOLDER/package/statserial/statserial.mk
+
+# BR2_PACKAGE_CURL -> BR2_PACKAGE_LIBCURL
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in $MERGE_FOLDER/package/libcurl/libcurl.mk
+sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL@g' -i $MERGE_FOLDER/package/zabbix/zabbix.mk
+
+# GETTEXT changes
+sed -e 's@select BR2_PACKAGE_GETTEXT if BR2_NEEDS_GETTEXT_IF_LOCALE@#select BR2_PACKAGE_GETTEXT if BR2_NEEDS_GETTEXT_IF_LOCALE@g' -i $MERGE_FOLDER/package/libidn/Config.in
+sed -e 's@select BR2_PACKAGE_GETTEXT if BR2_NEEDS_GETTEXT_IF_LOCALE@#select BR2_PACKAGE_GETTEXT if BR2_NEEDS_GETTEXT_IF_LOCALE@g' \
+    -e 's@select BR2_PACKAGE_LIBINTL if BR2_NEEDS_GETTEXT_IF_LOCALE@#select BR2_PACKAGE_LIBINTL if BR2_NEEDS_GETTEXT_IF_LOCALE@g' -i $MERGE_FOLDER/package/libglib2/Config.in
+sed -e 's@$(if $(BR2_NEEDS_GETTEXT),gettext libintl)@$(TARGET_NLS_DEPENDENCIES)@g' -i $MERGE_FOLDER/package/libglib2/libglib2.mk
+
+# hash file updates
+echo ""                                                                                                          >> $MERGE_FOLDER/linux/linux.hash
+echo "sha256  801ba01e82a8e25738d4f30d2640e537cc06bb13f9dbf0f6fce5095f3fb1f168  linux-cip-6.12.114-cip34.tar.xz" >> $MERGE_FOLDER/linux/linux.hash
+
+echo ""                                                                                                                                                            >> $MERGE_FOLDER/package/gcc/gcc.hash
+echo "# From https://gcc.gnu.org/pub/gcc/releases/gcc-13.5.0/sha512.sum"                                                                                           >> $MERGE_FOLDER/package/gcc/gcc.hash
+echo "sha512  709237ff8f10d46eb10cad53a71bdcacbd3d56f4559e9a5bb3323f743fdba78b7e505586135560b27e88320927a065ec4f5e45273d5504b542f67c7326eb683c  gcc-13.5.0.tar.xz" >> $MERGE_FOLDER/package/gcc/gcc.hash
+
+echo "sha256  6188d0f0c180db7a30467b5b6065a3cb5d2665b937d2e8c40366efb52bf689fe  beep-1.4.12.tar.gz"            >> $MERGE_FOLDER/package/beep/beep.hash
+echo "sha256  6a3b917a8b7ec1229e62f681ad64699d1b7df298ba2875f24442e103b45c45b3  bfdetect_src.tar.gz"           >> $MERGE_FOLDER/package/bfdetect/bfdetect.hash
+echo "sha256  81fcba02196e6a43ed6099e4a182a8b35ca60a0ac2ce1e9977cb3cf22f388e9d  clix-2013-03-30.tar.gz"        >> $MERGE_FOLDER/package/clix/clix.hash
+echo "sha256  5c8e66d4c478b6d7e58f4c842823a09125509bf6851017ff70e32b32ce95b01b  darkstat-3.0.722.tar.gz"       >> $MERGE_FOLDER/package/darkstat/darkstat.hash
+echo "sha256  16e80157ee62d0e257eca7b765e079946e8386205a4c360e87f5c23bb8626d99  ddclient-curl-3.8.3-08.tar.gz" >> $MERGE_FOLDER/package/ddclient/ddclient.hash
+echo "sha256  da4be7cf67e94572463b19e56850aa36dc4e39eb0d933d3688fe8574bb632409  ex-050325.tar.bz2"             >> $MERGE_FOLDER/package/ex-vi/ex-vi.hash
+echo "sha256  b90c40beb75308b0eba46b5add6e54a7a9e65ac90ce86ec8d78ae2a4bb8bae60  fossil-src-2.22.tar.gz"        >> $MERGE_FOLDER/package/fossil/fossil.hash
+echo "sha256  e3dd69c635e16a7d723dc5ae1c4c6ff4a216204fd8fc0f130eafc1022d303837  gntp-send-0.3.4.tar.gz"        >> $MERGE_FOLDER/package/gntp-send/gntp-send.hash
+echo "sha256  458c1b8fb3349076a6cecf26c29db1d561315d84e16bfcfba419f327f502e244  iksemel-1.4.tar.gz"            >> $MERGE_FOLDER/package/iksemel/iksemel.hash
+echo "sha256  85ba349ec5081c1fbbf3dae197fd162e70d18baa38b4e38a30e05b82b8a395ee  iprange-2.1.1.tar.gz"          >> $MERGE_FOLDER/package/iprange/iprange.hash
+echo "sha256  8956a72fa609057e9cb1df90c30505eebf30f37df386211779bfed5b3207a95a  oui-2026-09-16.txt"            >> $MERGE_FOLDER/package/mac2vendor/mac2vendor.hash
+echo "sha256  eb1cad5c63d6ead915c617b3da32ef97dc1e4272e73dd13af07bc75566ebf30c  2.2.4.tar.gz"                  >> $MERGE_FOLDER/package/sipgrep/sipgrep.hash
+
+# below is bug fixes at package level
 # --- boot folder
 # runnix - do not enable by default
 sed -e 's@default y@#default y@g' -i $MERGE_FOLDER/boot/runnix/Config.in
 
 # --- package folder
-# ddclient
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/ddclient/Config.in
-
-# dhcpdump - fix trailing slashes error
-sed -e 's@http://www.mavetju.org/download/@http://www.mavetju.org/download@g' -i $MERGE_FOLDER/package/dhcpdump/dhcpdump.mk
-
 # iptables - change IPTABLES_TARGET_INSTALL to IPTABLES_TARGET_INSTALL_INIT as it is giving issue in buildroot.
 sed -e 's@IPTABLES_TARGET_INSTALL@IPTABLES_TARGET_INSTALL_INIT@g' -i $MERGE_FOLDER/package/iptables/iptables.mk
-
-# libcurl
-sed -e 's@BR2_PACKAGE_CURL@BR2_PACKAGE_LIBCURL_CURL@g' -i $MERGE_FOLDER/package/libcurl/Config.in $MERGE_FOLDER/package/libcurl/libcurl.mk
 
 # libusb
 sed -e 's@BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV@BR2_PACKAGE_HAS_UDEV@g' -i $MERGE_FOLDER/package/libusb/libusb.mk
@@ -534,17 +579,17 @@ sed -e 's@depends on BR2_PACKAGE_NEON@#depends on BR2_PACKAGE_NEON@g' \
 	-i $MERGE_FOLDER/package/neon/Config.in
 sed -e '27,34s/^/#/' -e '53s/^/#/' -i $MERGE_FOLDER/package/neon/Config.in
 
-# popt - fix trailing slashes error
-sed -e 's@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p/@http://anduin.linuxfromscratch.org/sources/BLFS/svn/p@g' -i $MERGE_FOLDER/package/popt/popt.mk
-
 # prosody - circular dependency issue
 sed -e 's@select BR2_PACKAGE_LUA$@#select BR2_PACKAGE_LUA@g' -i $MERGE_FOLDER/package/prosody/Config.in
 
 # php
 sed -e '24,28s/^/#/' -e '62s/^/#/' -i $MERGE_FOLDER/package/php/Config.in
 
-# slang - fix trailing slashes error
-sed -e 's@http://www.uclibc.org/@http://www.uclibc.org@g' -i $MERGE_FOLDER/package/slang/slang.mk
 
-# statserial - fix trailing slashes error
-sed -e 's@http://www.ibiblio.org/pub/Linux/system/serial/@http://www.ibiblio.org/pub/Linux/system/serial@g' -i $MERGE_FOLDER/package/statserial/statserial.mk
+
+
+
+
+
+
+

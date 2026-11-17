@@ -40,7 +40,7 @@ if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
 	# Check for uncommitted changes
 	if git diff-index --name-only HEAD | grep -v "^scripts/package" \
 	    | read dummy; then
-		printf '%s' -git
+		printf '%s' -dirty
 	fi
 
 	# All done with git
@@ -76,7 +76,7 @@ if hgid=`HGRCPATH= hg id --id --tags 2>/dev/null`; then
 	# Are there uncommitted changes?
 	# These are represented by + after the changeset id.
 	case "$hgid" in
-		*+|*+\ *) printf '%s' -hg ;;
+		*+|*+\ *) printf '%s' -dirty ;;
 	esac
 
 	# All done with mercurial

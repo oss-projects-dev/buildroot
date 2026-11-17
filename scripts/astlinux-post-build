@@ -109,7 +109,6 @@ gen_os_release "$ASTVER" "$board" > "$target/etc/os-release"
 mkdir -p "$target/stat/etc/docs"
 gen_changelog "$ASTVER" "$base/docs/ChangeLog.txt" > "$target/stat/etc/docs/ChangeLog.txt"
 
-
 # cleanup
 rm -f $target/etc/init.d/rcS $target/etc/init.d/rcK
 
