@@ -29,7 +29,7 @@ config BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL
 	help
 	  Get or set the DOS FAT filesystem label.
 
-comment "dosfstools requires a toolchain with LARGEFILE and WCHAR support"
+comment "dosfstools requires a toolchain with WCHAR support"
 	depends on !BR2_USE_WCHAR
 
 endif

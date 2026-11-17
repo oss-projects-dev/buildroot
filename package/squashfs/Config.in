@@ -3,6 +3,7 @@ if BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 config BR2_PACKAGE_SQUASHFS
 	bool "squashfs"
+	#depends on BR2_LARGEFILE
 	select BR2_PACKAGE_SQUASHFS_GZIP if !(BR2_PACKAGE_SQUASHFS_LZMA || BR2_PACKAGE_SQUASHFS_LZO)
 	help
 	  Tools to generate SquashFS filesystems.
@@ -38,7 +39,8 @@ config BR2_PACKAGE_SQUASHFS_XZ
 
 endif
 
-comment "squashfs requires a toolchain with LARGEFILE support"
+#comment "squashfs requires a toolchain with LARGEFILE support"
+	#depends on !BR2_LARGEFILE
 
 endif
 

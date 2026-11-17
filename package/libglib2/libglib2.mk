@@ -94,7 +94,7 @@ HOST_LIBGLIB2_CONF_OPTS = \
 	--disable-systemtap \
 	--disable-xattr
 
-LIBGLIB2_DEPENDENCIES = host-pkgconf host-libglib2 libffi zlib $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext libintl)
+LIBGLIB2_DEPENDENCIES = host-pkgconf host-libglib2 libffi zlib $(TARGET_NLS_DEPENDENCIES)
 
 HOST_LIBGLIB2_DEPENDENCIES = host-pkgconf host-libffi host-zlib
 

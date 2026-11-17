@@ -3,6 +3,7 @@ if BR2_BUILD_USE_ASTLINUX_SCRIPTS
 
 config BR2_PACKAGE_UTIL_LINUX
 	bool "util-linux"
+	#depends on BR2_LARGEFILE
 	depends on BR2_USE_WCHAR
 	help
 	  Various useful/essential linux libraries and utilities.
