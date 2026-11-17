@@ -789,4 +789,18 @@ config BR2_ROOTFS_POST_IMAGE_SCRIPT_ARGS
 	  above, and then the arguments in this option will be passed
 	  *after* those.
 
+config BR2_BUILD_USE_CUSTOM_SCRIPTS
+        bool "Use Custom OS Scripts to Build"
+        help
+          This allows to use custom package build files.
+
+if BR2_BUILD_USE_CUSTOM_SCRIPTS
+menu "Use OS Specific Custom Scripts"
+config BR2_BUILD_USE_ASTLINUX_SCRIPTS
+        bool "AstLinux Scripts"
+        help
+          This allows to use AstLinux package build files.
+endmenu
+endif
+
 endmenu
