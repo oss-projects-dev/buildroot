@@ -54,7 +54,7 @@ if grep -Fq "BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION=" ${build_dir}/.config; th
 fi
 if [[ $build_name == initrd* ]]; then
   sed -e "s@BR2_ROOTFS_POST_BUILD_SCRIPT=\"\"@BR2_ROOTFS_POST_BUILD_SCRIPT=\"scripts/initrd-post-build\"@g" -i ${build_dir}/.config
-  echo "BR2_ROOTFS_POST_SCRIPT_ARGS=\"\$(TOPDIR)\"" >> ${build_dir}/.config
+  echo "BR2_ROOTFS_POST_SCRIPT_ARGS=\"\"" >> ${build_dir}/.config
   echo "BR2_ROOTFS_POST_BUILD_SCRIPT_ARGS=\"\""     >> ${build_dir}/.config
 fi
 if [[ $build_name == astlinux* ]]; then
@@ -74,8 +74,8 @@ echo "# BR2_PACKAGE_URANDOM_SCRIPTS is not set" >> ${build_dir}/.config
 (
   cd $build_dir
   make olddefconfig
+  sed -e "s@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\"@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\$(TOPDIR)\"@g" -i .config
   if [[ $build_name == astlinux* ]]; then
-    sed -e "s@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\"@BR2_ROOTFS_POST_SCRIPT_ARGS=\"\$(TOPDIR)\"@g" -i .config
     sed -e "s@BR2_TARGET_ROOTFS_EXT2_SIZE=\"60M\"@BR2_TARGET_ROOTFS_EXT2_SIZE=\"185M\"@g" -i .config
   fi
   cp -av .config .config-before-script-changes
