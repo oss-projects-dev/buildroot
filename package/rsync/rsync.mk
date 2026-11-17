@@ -64,7 +64,7 @@ else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 #
 ################################################################################
 
-RSYNC_VERSION = 3.5.0
+RSYNC_VERSION = 3.5.2
 RSYNC_SITE = https://rsync.samba.org/ftp/rsync/src
 RSYNC_LICENSE = GPL-3.0+ with exceptions
 RSYNC_LICENSE_FILES = COPYING
@@ -92,6 +92,13 @@ ifeq ($(BR2_PACKAGE_ACL),y)
 RSYNC_DEPENDENCIES += acl
 else
 RSYNC_CONF_OPTS += --disable-acl-support
+endif
+
+ifeq ($(BR2_PACKAGE_LIBIDN2),y)
+RSYNC_CONF_OPTS += --enable-idn
+RSYNC_DEPENDENCIES += libidn2
+else
+RSYNC_CONF_OPTS += --disable-idn
 endif
 
 ifeq ($(BR2_PACKAGE_LZ4),y)

@@ -91,7 +91,8 @@ else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 #
 ################################################################################
 
-LIBZLIB_VERSION = 1.3.2
+# When updating the version here, please also update the minizip-zlib package
+LIBZLIB_VERSION = 1.4
 LIBZLIB_SOURCE = zlib-$(LIBZLIB_VERSION).tar.xz
 LIBZLIB_SITE = https://www.zlib.net
 LIBZLIB_LICENSE = Zlib

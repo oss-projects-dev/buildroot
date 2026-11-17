@@ -37,7 +37,7 @@ else #BR2_BUILD_USE_CUSTOM_SCRIPTS
 #
 ################################################################################
 
-EXPAT_VERSION = 2.9.0
+EXPAT_VERSION = 2.10.0
 EXPAT_SITE = https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(EXPAT_VERSION))
 EXPAT_SOURCE = expat-$(EXPAT_VERSION).tar.xz
 EXPAT_INSTALL_STAGING = YES

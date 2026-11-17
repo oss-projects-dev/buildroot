@@ -109,6 +109,11 @@ OPENSSH_IGNORE_CVES += CVE-2026-60000
 OPENSSH_IGNORE_CVES += CVE-2026-60001
 # 0018-CVE-2026-60002.patch
 OPENSSH_IGNORE_CVES += CVE-2026-60002
+# 0019-CVE-2026-106583.patch
+OPENSSH_IGNORE_CVES += CVE-2026-106583
+
+# 0021-avoid-password-authn-bypass.patch
+OPENSSH_IGNORE_CVES += CVE-2026-123158
 
 OPENSSH_CONF_ENV = \
 	LD="$(TARGET_CC)" \
@@ -133,7 +138,9 @@ define OPENSSH_PERMISSIONS
 	/var/empty d 755 root root - - - - -
 endef
 
-ifeq ($(BR2_powerpc64le),y)
+# -fzero-call-used-regs=used is not supported on powerpc64le and ARM
+# Thumb-1, and makes gcc ICE on MIPS before R6
+ifneq ($(BR2_powerpc64le)$(BR2_ARM_INSTRUCTIONS_THUMB)$(BR2_TOOLCHAIN_HAS_GCC_BUG_104820),)
 OPENSSH_CONF_OPTS += --with-cflags-after="-fzero-call-used-regs=skip"
 endif
 
