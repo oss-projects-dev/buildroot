@@ -34,7 +34,7 @@ BUILDROOT_FILES_EXTRACT_DIR=$HOME/output-files
 
 # notes AstLinux pulled on 2026-11-07
 ASTVER=astlinux-338e17c4efd61b63fbecb66d3132a32e68440d83
-BUILDROOTVER=buildroot-2025.02.19
+BUILDROOTVER=buildroot-2025.02.20
 
 MERGE_FOLDER=m-buildroot-merge-${BUILDROOTVER//buildroot-/}-${ASTVER//astlinux-/}
 BASE_BUILDROOT_FOLDER=m-buildroot-orig-${BUILDROOTVER//buildroot-/}-${ASTVER//astlinux-/}
