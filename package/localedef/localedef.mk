@@ -7,8 +7,18 @@
 # Use the same VERSION, SITE and LICENSE as target glibc
 # As in glibc.mk, generate version string using:
 #   git describe --match 'glibc-*' --abbrev=40 origin/release/MAJOR.MINOR/master | cut -d '-' -f 2-
+ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_15),y)
+LOCALEDEF_VERSION = 2.42-112-gf30ac9a9b85be387052f2eb3899fcda52f9f77a1
+LOCALEDEF_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(LOCALEDEF_VERSION)))
+else ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_14),y)
 LOCALEDEF_VERSION = 2.40-235-gfe1b389aab330e8c5ec4d08db3be6d5d0d3cde23
-LOCALEDEF_CUSTOM_PATCH_DIR = custom
+LOCALEDEF_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(LOCALEDEF_VERSION)))
+else ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_13),y)
+LOCALEDEF_VERSION = 2.40-235-gfe1b389aab330e8c5ec4d08db3be6d5d0d3cde23
+LOCALEDEF_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(LOCALEDEF_VERSION)))
+else
+LOCALEDEF_VERSION = 2.41-167-gf247c0a2fb5b3e48a771d2d23efc9a45c64e957d
+endif
 LOCALEDEF_SOURCE = glibc-$(LOCALEDEF_VERSION)$(BR_FMT_VERSION_git).tar.gz
 LOCALEDEF_SITE = https://gitlab.com/gnutools/glibc.git
 LOCALEDEF_SITE_METHOD = git

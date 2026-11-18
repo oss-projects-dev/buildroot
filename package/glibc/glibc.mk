@@ -7,8 +7,18 @@
 # Generate version string using:
 #   git describe --match 'glibc-*' --abbrev=40 origin/release/MAJOR.MINOR/master | cut -d '-' -f 2-
 # When updating the version, please also update localedef
+ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_15),y)
+GLIBC_VERSION = 2.42-112-gf30ac9a9b85be387052f2eb3899fcda52f9f77a1
+GLIBC_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(GLIBC_VERSION)))
+else ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_14),y)
 GLIBC_VERSION = 2.40-235-gfe1b389aab330e8c5ec4d08db3be6d5d0d3cde23
-GLIBC_CUSTOM_PATCH_DIR = custom
+GLIBC_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(GLIBC_VERSION)))
+else ifeq ($(BR2_TOOLCHAIN_GCC_AT_LEAST_13),y)
+GLIBC_VERSION = 2.40-235-gfe1b389aab330e8c5ec4d08db3be6d5d0d3cde23
+GLIBC_CUSTOM_PATCH_DIR = $(firstword $(subst -, ,$(GLIBC_VERSION)))
+else
+GLIBC_VERSION = 2.41-167-gf247c0a2fb5b3e48a771d2d23efc9a45c64e957d
+endif
 GLIBC_SITE = https://gitlab.com/gnutools/glibc.git
 GLIBC_SITE_METHOD = git
 

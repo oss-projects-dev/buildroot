@@ -39,8 +39,6 @@ create_build_dir() {
   echo "( cd $BUILDS_DIR/output-${1} && make saveconfig )" >> $BUILDS_DIR/backup_configs.sh
 }
 
-create_build_dir toolchain13 pc_x86_64_astlinux_toolchain13_defconfig
-create_build_dir toolchain14 pc_x86_64_astlinux_toolchain14_defconfig
 create_build_dir astlinux-ast18se pc_x86_64_astlinux_astlinux_ast18se_defconfig
 create_build_dir astlinux-ast20 pc_x86_64_astlinux_astlinux_ast20_defconfig
 create_build_dir initrd pc_x86_64_astlinux_initrd_defconfig
