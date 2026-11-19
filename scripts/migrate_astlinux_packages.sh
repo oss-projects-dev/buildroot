@@ -95,7 +95,7 @@ cp -a $ASTVER/$dir_name/$pkg_src_dir/* $MERGE_FOLDER/$dir_name/$pkg_rename_name/
     sed -e "s@${pkg_name_upper}@${pkg_rename_name_upper}@g" -e "s@\"$pkg_name\"@\"$pkg_rename_name\"@g" -i *.in *.ext *.mk
   fi
   
-  touch .gitkeep
+  echo " " > .gitkeep
 
   # below changes have to be done for all files before merging with buildroot files so both are separate
   # add custom-patch-dir
@@ -180,7 +180,7 @@ mv $MERGE_FOLDER/$dir_name/$pkg_rename_name/$pkg_rename_name.mk.temp $MERGE_FOLD
 else
   mv $MERGE_FOLDER/$dir_name/$pkg_rename_name/${custom_folder_name}/Config.in             $MERGE_FOLDER/$dir_name/$pkg_rename_name/Config.in
   mv $MERGE_FOLDER/$dir_name/$pkg_rename_name/${custom_folder_name}/${pkg_rename_name}.mk $MERGE_FOLDER/$dir_name/$pkg_rename_name/$pkg_rename_name.mk
-  touch $MERGE_FOLDER/$dir_name/$pkg_rename_name/$pkg_rename_name.hash
+  echo " " > $MERGE_FOLDER/$dir_name/$pkg_rename_name/$pkg_rename_name.hash
 fi
 
   # create base folder before making any changes
@@ -538,18 +538,18 @@ echo ""                                                                         
 echo "# From https://gcc.gnu.org/pub/gcc/releases/gcc-13.5.0/sha512.sum"                                                                                           >> $MERGE_FOLDER/package/gcc/gcc.hash
 echo "sha512  709237ff8f10d46eb10cad53a71bdcacbd3d56f4559e9a5bb3323f743fdba78b7e505586135560b27e88320927a065ec4f5e45273d5504b542f67c7326eb683c  gcc-13.5.0.tar.xz" >> $MERGE_FOLDER/package/gcc/gcc.hash
 
-echo "sha256  6188d0f0c180db7a30467b5b6065a3cb5d2665b937d2e8c40366efb52bf689fe  beep-1.4.12.tar.gz"            >> $MERGE_FOLDER/package/beep/beep.hash
-echo "sha256  6a3b917a8b7ec1229e62f681ad64699d1b7df298ba2875f24442e103b45c45b3  bfdetect_src.tar.gz"           >> $MERGE_FOLDER/package/bfdetect/bfdetect.hash
-echo "sha256  81fcba02196e6a43ed6099e4a182a8b35ca60a0ac2ce1e9977cb3cf22f388e9d  clix-2013-03-30.tar.gz"        >> $MERGE_FOLDER/package/clix/clix.hash
-echo "sha256  5c8e66d4c478b6d7e58f4c842823a09125509bf6851017ff70e32b32ce95b01b  darkstat-3.0.722.tar.gz"       >> $MERGE_FOLDER/package/darkstat/darkstat.hash
-echo "sha256  16e80157ee62d0e257eca7b765e079946e8386205a4c360e87f5c23bb8626d99  ddclient-curl-3.8.3-08.tar.gz" >> $MERGE_FOLDER/package/ddclient/ddclient.hash
-echo "sha256  da4be7cf67e94572463b19e56850aa36dc4e39eb0d933d3688fe8574bb632409  ex-050325.tar.bz2"             >> $MERGE_FOLDER/package/ex-vi/ex-vi.hash
-echo "sha256  b90c40beb75308b0eba46b5add6e54a7a9e65ac90ce86ec8d78ae2a4bb8bae60  fossil-src-2.22.tar.gz"        >> $MERGE_FOLDER/package/fossil/fossil.hash
-echo "sha256  e3dd69c635e16a7d723dc5ae1c4c6ff4a216204fd8fc0f130eafc1022d303837  gntp-send-0.3.4.tar.gz"        >> $MERGE_FOLDER/package/gntp-send/gntp-send.hash
-echo "sha256  458c1b8fb3349076a6cecf26c29db1d561315d84e16bfcfba419f327f502e244  iksemel-1.4.tar.gz"            >> $MERGE_FOLDER/package/iksemel/iksemel.hash
-echo "sha256  85ba349ec5081c1fbbf3dae197fd162e70d18baa38b4e38a30e05b82b8a395ee  iprange-2.1.1.tar.gz"          >> $MERGE_FOLDER/package/iprange/iprange.hash
-echo "sha256  8956a72fa609057e9cb1df90c30505eebf30f37df386211779bfed5b3207a95a  oui-2026-09-16.txt"            >> $MERGE_FOLDER/package/mac2vendor/mac2vendor.hash
-echo "sha256  eb1cad5c63d6ead915c617b3da32ef97dc1e4272e73dd13af07bc75566ebf30c  2.2.4.tar.gz"                  >> $MERGE_FOLDER/package/sipgrep/sipgrep.hash
+sed -e 's@^ @sha256  6188d0f0c180db7a30467b5b6065a3cb5d2665b937d2e8c40366efb52bf689fe  beep-1.4.12.tar.gz@g'            -i $MERGE_FOLDER/package/beep/beep.hash
+sed -e 's@^ @sha256  6a3b917a8b7ec1229e62f681ad64699d1b7df298ba2875f24442e103b45c45b3  bfdetect_src.tar.gz@g'           -i $MERGE_FOLDER/package/bfdetect/bfdetect.hash
+sed -e 's@^ @sha256  81fcba02196e6a43ed6099e4a182a8b35ca60a0ac2ce1e9977cb3cf22f388e9d  clix-2013-03-30.tar.gz@g'        -i $MERGE_FOLDER/package/clix/clix.hash
+sed -e 's@^ @sha256  5c8e66d4c478b6d7e58f4c842823a09125509bf6851017ff70e32b32ce95b01b  darkstat-3.0.722.tar.gz@g'       -i $MERGE_FOLDER/package/darkstat/darkstat.hash
+sed -e 's@^ @sha256  16e80157ee62d0e257eca7b765e079946e8386205a4c360e87f5c23bb8626d99  ddclient-curl-3.8.3-08.tar.gz@g' -i $MERGE_FOLDER/package/ddclient/ddclient.hash
+sed -e 's@^ @sha256  da4be7cf67e94572463b19e56850aa36dc4e39eb0d933d3688fe8574bb632409  ex-050325.tar.bz2@g'             -i $MERGE_FOLDER/package/ex-vi/ex-vi.hash
+sed -e 's@^ @sha256  b90c40beb75308b0eba46b5add6e54a7a9e65ac90ce86ec8d78ae2a4bb8bae60  fossil-src-2.22.tar.gz@g'        -i $MERGE_FOLDER/package/fossil/fossil.hash
+sed -e 's@^ @sha256  e3dd69c635e16a7d723dc5ae1c4c6ff4a216204fd8fc0f130eafc1022d303837  gntp-send-0.3.4.tar.gz@g'        -i $MERGE_FOLDER/package/gntp-send/gntp-send.hash
+sed -e 's@^ @sha256  458c1b8fb3349076a6cecf26c29db1d561315d84e16bfcfba419f327f502e244  iksemel-1.4.tar.gz@g'            -i $MERGE_FOLDER/package/iksemel/iksemel.hash
+sed -e 's@^ @sha256  85ba349ec5081c1fbbf3dae197fd162e70d18baa38b4e38a30e05b82b8a395ee  iprange-2.1.1.tar.gz@g'          -i $MERGE_FOLDER/package/iprange/iprange.hash
+sed -e 's@^ @sha256  8956a72fa609057e9cb1df90c30505eebf30f37df386211779bfed5b3207a95a  oui-2026-09-16.txt@g'            -i $MERGE_FOLDER/package/mac2vendor/mac2vendor.hash
+sed -e 's@^ @sha256  eb1cad5c63d6ead915c617b3da32ef97dc1e4272e73dd13af07bc75566ebf30c  2.2.4.tar.gz@g'                  -i $MERGE_FOLDER/package/sipgrep/sipgrep.hash
 
 # below is bug fixes at package level
 # --- boot folder
